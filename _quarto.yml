@@ -7,6 +7,10 @@ execute:
 website:
   title: "emidm"
   navbar:
+    background: "#B39EB5"  # Background color for navbar (menu part)
+    alignment: "center"  # Center align menu items
+    pinned: true
+    back-to-top-navigation: true
     left:
       - text: Home
         href: index.qmd
