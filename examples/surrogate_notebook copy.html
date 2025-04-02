@@ -624,8 +624,8 @@ Note: you may need to restart the kernel to use updated packages.</code></pre>
 <h3 class="anchored" data-anchor-id="generating-training-and-test-data">Generating Training and Test Data</h3>
 <p>Now that we have seen how LHS is being used to sample different <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\gamma\)</span> parameters and to generate simulations, we will now generate training and test data in much the same way:</p>
 <div id="cell-25" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>n_train_samples <span class="op">=</span> <span class="dv">1000</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>n_test_samples <span class="op">=</span> <span class="dv">100</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>n_train_samples <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>n_test_samples <span class="op">=</span> <span class="dv">10</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># generate train samples and data</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>train_samples <span class="op">=</span> generate_lhs_samples(param_ranges, n_samples<span class="op">=</span>n_train_samples, seed<span class="op">=</span><span class="dv">42</span>)</span>
@@ -660,9 +660,6 @@ Note: you may need to restart the kernel to use updated packages.</code></pre>
 <p>While we have generated our training and test data, we need to prepare it into a PyTorch dataset and dataloader. The dataloader is a way of iterating through our data in batches, which is useful for training deep learning models. Batches are used to train the model in mini-batches, which is more efficient than training on the entire dataset at once. It also has the advantage of allowing us to use GPU acceleration if available.</p>
 <p>We have not created this dataset class yet in <code>emidm</code>, so that we can show you how it works, so we will do that next. We will also use this an opportunity to learn a bit more about PyTorch and also how (more often) Python leverages classes.</p>
 <p>First, let’s remind ourselves what our data looks like</p>
-<div id="cell-28" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test_data.__class__</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="dataset-and-scaling" class="level3">
 <h3 class="anchored" data-anchor-id="dataset-and-scaling">Dataset and Scaling</h3>
