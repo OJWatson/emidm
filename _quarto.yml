@@ -7,7 +7,7 @@ execute:
 website:
   title: "emidm"
   navbar:
-    background: "#B39EB5"  # Background color for navbar (menu part)
+    background: "#E6D1F2"  # Background color for navbar (menu part)
     alignment: "center"  # Center align menu items
     pinned: true
     back-to-top-navigation: true
@@ -24,6 +24,9 @@ website:
             href: examples/notebooks_intro.ipynb
           - text: "Surrogate Training"
             href: examples/surrogate_notebook.ipynb
+    tools:
+          - icon: github
+            href: https://github.com/OJWatson/emidm
 
 format:
   html:
