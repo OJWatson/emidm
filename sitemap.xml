@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://OJWatson.github.io/emidm/examples/surrogate_notebook.html</loc>
-    <lastmod>2025-04-02T16:27:30.417Z</lastmod>
-  </url>
-  <url>
-    <loc>https://OJWatson.github.io/emidm/slides/emidm_intro1.html</loc>
-    <lastmod>2025-04-02T16:27:30.417Z</lastmod>
-  </url>
-  <url>
-    <loc>https://OJWatson.github.io/emidm/index.html</loc>
-    <lastmod>2025-04-02T16:27:30.417Z</lastmod>
+    <loc>https://OJWatson.github.io/emidm/examples/surrogate_notebook copy.html</loc>
+    <lastmod>2025-04-02T17:14:40.764Z</lastmod>
   </url>
   <url>
     <loc>https://OJWatson.github.io/emidm/examples/notebooks_intro.html</loc>
-    <lastmod>2025-04-02T16:27:30.412Z</lastmod>
+    <lastmod>2025-04-02T17:14:40.759Z</lastmod>
+  </url>
+  <url>
+    <loc>https://OJWatson.github.io/emidm/index.html</loc>
+    <lastmod>2025-04-02T17:14:40.770Z</lastmod>
+  </url>
+  <url>
+    <loc>https://OJWatson.github.io/emidm/slides/emidm_intro1.html</loc>
+    <lastmod>2025-04-02T17:14:40.770Z</lastmod>
+  </url>
+  <url>
+    <loc>https://OJWatson.github.io/emidm/examples/surrogate_notebook.html</loc>
+    <lastmod>2025-04-02T17:14:40.770Z</lastmod>
   </url>
 </urlset>
