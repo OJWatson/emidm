@@ -231,62 +231,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
 <p>We will be using the helper functions in the <code>emidm</code> package, which will be installed and all relevant modules from this as well as other required packages loaded below in two steps.</p>
 <p>First we will install <code>emidm</code> from Github:</p>
-<div id="cell-4" class="cell" data-execution_count="1">
+<div id="cell-4" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>pip install git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>OJWatson<span class="op">/</span>emidm.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>2940.76s - pydevd: Sending message related to process being replaced timed-out after 5 seconds</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Defaulting to user installation because normal site-packages is not writeable
-Collecting git+https://github.com/OJWatson/emidm.git
-  Cloning https://github.com/OJWatson/emidm.git to /tmp/pip-req-build-fzvsb5ih
-  Running command git clone --filter=blob:none --quiet https://github.com/OJWatson/emidm.git /tmp/pip-req-build-fzvsb5ih
-  Resolved https://github.com/OJWatson/emidm.git to commit 9e6fd907955e51d38bea00b9d13767d2146a8ad1
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... error
-  error: subprocess-exited-with-error
-  
-  × Preparing metadata (pyproject.toml) did not run successfully.
-  │ exit code: 1
-  ╰─&gt; [14 lines of output]
-      Traceback (most recent call last):
-        File "/usr/lib/python3/dist-packages/pip/_vendor/pep517/in_process/_in_process.py", line 363, in &lt;module&gt;
-          main()
-        File "/usr/lib/python3/dist-packages/pip/_vendor/pep517/in_process/_in_process.py", line 345, in main
-          json_out['return_val'] = hook(**hook_input['kwargs'])
-        File "/usr/lib/python3/dist-packages/pip/_vendor/pep517/in_process/_in_process.py", line 164, in prepare_metadata_for_build_wheel
-          return hook(metadata_directory, config_settings)
-        File "/tmp/pip-build-env-j9vcxpvk/overlay/local/lib/python3.10/dist-packages/hatchling/build.py", line 117, in prepare_metadata_for_build_wheel
-          f.write(builder.config.core_metadata_constructor(builder.metadata))
-        File "/tmp/pip-build-env-j9vcxpvk/overlay/local/lib/python3.10/dist-packages/hatchling/metadata/spec.py", line 546, in construct_metadata_file_2_4
-          if metadata.core.license:
-        File "/tmp/pip-build-env-j9vcxpvk/overlay/local/lib/python3.10/dist-packages/hatchling/metadata/core.py", line 677, in license
-          from packaging.licenses import canonicalize_license_expression
-      ModuleNotFoundError: No module named 'packaging.licenses'
-      [end of output]
-  
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-error: metadata-generation-failed
-
-× Encountered error while generating package metadata.
-╰─&gt; See above for output.
-
-note: This is an issue with the package mentioned above, not pip.
-hint: See above for details.</code></pre>
-</div>
 </div>
 <p>Next we will import any required modules once here. If this works then the rest of the notebook should work 🤞:</p>
-<div id="cell-6" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports from the emidm package that we have just installed</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sampler <span class="im">import</span> generate_lhs_samples</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># imports from other packages</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># for those who like me prescrbe to Hadley Wickham's one truth of a grammar of graphics</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> ggplot, aes, geom_line, facet_wrap</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-6" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports from the emidm package that we have just installed</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sampler <span class="im">import</span> generate_lhs_samples</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># imports from other packages</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># for those who like me prescrbe to Hadley Wickham's one truth of a grammar of graphics</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> ggplot, aes, geom_line, facet_wrap</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="generate-simulation-data" class="level2">
@@ -294,12 +252,12 @@ hint: See above for details.</code></pre>
 <section id="running-a-single-sir-model-simulation" class="level3">
 <h3 class="anchored" data-anchor-id="running-a-single-sir-model-simulation">Running a Single SIR Model Simulation</h3>
 <p>We can use <code>emidm</code> to ssimulate the SIR model dynamics using default parameters:</p>
-<div id="cell-9" class="cell" data-outputid="37fd6c9f-85eb-4998-89ad-4f17e522fc7d" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Demonstrate running one model</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> run_sir()</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the output</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>single</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-9" class="cell" data-outputid="37fd6c9f-85eb-4998-89ad-4f17e522fc7d" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Demonstrate running one model</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> run_sir()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the output</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>single</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 
@@ -328,32 +286,32 @@ hint: See above for details.</code></pre>
 <td data-quarto-table-cell-role="th">1</td>
 <td>1</td>
 <td>1000</td>
-<td>987</td>
-<td>13</td>
+<td>989</td>
+<td>11</td>
 <td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>2</td>
 <td>1000</td>
-<td>985</td>
-<td>14</td>
+<td>986</td>
+<td>13</td>
 <td>1</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>3</td>
 <td>1000</td>
-<td>982</td>
+<td>983</td>
 <td>15</td>
-<td>3</td>
+<td>2</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>4</td>
 <td>1000</td>
-<td>980</td>
-<td>14</td>
+<td>978</td>
+<td>16</td>
 <td>6</td>
 </tr>
 <tr class="even">
@@ -368,41 +326,41 @@ hint: See above for details.</code></pre>
 <td data-quarto-table-cell-role="th">96</td>
 <td>96</td>
 <td>1000</td>
-<td>185</td>
-<td>15</td>
-<td>800</td>
+<td>179</td>
+<td>13</td>
+<td>808</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">97</td>
 <td>97</td>
 <td>1000</td>
-<td>184</td>
-<td>16</td>
-<td>800</td>
+<td>179</td>
+<td>12</td>
+<td>809</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">98</td>
 <td>98</td>
 <td>1000</td>
-<td>183</td>
-<td>17</td>
-<td>800</td>
+<td>177</td>
+<td>14</td>
+<td>809</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">99</td>
 <td>99</td>
 <td>1000</td>
-<td>182</td>
-<td>18</td>
-<td>800</td>
+<td>176</td>
+<td>15</td>
+<td>809</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">100</td>
 <td>100</td>
 <td>1000</td>
-<td>181</td>
-<td>17</td>
-<td>802</td>
+<td>175</td>
+<td>14</td>
+<td>811</td>
 </tr>
 </tbody>
 </table>
@@ -413,9 +371,9 @@ hint: See above for details.</code></pre>
 </div>
 <p>The output is a <code>pandas DataFrame</code> containing the number of susceptible (S), infected (I), and recovered (R) individuals over time.</p>
 <p>To visualize the results:</p>
-<div id="cell-11" class="cell" data-outputid="5673c5e4-1c9a-4331-a1f2-91173d7b116e" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show a single plot line</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>single.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-11" class="cell" data-outputid="5673c5e4-1c9a-4331-a1f2-91173d7b116e" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show a single plot line</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>single.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -425,10 +383,10 @@ hint: See above for details.</code></pre>
 </div>
 </div>
 <p>We can adjust parameters such as the transmission rate (<code>beta</code>) to observe different dynamics:</p>
-<div id="cell-13" class="cell" data-outputid="2f008828-6c6d-42bd-a05d-d2fee2bd5876" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also vary the parameters and plot these outputs</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>alt <span class="op">=</span> run_sir(beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>alt.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-13" class="cell" data-outputid="2f008828-6c6d-42bd-a05d-d2fee2bd5876" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also vary the parameters and plot these outputs</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>alt <span class="op">=</span> run_sir(beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>alt.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -441,12 +399,12 @@ hint: See above for details.</code></pre>
 <section id="running-multiple-stochastic-realisations" class="level3">
 <h3 class="anchored" data-anchor-id="running-multiple-stochastic-realisations">Running Multiple Stochastic Realisations</h3>
 <p>To account for stochasticity, we can run multiple realizations of the model:</p>
-<div id="cell-15" class="cell" data-outputid="51531c84-b956-49bb-ff8a-12f77fb16a99" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can run multiple realisations</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model <span class="op">=</span> run_sir, reps <span class="op">=</span> <span class="dv">10</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and plot these - ahhh a ggplot my friend</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> plot_model_outputs(reps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-15" class="cell" data-outputid="51531c84-b956-49bb-ff8a-12f77fb16a99" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can run multiple realisations</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model <span class="op">=</span> run_sir, reps <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and plot these - ahhh a ggplot my friend</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> plot_model_outputs(reps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -456,12 +414,12 @@ hint: See above for details.</code></pre>
 </div>
 </div>
 <p>And we can also pass through any of the arguments to <code>run_sir</code> to our <code>run_model_with_replicates</code> function.</p>
-<div id="cell-17" class="cell" data-outputid="abae7569-db28-475c-fd5d-7130ea8806ab" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also by args to run_sir through kwargs</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model<span class="op">=</span>run_sir, reps<span class="op">=</span><span class="dv">10</span>, beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and plot these</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> plot_model_outputs(reps, columns <span class="op">=</span> [<span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-17" class="cell" data-outputid="abae7569-db28-475c-fd5d-7130ea8806ab" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also by args to run_sir through kwargs</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model<span class="op">=</span>run_sir, reps<span class="op">=</span><span class="dv">10</span>, beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and plot these</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> plot_model_outputs(reps, columns <span class="op">=</span> [<span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -477,13 +435,13 @@ hint: See above for details.</code></pre>
 <section id="sampling-parameter-space-with-latin-hypercube-sampling" class="level3">
 <h3 class="anchored" data-anchor-id="sampling-parameter-space-with-latin-hypercube-sampling">Sampling Parameter Space with Latin Hypercube Sampling</h3>
 <p>To systematically explore the parameter space, we use Latin Hypercube Sampling (LHS), which we have again provided helper functions from <code>emidm</code> for you to use.</p>
-<div id="cell-20" class="cell" data-outputid="4f0d96d4-d00c-4bf2-c2b9-1e4f92b9f269" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start by providing a dictionary of the ranges for each parameter to be sampled</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>param_ranges <span class="op">=</span> {<span class="st">"beta"</span>: [<span class="fl">0.1</span>, <span class="fl">0.5</span>], <span class="st">"gamma"</span>: [<span class="fl">0.05</span>, <span class="fl">0.5</span>]}</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Latin Hypercube Samples</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>df_samples <span class="op">=</span> generate_lhs_samples(param_ranges, n_samples<span class="op">=</span><span class="dv">9</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df_samples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-20" class="cell" data-outputid="4f0d96d4-d00c-4bf2-c2b9-1e4f92b9f269" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start by providing a dictionary of the ranges for each parameter to be sampled</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>param_ranges <span class="op">=</span> {<span class="st">"beta"</span>: [<span class="fl">0.1</span>, <span class="fl">0.5</span>], <span class="st">"gamma"</span>: [<span class="fl">0.05</span>, <span class="fl">0.5</span>]}</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Latin Hypercube Samples</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df_samples <span class="op">=</span> generate_lhs_samples(param_ranges, n_samples<span class="op">=</span><span class="dv">9</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>df_samples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 
@@ -549,52 +507,52 @@ hint: See above for details.</code></pre>
 </div>
 </div>
 <p>This generates a set of parameter combinations, which we can then pass to our <code>run_model_with_replicates</code> function. We have just used 9 samples here initially just to show you the outputs and understand it. Later we will generate more to build a robust training dataset.</p>
-<div id="cell-22" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model for each row of samples:</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> [</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    run_model_with_replicates(<span class="op">**</span>row.to_dict(), reps<span class="op">=</span><span class="dv">10</span>).assign(<span class="op">**</span>row.to_dict())</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> df_samples.iterrows()</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine results into one DataFrame:</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df_all_results <span class="op">=</span> pd.concat(results, axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-22" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model for each row of samples:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> [</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    run_model_with_replicates(<span class="op">**</span>row.to_dict(), reps<span class="op">=</span><span class="dv">10</span>).assign(<span class="op">**</span>row.to_dict())</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> df_samples.iterrows()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine results into one DataFrame:</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>df_all_results <span class="op">=</span> pd.concat(results, axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-23" class="cell" data-outputid="0905793c-5fd3-40df-f68e-d143d7346903" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape dataframe into tidy long-format</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_all_results.melt(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    id_vars<span class="op">=</span>[<span class="st">"t"</span>, <span class="st">"replicate"</span>, <span class="st">"gamma"</span>, <span class="st">"beta"</span>],</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    value_vars<span class="op">=</span>[<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>],</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    var_name<span class="op">=</span><span class="st">"Compartment"</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    value_name<span class="op">=</span><span class="st">"Value"</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add unique identifier for group plotting</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_long.assign(</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    uid<span class="op">=</span>df_long[<span class="st">"Compartment"</span>]</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"replicate"</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Add facet identifier for group plotting</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_long.assign(</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    facet<span class="op">=</span><span class="st">"beta = "</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"beta"</span>].<span class="bu">round</span>(<span class="dv">3</span>).astype(<span class="bu">str</span>)</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="st">",</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="st">"gamma = "</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"gamma"</span>].<span class="bu">round</span>(<span class="dv">3</span>).astype(<span class="bu">str</span>)</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: color by compartment, lines grouped by replicate</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> (</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    ggplot(</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>        df_long,</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>        aes(x<span class="op">=</span><span class="st">"t"</span>, y<span class="op">=</span><span class="st">"Value"</span>, group<span class="op">=</span><span class="st">"uid"</span>, color<span class="op">=</span><span class="st">"Compartment"</span>),</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> geom_line(alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> facet_wrap(<span class="st">"facet"</span>)</span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Explicitly plot</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>ggplot.show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-23" class="cell" data-outputid="0905793c-5fd3-40df-f68e-d143d7346903" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape dataframe into tidy long-format</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_all_results.melt(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    id_vars<span class="op">=</span>[<span class="st">"t"</span>, <span class="st">"replicate"</span>, <span class="st">"gamma"</span>, <span class="st">"beta"</span>],</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    value_vars<span class="op">=</span>[<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>],</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    var_name<span class="op">=</span><span class="st">"Compartment"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    value_name<span class="op">=</span><span class="st">"Value"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add unique identifier for group plotting</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_long.assign(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    uid<span class="op">=</span>df_long[<span class="st">"Compartment"</span>]</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"replicate"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Add facet identifier for group plotting</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_long.assign(</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    facet<span class="op">=</span><span class="st">"beta = "</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"beta"</span>].<span class="bu">round</span>(<span class="dv">3</span>).astype(<span class="bu">str</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="st">",</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="st">"gamma = "</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> df_long[<span class="st">"gamma"</span>].<span class="bu">round</span>(<span class="dv">3</span>).astype(<span class="bu">str</span>)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: color by compartment, lines grouped by replicate</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> (</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    ggplot(</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>        df_long,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>        aes(x<span class="op">=</span><span class="st">"t"</span>, y<span class="op">=</span><span class="st">"Value"</span>, group<span class="op">=</span><span class="st">"uid"</span>, color<span class="op">=</span><span class="st">"Compartment"</span>),</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> geom_line(alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> facet_wrap(<span class="st">"facet"</span>)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Explicitly plot</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>ggplot.show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
