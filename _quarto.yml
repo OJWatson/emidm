@@ -32,3 +32,6 @@ format:
   html:
     theme: cosmo
     css: styles.css  # Optional: Add custom CSS if desired
+    toc: true
+    toc-location: right
+    toc-depth: 3
