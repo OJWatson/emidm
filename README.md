@@ -1,6 +1,6 @@
 <!-- badges: start -->
 
-![Quarto Website Publish](https://github.com/ojwatson/emidm.io/actions/workflows/publish.yml/badge.svg)
+![Quarto Website Publish](https://github.com/ojwatson/emidm/actions/workflows/publish.yml/badge.svg)
 [![Website](https://img.shields.io/badge/View-Website-blue?logo=githubpages&style=flat-square)](https://ojwatson.github.io/emidm/)
 
 # emidm
