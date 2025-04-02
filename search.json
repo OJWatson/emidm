@@ -1,0 +1,198 @@
+[
+  {
+    "objectID": "examples/surrogate_notebook.html",
+    "href": "examples/surrogate_notebook.html",
+    "title": "Training Surrogates",
+    "section": "",
+    "text": "Open In Colab\n\n\n\n!git clone https://github.com/OJWatson/emidm.git\n%cd emidm\n!pip install .\n\n\n# Imports from our own package\nfrom emidm.sir import run_sir, run_model_with_replicates, plot_model_outputs\nfrom emidm.sampler import generate_lhs_samples\nimport pandas as pd\nfrom plotnine import ggplot, aes, geom_line, facet_wrap\n\n\n# Demonstrate running one model\nsingle = run_sir()\n\n# Show the output\nsingle\n\n\n\n\n\n\n\n\nt\nN\nS\nI\nR\n\n\n\n\n0\n0\n1000\n990\n10\n0\n\n\n1\n1\n1000\n984\n16\n0\n\n\n2\n2\n1000\n981\n16\n3\n\n\n3\n3\n1000\n977\n16\n7\n\n\n4\n4\n1000\n974\n18\n8\n\n\n...\n...\n...\n...\n...\n...\n\n\n96\n96\n1000\n223\n16\n761\n\n\n97\n97\n1000\n221\n14\n765\n\n\n98\n98\n1000\n220\n14\n766\n\n\n99\n99\n1000\n220\n14\n766\n\n\n100\n100\n1000\n220\n12\n768\n\n\n\n\n101 rows × 5 columns\n\n\n\n\n# Show a single plot line\nsingle.plot(\"t\", [\"S\", \"I\", \"R\"])\n\n\n\n\n\n\n\n\n\n# We can also vary the parameters\nalt = run_sir(beta = 0.3)\nalt.plot(\"t\", [\"S\", \"I\", \"R\"])\n\n\n\n\n\n\n\n\n\n# we can run multiple realisations\nreps = run_model_with_replicates(model = run_sir, reps = 10)\n\n# and plot these\np = plot_model_outputs(reps)\n\n\n\n\n\n\n\n\n\n# we can also by args to run_sir through kwargs\nreps = run_model_with_replicates(model=run_sir, reps=10, beta = 0.3)\n\n# and plot these\np = plot_model_outputs(reps, columns = [\"I\", \"R\"])\n\n\n\n\n\n\n\n\n\n# now to generate a lhs sample\nparam_ranges = {\"beta\": [0.1, 0.5], \"gamma\": [0.05, 0.5]}\ndf_samples = generate_lhs_samples(param_ranges, n_samples=9, seed=42)\ndf_samples\n\n\n\n\n\n\n\n\nbeta\ngamma\n\n\n\n\n0\n0.376713\n0.228056\n\n\n1\n0.150729\n0.165132\n\n\n2\n0.229148\n0.351219\n\n\n3\n0.421727\n0.310697\n\n\n4\n0.272084\n0.127481\n\n\n5\n0.350187\n0.253662\n\n\n6\n0.471384\n0.458862\n\n\n7\n0.302515\n0.088638\n\n\n8\n0.119796\n0.446809\n\n\n\n\n\n\n\n\n# Run the model for each row of samples:\nresults = [\n    run_model_with_replicates(**row.to_dict(), reps=10).assign(**row.to_dict())\n    for _, row in df_samples.iterrows()\n]\n\n# Combine results into one DataFrame:\ndf_all_results = pd.concat(results, axis=0)\n\n\n# Reshape dataframe into tidy long-format\ndf_long = df_all_results.melt(\n    id_vars=[\"t\", \"replicate\", \"gamma\", \"beta\"],\n    value_vars=[\"S\", \"I\", \"R\"],\n    var_name=\"Compartment\",\n    value_name=\"Value\",\n)\n\n# Add unique identifier for group plotting\ndf_long = df_long.assign(\n    uid=df_long[\"Compartment\"]\n    + df_long[\"replicate\"].astype(str)\n)\n\n# Add facet identifier for group plotting\ndf_long = df_long.assign(\n    facet=\"beta = \"\n    + df_long[\"beta\"].round(3).astype(str)\n    + \",\\n\"\n    + \"gamma = \"\n    + df_long[\"gamma\"].round(3).astype(str)\n)\n\n# Plot: color by compartment, lines grouped by replicate\np = (\n    ggplot(\n        df_long,\n        aes(x=\"t\", y=\"Value\", group=\"uid\", color=\"Compartment\"),\n    )\n    + geom_line(alpha=0.7)\n    + facet_wrap(\"facet\")\n)\n\n# Explicitly plot\nggplot.show(p)"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#python-vs-r-syntax-structure-reminders",
+    "href": "slides/emidm_intro1.html#python-vs-r-syntax-structure-reminders",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Python vs R: Syntax & Structure Reminders",
+    "text": "Python vs R: Syntax & Structure Reminders\n\nSyntax: Python uses indentation instead of {}. No &lt;- assignment (use =).\nIndexing: Python indices start at 0 (R starts at 1). Slicing in Python excludes end index.\nData structures: Python has lists, dicts, tuples (vs R’s vectors, lists, data frames). Python lists are heterogeneous like R lists.\nExample:\n\nIn Python, mylist = [10, 20, 30]; mylist[0] = 10.\nIn R, myvec &lt;- c(10,20,30); myvec[1] = 10."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#python-vs-r-deeper-overview",
+    "href": "slides/emidm_intro1.html#python-vs-r-deeper-overview",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Python vs R: Deeper Overview",
+    "text": "Python vs R: Deeper Overview\n\nPython Workshop: Jesse and Paul python-workshop\n\n\n\n\nFeature\nR\nPython\n\n\n\n\nwhitespace\nignored\nmeaningful\n\n\ndata frames & stats\nout-of-box\nneed package\n\n\npackages\nfussy\neasy\n\n\noperate on language\nyes\nno\n\n\nmodifying variables\ncopy-on-modify\nmodify-in-place\n\n\nvariable assignment\n&lt;- (madness)\n= (sane)\n\n\n\n\nOJ Reflections on Above Table: 🤔"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#python-vs-r-deeper-overview-1",
+    "href": "slides/emidm_intro1.html#python-vs-r-deeper-overview-1",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Python vs R: Deeper Overview",
+    "text": "Python vs R: Deeper Overview\n\nPython Workshop: Jesse and Paul python-workshop\nOJ Edits on Table: 🤔\n\n\n\n\nFeature\nR\nPython\n\n\n\n\nplotting\nheavenly\nhell\n\n\ndocumentation\nroxygen❤️\ndocstrings😒\n\n\ndependencies hell 😈\nmoderate\nfrequent\n\n\nvirtual environments\nless often\nstandard"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#what-is-positron",
+    "href": "slides/emidm_intro1.html#what-is-positron",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "What is Positron?",
+    "text": "What is Positron?\n\nPositron is a next-generation IDE from Posit (RStudio) built on VS Code, tailored for data science. It feels like a blend of RStudio and VSCode in one interface.\nPolyglot support: Comes configured for both R and Python out of the box – you can run R scripts and Jupyter Python notebooks in the same environment.\nFamiliar interface: Shares RStudio’s layout (source, console, plots, environment) with VSCode’s extensibility. This makes the transition easier for R users.\nWhy use it? Simplifies working on projects that use R and Python together, without switching IDEs. Familiiar IDE experience for R users learning/transitioning to Python.\n\n(Positron) Positron IDE combines a Visual Studio Code foundation with an RStudio-like layout, supporting multi-language notebooks and scripts (R and Python) seamlessly."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#benefits-for-r-users",
+    "href": "slides/emidm_intro1.html#benefits-for-r-users",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Benefits for R Users",
+    "text": "Benefits for R Users\n\nUnified Workflow: Work with .R and .py files in one place, share workspace and variables. For example, run an R analysis then a Python machine learning step in one project.\nJupyter integration: Built-in support for Jupyter notebooks (no separate JupyterLab needed).\nExtensions: Leverage VSCode extensions (linting, Git integration, etc.) in Positron. Most VSCode extensions (except a few Microsoft-specific) are available (Fun with Positron | Andrew Heiss – Andrew Heiss).\nTransition ease: Minimal setup – Positron auto-detects R and Python installations. Familiar shortcuts (e.g. Ctrl+Enter to run code) work for both languages.\nREPL-like development experience: Positron has a REPL-style development environment, similar to RStudio. You can run code, see results, and modify the environment as you go, putting you closer to understanding the code you write.\nBottom line: Positron lowers the barrier for R programmers to start incorporating Python into their workflow within a single IDE."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#what-is-deep-learning",
+    "href": "slides/emidm_intro1.html#what-is-deep-learning",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "What is Deep Learning?",
+    "text": "What is Deep Learning?\n\nDefinition: Deep learning is a subset of machine learning that uses multi-layered neural networks to simulate complex decision-making, akin to the human brain (What Is Deep Learning? | IBM).\nKey idea: Instead of manual feature engineering, a deep neural network learns representations through layers of neurons.\nWhy it matters: Achieved breakthroughs in image recognition, natural language processing, etc. – many AI applications today are powered by deep learning (What Is Deep Learning? | IBM) (What Is Deep Learning? | IBM).\nExamples: Digital assistants (speech recognition), fraud detection, medical image analysis, and even epidemic forecasting models have benefited from deep learning techniques (What Is Deep Learning? | IBM).\nIn short: Deep learning can automatically extract complex patterns from data, making it extremely powerful for modeling nonlinear relationships."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#key-concepts-neural-networks",
+    "href": "slides/emidm_intro1.html#key-concepts-neural-networks",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Key Concepts: Neural Networks",
+    "text": "Key Concepts: Neural Networks\n\nNeurons & Layers: Basic unit is a neuron (takes inputs, applies weights and activation). Neurons are organized into layers (input layer -&gt; hidden layers -&gt; output layer). Multiple hidden layers = a “deep” network.\nActivation Functions: Non-linear functions applied at neurons (e.g. ReLU, sigmoid). They enable networks to learn complex non-linear mappings.\nLoss Function: Metric that quantifies error between the network’s prediction and true values (e.g. mean squared error, cross-entropy). The network’s goal is to minimize this during training.\nForward Propagation: Data flows through the network layer by layer to produce an output (prediction) (What Is Deep Learning? | IBM).\nBackpropagation: The training algorithm – compute the loss, then propagate the error gradients backward adjusting weights (via gradient descent) (What Is Deep Learning? | IBM). This is how the network “learns” from mistakes.\nOptimization: An optimizer (SGD, Adam, etc.) uses those gradients to update weights iteratively, gradually improving the model’s performance."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#training-process-recap",
+    "href": "slides/emidm_intro1.html#training-process-recap",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Training Process Recap",
+    "text": "Training Process Recap\n\nInitialize weights (often random small values).\nForward pass: Input data -&gt; compute outputs and loss.\nBackward pass: Compute gradients of loss w.rt each weight (this is automatic via backpropagation).\nWeight update: Adjust weights using gradients (optimizer step).\nIterate: Repeat for many epochs (passes through data) until loss converges or performance is sufficient.\nResult: A trained neural network model that hopefully generalizes to new data.\nThroughout training, we monitor metrics on a validation set to avoid overfitting. If validation performance plateaus or worsens, we consider techniques like early stopping or regularization."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#what-is-pytorch",
+    "href": "slides/emidm_intro1.html#what-is-pytorch",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "What is PyTorch?",
+    "text": "What is PyTorch?\n\nPyTorch is an open-source deep learning framework based on Python (and Torch library). It’s one of the most popular platforms for deep learning research and deployment (What is PyTorch?).\nDeveloped by researchers at Facebook (Meta) in 2016, it accelerated from prototyping to production with a flexible, pythonic approach (What is PyTorch?) (What is PyTorch?).\nDynamic computation graph: PyTorch uses a “define-by-run” approach – the neural network graph is built on the fly as you run code, making it intuitive to debug and modify.\nWhy PyTorch?\n\nEasy to learn: Pythonic API feels natural if you know Python.\nFlexibility: Define complex models imperatively (no static graphs).\nCommunity & Ecosystem: Huge community, lots of pre-trained models and tutorials. Backed by Meta and the open-source community (now part of Linux Foundation).\n\nUsage: Widely used in academia and industry (Meta uses PyTorch to power all its AI workloads (What is PyTorch?)). It has become a go-to framework for computer vision, NLP, and many scientific applications."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#core-components-of-pytorch",
+    "href": "slides/emidm_intro1.html#core-components-of-pytorch",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Core Components of PyTorch",
+    "text": "Core Components of PyTorch\n\nTensor: Fundamental data structure in PyTorch. A tensor is a homogeneous multi-dimensional array (similar to a NumPy array) that can be processed on CPU or GPU (PyTorch - Wikipedia).\n\nExample: torch.tensor([[1,2],[3,4]]) is a 2x2 tensor of integers.\n\nAutograd: PyTorch’s automatic differentiation engine. It records operations on tensors so that gradients can be computed via backpropagation. This means if you have a loss computed from tensors, you can call .backward() to get gradients of all parameters – no manual calculus needed.\nnn Module: High-level neural network APIs. torch.nn provides building blocks like layers (Linear, Conv2d, LSTM, etc.), activation functions, loss functions, etc., to easily build complex networks (PyTorch - Wikipedia).\n\nYou define a neural network as a class inheriting nn.Module, compose layers in the constructor, and define the forward pass. PyTorch takes care of gradient computation for the parameters.\n\nOptimizers: torch.optim has algorithms like SGD, Adam for updating model parameters based on computed gradients.\nDataLoader: Utility to load and batch your dataset conveniently, with shuffling and parallel loading.\nIn summary: PyTorch provides the pieces (tensors + autograd + nn modules) to build and train neural networks efficiently, abstracting away much of the math and boilerplate."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#pytorch-in-action-basic-operations",
+    "href": "slides/emidm_intro1.html#pytorch-in-action-basic-operations",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "PyTorch in Action: Basic Operations",
+    "text": "PyTorch in Action: Basic Operations\nLet’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:\n\nimport torch\n\n# Create a tensor with gradient tracking\nx = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)\n# Perform operations on the tensor\ny = x * 2  # y = [2.0, 4.0, 6.0]\ny_sum = y.sum()  # y_sum = 12.0 (scalar tensor)\n# Compute gradients (dy_sum/dx)\ny_sum.backward()  # backpropagate through the computation\nprint(x.grad)  # Gradient of y_sum w.r.t x\n# Expected output: tensor([2., 2., 2.])\n\ntensor([2., 2., 2.])\n\n\n\nIn this example, y = 2*x, and y_sum = 2*x1 + 2*x2 + 2*x3. The gradient ∂(y_sum)/∂x = [2, 2, 2], which PyTorch computes for us.\nThis illustrates how autograd frees us from manual gradient derivation. We can then use these gradients in an optimizer to update x (or, typically, model parameters) during training.\nPyTorch’s imperative style means we used standard Python control flow to compute y and y_sum. The framework built the computation graph dynamically and handled differentiation under the hood."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#why-ai-in-epidemiology",
+    "href": "slides/emidm_intro1.html#why-ai-in-epidemiology",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Why AI in Epidemiology?",
+    "text": "Why AI in Epidemiology?\n\nData-driven insights: Infectious disease modeling traditionally relies on differential equations and statistical models. Machine learning (ML) offers an alternative approach to identify patterns in epidemiological data (e.g. forecasting outbreaks from trends).\nDeep learning advantages: Ability to model complex, non-linear relationships. For instance, neural networks can capture patterns in time-series infection data that might be hard to specify in a parametric model.\nLarge Development Community: PyTorch has a large and active community, with many pre-trained models and tutorials. Other popular tools such as Jax/flax underpin the development by large tech companies like Google and Meta, which likely predicates a more robust ecosystem and rapid development and contributions from the community."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#why-ai-in-epidemiology-1",
+    "href": "slides/emidm_intro1.html#why-ai-in-epidemiology-1",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Why AI in Epidemiology?",
+    "text": "Why AI in Epidemiology?\n\nEnhancing traditional models: AI can be combined with mechanistic models. For example, researchers have integrated neural networks with compartmental models to help estimate parameters that are hard to infer otherwise (Epi-DNNs: Epidemiological priors informed deep neural networks for modeling COVID-19 dynamics - PMC). This can merge domain knowledge (e.g. SIR model structure) with data-driven flexibility.\nPhysics-informed NN: There is a trend of physics-informed neural networks for epidemic forecasting (Physics-informed deep learning for infectious disease forecasting) – these models incorporate the known dynamics (e.g. equations of disease spread) into the training of a neural network, ensuring predictions that respect known laws while still learning from data."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#why-ai-in-epidemiology-2",
+    "href": "slides/emidm_intro1.html#why-ai-in-epidemiology-2",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Why AI in Epidemiology?",
+    "text": "Why AI in Epidemiology?\n\nSurrogate models: Using AI to approximate the input-output behavior of complex simulation models. This is particularly useful to speed up scenario analysis in infectious disease simulations that would otherwise be computationally intensive.\nIt is likely going to be everywhere: Artificial intelligence for modelling infectious disease epidemics"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#surrogate-modeling-bridging-simulation-and-ai",
+    "href": "slides/emidm_intro1.html#surrogate-modeling-bridging-simulation-and-ai",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Surrogate Modeling: Bridging Simulation and AI",
+    "text": "Surrogate Modeling: Bridging Simulation and AI\n\nWhat is a surrogate model? It’s an AI model trained to emulate another process or simulation. For infectious diseases, a surrogate model can learn to reproduce the outcomes of a complex epidemic simulation (e.g. an agent-based model or a stochastic SIR model), given certain inputs, but much faster.\nWhy use it? Simulations (especially stochastic ones) can be slow when exploring many scenarios or doing real-time forecasting. A surrogate (once trained) runs almost instantly, allowing rapid experimentation or even real-time applications (like outbreak forecast updates).\nIn epidemiology: Surrogates can learn the mapping from disease parameters (like transmission rate, recovery rate) to outputs of interest (like peak infected, time series of infections). Then we can query the surrogate for any parameter combination instead of rerunning the simulation.\nConsiderations: Surrogate models need a comprehensive training dataset from the simulation (covering the range of scenarios). They should be validated to ensure they accurately reflect the simulation’s behavior, especially in the regime of interest (e.g. epidemic growth vs decline phases)."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#case-study-surrogating-a-stochastic-sir-model",
+    "href": "slides/emidm_intro1.html#case-study-surrogating-a-stochastic-sir-model",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Case Study: Surrogating a Stochastic SIR Model",
+    "text": "Case Study: Surrogating a Stochastic SIR Model\n\nWe’ll use the classic SIR model (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.\n\n\nfrom emidm.sir import run_sir, run_model_with_replicates, plot_model_outputs\nplot_model_outputs(run_model_with_replicates(run_sir, reps=10))"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#building-the-surrogate",
+    "href": "slides/emidm_intro1.html#building-the-surrogate",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Building the Surrogate",
+    "text": "Building the Surrogate\n\n1. Generate simulation data: Sample a range of parameter sets (e.g. transmission rate β, recovery rate γ, possibly initial population sizes). For each set, run the SIR simulation and record the resulting infection curves (S(t), I(t), R(t) over time).\n2. Prepare training dataset: From these runs, construct input-output pairs for learning. One approach is to provide the parameters (β, γ, time t) as inputs and the corresponding S, I, R at that time as outputs. (Alternatively, train a model that directly outputs the entire time-series given β and γ.)\n3. Train a neural network: Use PyTorch to define a network (for example, a simple feed-forward network or an RNN) that takes in parameters (and time) and outputs the state. Train it on the simulation data by minimizing the error between the network’s predicted epidemic curve and the simulation’s actual values.\n4. Validate the model: Test the surrogate on simulation runs it hasn’t seen. Check that it can predict the trajectory for new β, γ with reasonable accuracy (e.g., the peak and timing of infections match the simulation).\n5. Use the surrogate: Now you have a fast approximation of the SIR model. You can sweep through parameter space quickly, perform uncertainty quantification (by sampling many β, γ from distributions and getting outcomes rapidly), or embed this surrogate inside larger frameworks (e.g., optimization or real-time forecasting systems)."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#surrogate-model-visualization-validation",
+    "href": "slides/emidm_intro1.html#surrogate-model-visualization-validation",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Surrogate Model Visualization (Validation)",
+    "text": "Surrogate Model Visualization (Validation)\n\nOnce trained, we can visualize how well the surrogate matches the actual simulation:\n\nPlot the infection curve from the true simulation and the surrogate’s predicted curve for a few test parameter sets. Ideally, they overlap closely.\nPlot predicted vs actual values (parity plot) for key outcomes (e.g. final epidemic size, peak infection) to quantify accuracy.\n\nIf the surrogate is accurate, we can be confident using it for further experiments. For example, we could vary β continuously and see how peak infection changes, using the surrogate outputs instantly rather than running hundreds of simulations.\nIt’s also insightful to examine the surrogate’s learned parameters. In the SEINN example, the network inferred β and γ. If those learned values align with the true parameters used in simulation, it validates that the network not only predicts well but also captures the underlying epidemic parameters."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#surrogate-notebook",
+    "href": "slides/emidm_intro1.html#surrogate-notebook",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Surrogate Notebook",
+    "text": "Surrogate Notebook\nTraining Surrogates"
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#conditional-variational-autoencoders-cvaes.-what-is-a-cvae",
+    "href": "slides/emidm_intro1.html#conditional-variational-autoencoders-cvaes.-what-is-a-cvae",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Conditional Variational Autoencoders (cVAEs). What is a cVAE?",
+    "text": "Conditional Variational Autoencoders (cVAEs). What is a cVAE?\n\nA Conditional Variational Autoencoder (cVAE) is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process (Conditional Variational Autoencoders).\nRecap VAE: A VAE consists of an encoder that compresses input data into a latent distribution (usually a Gaussian in a low-dimensional space) and a decoder that reconstructs data from a sample of that latent distribution. It’s trained to reconstruct inputs while keeping latent variables meaningful (via a KL divergence regularization).\nConditional part: In a cVAE, we “condition” both encoder and decoder on some extra context. For example, when dealing with images of digits, we can provide the digit label as a condition. The encoder then learns latent variables given that label, and the decoder can generate data conditioned on a specific label (Conditional Variational Autoencoders).\nEffect: This allows directed generation – e.g., “generate samples that look like digit 5” or, in our context, “generate epidemic curves under a certain scenario”. The latent space then captures variations other than the condition.\n\nFor digits, the label fixes which digit, and the latent variables can capture style (thickness of writing, slant, etc.) (Conditional Variational Autoencoders).\nFor epidemics, one could imagine conditioning on, say, the basic reproduction number \\(R_0\\) or other known factors, and the latent variables capture random effects or unknown influences.\n\nUncertainty modeling: cVAEs are useful for representing uncertainty. Instead of a single prediction, a cVAE can generate a distribution of possible outcomes for a given condition. For instance, given an initial infection count and \\(R_0\\), a cVAE could generate many possible epidemic trajectories (reflecting stochastic variations)."
+  },
+  {
+    "objectID": "slides/emidm_intro1.html#potential-application-of-cvae-in-epidemiology",
+    "href": "slides/emidm_intro1.html#potential-application-of-cvae-in-epidemiology",
+    "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
+    "section": "Potential Application of cVAE in Epidemiology",
+    "text": "Potential Application of cVAE in Epidemiology\n\nScenario: We have many observed epidemic curves (from simulations or real data) under various conditions (e.g. different intervention strategies). We want to model the distribution of epidemic outcomes for a new condition.\nUsing cVAE: We could train a cVAE where:\n\nThe input to the encoder is an epidemic trajectory with its condition (e.g. “with lockdown” vs “no lockdown”).\nThe condition is also fed into the decoder.\nThe cVAE learns a latent space of other factors (like unobserved socio-behavioral factors or stochastic effects).\n\nOnce trained, for a given condition (say “lockdown from day 30”), we can sample different latent vectors to generate a variety of plausible epidemic curves that all reflect that condition. This gives a principled way to explore uncertainty and variability in outcomes.\nWhy cVAE? Unlike a standard deterministic model, a cVAE provides a distribution of outcomes, not just one. This is valuable for risk assessment – e.g., what’s the worst-case scenario vs best-case scenario under a specific intervention?\nNote: This is an advanced technique and an active research area. It combines deep learning’s generative power with the need in epidemiology to quantify uncertainty."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "emidm",
+    "section": "",
+    "text": "Installation\nExample Usage\nLicense"
+  },
+  {
+    "objectID": "index.html#table-of-contents",
+    "href": "index.html#table-of-contents",
+    "title": "emidm",
+    "section": "",
+    "text": "Installation\nExample Usage\nLicense"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "emidm",
+    "section": "Installation",
+    "text": "Installation\npip install git+https://github.com/OJWatson/emidm.git\nOr\ngit clone https://github.com/OJWatson/emidm.git\ncd emidm\npip install ."
+  },
+  {
+    "objectID": "index.html#example-usage",
+    "href": "index.html#example-usage",
+    "title": "emidm",
+    "section": "Example Usage",
+    "text": "Example Usage\n\nfrom emidm.sir import run_sir, run_model_with_replicates, plot_model_outputs\nsingle = run_sir()\nsingle.plot(\"t\", [\"S\", \"I\", \"R\"])"
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "emidm",
+    "section": "License",
+    "text": "License\nemidm is distributed under the terms of the MIT license."
+  },
+  {
+    "objectID": "examples/notebooks_intro.html",
+    "href": "examples/notebooks_intro.html",
+    "title": "Introduction to Jupyter and Colab Notebooks",
+    "section": "",
+    "text": "Open In Colab\n\n\nJupyter Notebooks and Google Colab are interactive computing environments widely used for data analysis, machine learning, and programming tutorials. Both platforms allow you to combine code, visualisations, explanatory text, and equations in one document, enhancing clarity, reproducibility, and collaboration.\n\nWhat is a Notebook?\nA notebook is a special file format (with a .ipynb extension) that stores not only the code but also the outputs of that code (such as plots, tables, and text), as well as any markdown-formatted explanations. Under the hood, it’s a JSON document that wraps code, output, and metadata in a structured format, often rendered as HTML when viewed in a browser (e.g. on GitHub). This allows you to view the outputs of a notebook—even without running the code—when it’s shared online.\n\n\nRun Order Matters\nOne important aspect of working with notebooks is that cells can be executed in any order, and their outputs are stored until cleared or overwritten. This means a notebook can appear to “work” even when the code is run out of sequence or relies on prior cell execution that hasn’t happened in a fresh session. Always restart the kernel and run all cells in order to ensure reproducibility.\n\n\nGetting Started\n\nJupyter Notebook: Typically runs locally on your computer via Anaconda or through a cloud service.\nGoogle Colab: Runs entirely online in your browser via Google’s infrastructure, providing easy access without setup.\n\n\n\nKey Components of the Notebook Interface\n\nCells: Notebooks consist of cells that hold either:\n\nCode (Python, R, etc.)\nMarkdown (formatted text)\n\nToolbar: Located at the top, contains essential buttons:\n\nRun Cell ▶️ to execute the current cell.\nAdd Cell ➕ to insert a new cell.\nCell Type drop-down to switch between Code and Markdown.\n\nFile Explorer (Jupyter): On the left, navigate files and folders.\nSidebar (Colab): On the left, access files, data, or settings.\n\n\n\nCode Cells\nCode cells can be interespersed with markdown cells (similar to mixed text and code chunks in Rmd or Quarto), such as below where we have a python code cell.\n\na = 1\nb = 2\na*b\n\n2\n\n\n\n\nChanging Runtime Type in Colab (GPUs and TPUs)\nGoogle Colab allows users to leverage GPU or TPU resources for computationally intensive tasks such as deep learning. To enable GPU or TPU:\n\nNavigate to Runtime &gt; Change runtime type.\nSelect the hardware accelerator (GPU or TPU) from the dropdown menu.\nClick Save to confirm your selection.\n\nAfter you click save, your runtime is reloaded so your active session, variables and environment will be lost.\n\nYou can check this by adding a code cell below and seeing if a and b still exist\n\n\n\nSaving and Managing Files in Colab\nGoogle Colab provides seamless integration with Google Drive and GitHub, allowing users to efficiently manage and store notebooks:\n\nSaving to Google Drive:\n\nAutomatically saves your notebooks to Google Drive in a dedicated “Colab Notebooks” folder.\nYou can manually save copies by selecting File &gt; Save a copy in Drive.\n\nIntegration with GitHub:\n\nColab allows direct loading of notebooks from GitHub repositories via File &gt; Open notebook &gt; GitHub.\nYou can save your notebook back to GitHub by selecting File &gt; Save a copy in GitHub (authentication required).\n\n\n\n\nCommon Keyboard Shortcuts\nMastering keyboard shortcuts significantly boosts productivity:\n\n\n\n\n\n\n\n\nAction\nJupyter Shortcut\nColab Shortcut\n\n\n\n\nRun Cell\nShift + Enter\nShift + Enter\n\n\nAdd Cell Below\nB (in command mode)\nCtrl + M, then B\n\n\nAdd Cell Above\nA (in command mode)\nCtrl + M, then A\n\n\nDelete Cell\nD, D\nCtrl + M, then D\n\n\nConvert Cell to Markdown\nM\nCtrl + M, then M\n\n\nConvert Cell to Code\nY\nCtrl + M, then Y\n\n\nInterrupt Execution\nI, I\nCtrl + M, then I\n\n\nHelp\nH\nCtrl + M, then H\n\n\n\nNote: Colab requires first pressing Ctrl + M to activate shortcuts.\n\n\nExample Code Cell: Plotting the Iris Dataset\nHere is a simple example using numpy, pandas, and matplotlib to plot the famous Iris dataset:\nRun the cell below using Shift + Enter to execute it and render the plot directly beneath the code.\n\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_iris\n\n# Load the Iris dataset\niris = load_iris()\ndf = pd.DataFrame(data=iris.data, columns=iris.feature_names)\ndf[\"species\"] = iris.target\n\n# Plot sepal length vs. sepal width\nplt.figure(figsize=(8, 6))\nfor species_id, species_name in enumerate(iris.target_names):\n    subset = df[df[\"species\"] == species_id]\n    plt.scatter(subset.iloc[:, 0], subset.iloc[:, 1], label=species_name)\n\nplt.xlabel(\"Sepal Length (cm)\")\nplt.ylabel(\"Sepal Width (cm)\")\nplt.title(\"Iris Dataset - Sepal Dimensions\")\nplt.legend()\nplt.grid(True)\nplt.show()\n\n\n\n\n\n\n\n\n\n\nBest Practices\n\nRegularly save your notebook (Ctrl + S or Command + S).\nFrequently restart kernels (Runtime &gt; Restart in Colab; Kernel &gt; Restart in Jupyter) to clear memory and prevent issues.\nClearly document code with Markdown cells.\nUse cells for modular coding and step-by-step debugging.\nUse Run all cells (from the menu) to ensure reproducibility before sharing.\n\n\n\nAdditional Resources\n\nJupyter documentation: https://jupyter.org/documentation\nColab guide: https://colab.research.google.com/notebooks/welcome.ipynb"
+  }
+]
