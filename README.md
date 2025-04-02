@@ -1,5 +1,6 @@
 # emidm
 
+[![Website](https://img.shields.io/badge/View-Website-blue?logo=githubpages&style=flat-square)](https://ojwatson.github.io/emidm/)
 
 ## Table of Contents
 
@@ -29,7 +30,7 @@ single = run_sir()
 single.plot("t", ["S", "I", "R"])
 ```
 
-![](index_files/figure-commonmark/cell-2-output-1.png)
+![](_freeze_/index/figure-html/cell-2-output-1.png)
 
 ## License
 
