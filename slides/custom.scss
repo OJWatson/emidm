@@ -1,0 +1,23 @@
+
+// headings
+$font-family-sans-serif: "Open Sans", sans-serif !default;
+$body-color: #333 !default;
+$presentation-heading-font: "Quicksand", sans-serif !default;
+$presentation-heading-color: $body-color !default;
+$presentation-heading-letter-spacing: -0.08em !default;
+$presentation-heading-text-shadow: none !default;
+$body-bg: #f7fbfc !default;
+$link-color: #3b759e !default;
+$selection-bg: #134674 !default;
+$overlayElementBgColor: 0, 0, 0 !default;
+$overlayElementFgColor: 240, 240, 240 !default;
+$presentation-h1-font-size: 1.5em;
+$presentation-font-size-root: 24pt;
+
+
+/*-- scss:rules --*/
+
+.reveal .slide blockquote {
+  border-left: 3px solid $text-muted;
+  padding-left: 0.5em;
+}

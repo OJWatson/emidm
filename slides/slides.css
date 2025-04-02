@@ -1,0 +1,8 @@
+.reveal .slide-logo {
+  height: 200px !important;
+}
+
+
+.reveal .visible .visible {
+  font-size: 80% !important;
+}

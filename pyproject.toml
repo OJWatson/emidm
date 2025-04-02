@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "emidm"
+version = "0.1"
+description = 'A simple package for demonstrating emulators for infectious disease modelling'
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+keywords = ["infectious disease model", "emulators"]
+authors = [
+  { name = "OJWatson", email = "o.watson15@imperial.ac.uk" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+dependencies = [
+  "numpy",
+  "pandas"
+]
+
+[project.urls]
+Documentation = "https://github.com/OJWatson/emidm#readme"
+Issues = "https://github.com/OJWatson/emidm/issues"
+Source = "https://github.com/OJWatson/emidm"
+
