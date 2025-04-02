@@ -419,7 +419,7 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="2c74b761" class="cell" data-execution_count="1">
+<div id="d6823723" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a href=""></a></span>
 <span id="cb1-3"><a href=""></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -489,7 +489,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="beb6b8e4" class="cell" data-execution_count="2">
+<div id="81f5df88" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-2"><a href=""></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -507,7 +507,9 @@
 </div>
 </div>
 </div>
-<h3 class="smaller" id="building-the-surrogate">Building the Surrogate</h3>
+</section>
+<section id="building-the-surrogate" class="slide level2 smaller">
+<h2>Building the Surrogate</h2>
 <ul>
 <li><strong>1. Generate simulation data:</strong> Sample a range of parameter sets (e.g.&nbsp;transmission rate β, recovery rate γ, possibly initial population sizes). For each set, run the SIR simulation and record the resulting infection curves (S(t), I(t), R(t) over time).</li>
 <li><strong>2. Prepare training dataset:</strong> From these runs, construct input-output pairs for learning. One approach is to provide the parameters (β, γ, time t) as inputs and the corresponding S, I, R at that time as outputs. (Alternatively, train a model that directly outputs the entire time-series given β and γ.)</li>
@@ -515,7 +517,9 @@
 <li><strong>4. Validate the model:</strong> Test the surrogate on simulation runs it hasn’t seen. Check that it can predict the trajectory for new β, γ with reasonable accuracy (e.g., the peak and timing of infections match the simulation).</li>
 <li><strong>5. Use the surrogate:</strong> Now you have a fast approximation of the SIR model. You can sweep through parameter space quickly, perform uncertainty quantification (by sampling many β, γ from distributions and getting outcomes rapidly), or embed this surrogate inside larger frameworks (e.g., optimization or real-time forecasting systems).</li>
 </ul>
-<h3 class="smaller" id="surrogate-model-visualization-validation">Surrogate Model Visualization (Validation)</h3>
+</section>
+<section id="surrogate-model-visualization-validation" class="slide level2 smaller">
+<h2>Surrogate Model Visualization (Validation)</h2>
 <ul>
 <li>Once trained, we can visualize how well the surrogate matches the actual simulation:
 <ul>
@@ -525,13 +529,18 @@
 <li>If the surrogate is accurate, we can be confident using it for further experiments. For example, we could vary β continuously and see how peak infection changes, using the surrogate outputs instantly rather than running hundreds of simulations.</li>
 <li>It’s also insightful to examine the surrogate’s learned parameters. In the SEINN example, the network inferred β and γ. If those learned values align with the true parameters used in simulation, it validates that the network not only predicts well but also captures the underlying epidemic parameters.</li>
 </ul>
+</section>
+<section id="surrogate-notebook" class="slide level2 smaller">
+<h2>Surrogate Notebook</h2>
+<p><a href="https://github.com/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb" data-preview-link="false">Training Surrogates</a></p>
 </section></section>
 <section>
 <section id="alernative-surrogate-approaches" class="title-slide slide level1 center">
 <h1>7. Alernative Surrogate Approaches</h1>
 
 </section>
-<h3 class="smaller" id="conditional-variational-autoencoders-cvaes.-what-is-a-cvae">Conditional Variational Autoencoders (cVAEs). What is a cVAE?</h3>
+<section id="conditional-variational-autoencoders-cvaes.-what-is-a-cvae" class="slide level2 smaller">
+<h2>Conditional Variational Autoencoders (cVAEs). What is a cVAE?</h2>
 <ul>
 <li>A <strong>Conditional Variational Autoencoder (cVAE)</strong> is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process (<a href="http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=however%2C%20produce%20an%20image%20of,the%20encoder%20and%20the%20decoder">Conditional Variational Autoencoders</a>).</li>
 <li><strong>Recap VAE:</strong> A VAE consists of an encoder that compresses input data into a latent distribution (usually a Gaussian in a low-dimensional space) and a decoder that reconstructs data from a sample of that latent distribution. It’s trained to reconstruct inputs while keeping latent variables meaningful (via a KL divergence regularization).</li>
@@ -543,6 +552,7 @@
 </ul></li>
 <li><strong>Uncertainty modeling:</strong> cVAEs are useful for representing uncertainty. Instead of a single prediction, a cVAE can generate a <em>distribution</em> of possible outcomes for a given condition. For instance, given an initial infection count and <span class="math inline">\(R_0\)</span>, a cVAE could generate many possible epidemic trajectories (reflecting stochastic variations).</li>
 </ul>
+</section>
 <section id="potential-application-of-cvae-in-epidemiology" class="slide level2 smaller">
 <h2>Potential Application of cVAE in Epidemiology</h2>
 <ul>
