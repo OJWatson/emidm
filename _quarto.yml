@@ -1,0 +1,24 @@
+project:
+  type: website
+  output-dir: docs
+website:
+  title: "emidm"
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Slides
+        menu:
+          - text: "Surrogate Training Slides"
+            href: slides/emidm_intro1.qmd
+      - text: Examples
+        menu:
+          - text: "Colab Notebooks Introduction"
+            href: examples/notebooks_intro.ipynb
+          - text: "Surrogate Training"
+            href: examples/surrogate_notebook.ipynb
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css  # Optional: Add custom CSS if desired

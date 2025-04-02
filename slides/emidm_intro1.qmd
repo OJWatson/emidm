@@ -13,9 +13,14 @@ format:
 
 # Introduction {.smaller}
 
-- Welcome! Today we’ll bridge **R and Python** for infectious disease modeling.
 - We’ll explore Python basics for R users, a new IDE (Positron), and deep learning concepts.
-- **Goal:** Equip you to leverage **PyTorch** (a popular deep learning framework) in epidemiological research.
+- **Goal:** Show you how to use **PyTorch** for training a surrogate infectious disease model.
+
+- Structure:
+  - 2:00 - 2:30: Introduction Slides (python basics, positron, notebooks, deep learning)
+  - 2:30 - 3:00: Sharing Surrogate Notebook (making sure everyone can run Colab, everyone is zen 🧘)
+  - 3:00 - 3:30: Hands-on practice running PyTorch and checking it out
+  - 3:30 - 4:00: Extension exercises and wrap up
 
 # 1. Introduction to Python for R Users {.smaller}
 
@@ -52,7 +57,7 @@ Feature               R              Python
 --------------------- -------------- ---------------
 plotting              heavenly       hell
 documentation         `roxygen`❤️     `docstrings`😒
-dependencies hell     moderate       frequent
+dependencies hell 😈  moderate       frequent
 virtual environments  less often     standard
 
 # 2. Positron IDE  {.smaller}
@@ -62,7 +67,7 @@ virtual environments  less often     standard
 - **Positron** is a next-generation IDE from Posit (RStudio) built on VS Code, tailored for data science. It feels like a blend of RStudio and VSCode in one interface.
 - **Polyglot support:** Comes configured for both R *and* Python out of the box – you can run R scripts and Jupyter Python notebooks in the same environment.
 - **Familiar interface:** Shares RStudio’s layout (source, console, plots, environment) with VSCode’s extensibility. This makes the transition easier for R users.
-- **Why use it?** Simplifies working on projects that use R **and** Python together, without switching IDEs.
+- **Why use it?** Simplifies working on projects that use R **and** Python together, without switching IDEs. Familiiar IDE experience for R users learning/transitioning to Python.
 
  ([Positron](https://positron.posit.co/)) *Positron IDE combines a Visual Studio Code foundation with an RStudio-like layout, supporting multi-language notebooks and scripts (R and Python) seamlessly.*
 
