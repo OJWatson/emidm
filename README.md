@@ -30,7 +30,7 @@ single = run_sir()
 single.plot("t", ["S", "I", "R"])
 ```
 
-![](_freeze_/index/figure-html/cell-2-output-1.png)
+![](_freeze/index/figure-html/cell-2-output-1.png)
 
 ## License
 
