@@ -109,7 +109,9 @@ virtual environments  less often     standard
 - **Forward pass:** Input data -> compute outputs and loss.
 - **Backward pass:** Compute gradients of loss w.rt each weight (this is automatic via backpropagation).
 - **Weight update:** Adjust weights using gradients (optimizer step).
+- **Epoch:** A complete pass through the entire training dataset. Training typically requires multiple epochs to converge.
 - **Iterate:** Repeat for many epochs (passes through data) until loss converges or performance is sufficient.
+- **Batch size:** The number of training examples in a mini-batch. Affects training speed, memory usage, and generalization.
 - **Result:** A trained neural network model that hopefully generalizes to new data.
 - Throughout training, we monitor metrics on a **validation set** to avoid overfitting. If validation performance plateaus or worsens, we consider techniques like early stopping or regularization.
 
@@ -135,7 +137,7 @@ virtual environments  less often     standard
   - You define a neural network as a class inheriting `nn.Module`, compose layers in the constructor, and define the forward pass. PyTorch takes care of gradient computation for the parameters.
 - **Optimizers:** `torch.optim` has algorithms like SGD, Adam for updating model parameters based on computed gradients.
 - **DataLoader:** Utility to load and batch your dataset conveniently, with shuffling and parallel loading.
-- *In summary:* PyTorch provides the pieces (tensors + autograd + nn modules) to build and train neural networks efficiently, abstracting away much of the math and boilerplate.
+- **Device:** Specification of where tensors and models should be stored/executed (CPU or GPU). Example: `device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")`
 
 ## PyTorch in Action: Basic Operations {.smaller}
 
