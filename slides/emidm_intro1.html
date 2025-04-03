@@ -384,7 +384,9 @@
 <li><strong>Forward pass:</strong> Input data -&gt; compute outputs and loss.</li>
 <li><strong>Backward pass:</strong> Compute gradients of loss w.rt each weight (this is automatic via backpropagation).</li>
 <li><strong>Weight update:</strong> Adjust weights using gradients (optimizer step).</li>
+<li><strong>Epoch:</strong> A complete pass through the entire training dataset. Training typically requires multiple epochs to converge.</li>
 <li><strong>Iterate:</strong> Repeat for many epochs (passes through data) until loss converges or performance is sufficient.</li>
+<li><strong>Batch size:</strong> The number of training examples in a mini-batch. Affects training speed, memory usage, and generalization.</li>
 <li><strong>Result:</strong> A trained neural network model that hopefully generalizes to new data.</li>
 <li>Throughout training, we monitor metrics on a <strong>validation set</strong> to avoid overfitting. If validation performance plateaus or worsens, we consider techniques like early stopping or regularization.</li>
 </ul>
@@ -423,13 +425,13 @@
 </ul></li>
 <li><strong>Optimizers:</strong> <code>torch.optim</code> has algorithms like SGD, Adam for updating model parameters based on computed gradients.</li>
 <li><strong>DataLoader:</strong> Utility to load and batch your dataset conveniently, with shuffling and parallel loading.</li>
-<li><em>In summary:</em> PyTorch provides the pieces (tensors + autograd + nn modules) to build and train neural networks efficiently, abstracting away much of the math and boilerplate.</li>
+<li><strong>Device:</strong> Specification of where tensors and models should be stored/executed (CPU or GPU). Example: <code>device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")</code></li>
 </ul>
 </section>
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="641f6240" class="cell" data-execution_count="1">
+<div id="82e85c8b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -499,7 +501,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="d4ec193b" class="cell" data-execution_count="2">
+<div id="a5fc486c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
