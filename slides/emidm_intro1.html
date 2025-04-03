@@ -429,7 +429,7 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="b3d64f92" class="cell" data-execution_count="1">
+<div id="641f6240" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -499,7 +499,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="9bccf437" class="cell" data-execution_count="2">
+<div id="d4ec193b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -544,20 +544,42 @@
 <h2>Surrogate Notebook</h2>
 <p><a href="https://github.com/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb" data-preview-link="false">Training Surrogates</a></p>
 </section></section>
+<section id="conclusion-and-next-steps" class="title-slide slide level1 smaller center">
+<h1>7. Conclusion and Next Steps</h1>
+<ul>
+<li>We introduced Python again for R users but perhaps in a way focussed on actually using IDEs and emulating Rstudio experience.</li>
+<li>We covered deep learning fundamentals – from what neural networks are to how we train them – setting the stage for using these techniques in epidemiology.</li>
+<li>With <strong>PyTorch</strong>, you have a powerful tool to implement deep learning models. We saw how tensors and autograd work, and ran through a simple example.</li>
+<li>Machine learning and deep learning are increasingly important in infectious disease modeling and surrogate models can accelerate simulation-based research.</li>
+<li><strong>Next steps:</strong>
+<ul>
+<li>Hands-on practice: try running a simple PyTorch model (e.g., fit a curve) in Positron.</li>
+<li>Experiment with the SIR surrogate idea: simulate data in R, train a PyTorch model in Python.</li>
+<li>Explore real datasets: Can you use a neural network to forecast cases? How would you incorporate domain knowledge?</li>
+<li>Alternative surrogate approaches</li>
+</ul></li>
+</ul>
+</section>
+
 <section>
 <section id="alernative-surrogate-approaches" class="title-slide slide level1 center">
-<h1>7. Alernative Surrogate Approaches</h1>
+<h1>8. Alernative Surrogate Approaches</h1>
 
 </section>
 <section id="conditional-variational-autoencoders-cvaes.-what-is-a-cvae" class="slide level2 smaller">
 <h2>Conditional Variational Autoencoders (cVAEs). What is a cVAE?</h2>
 <ul>
-<li>A <strong>Conditional Variational Autoencoder (cVAE)</strong> is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process (<a href="http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=however%2C%20produce%20an%20image%20of,the%20encoder%20and%20the%20decoder">Conditional Variational Autoencoders</a>).</li>
+<li>A <strong>Conditional Variational Autoencoder (cVAE)</strong> is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process.</li>
 <li><strong>Recap VAE:</strong> A VAE consists of an encoder that compresses input data into a latent distribution (usually a Gaussian in a low-dimensional space) and a decoder that reconstructs data from a sample of that latent distribution. It’s trained to reconstruct inputs while keeping latent variables meaningful (via a KL divergence regularization).</li>
-<li><strong>Conditional part:</strong> In a cVAE, we “condition” both encoder and decoder on some extra context. For example, when dealing with images of digits, we can provide the digit label as a condition. The encoder then learns latent variables <em>given</em> that label, and the decoder can generate data conditioned on a specific label (<a href="http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=however%2C%20produce%20an%20image%20of,the%20encoder%20and%20the%20decoder">Conditional Variational Autoencoders</a>).</li>
+<li><strong>Conditional part:</strong> In a cVAE, we “condition” both encoder and decoder on some extra context. For example, when dealing with images of digits, we can provide the digit label as a condition. The encoder then learns latent variables <em>given</em> that label, and the decoder can generate data conditioned on a specific label.</li>
+</ul>
+</section>
+<section id="conditional-variational-autoencoders-cvaes.-what-is-a-cvae-1" class="slide level2 smaller">
+<h2>Conditional Variational Autoencoders (cVAEs). What is a cVAE?</h2>
+<ul>
 <li><strong>Effect:</strong> This allows directed generation – e.g., “generate samples that look like digit 5” or, in our context, “generate epidemic curves under a certain scenario”. The latent space then captures variations <em>other than</em> the condition.
 <ul>
-<li>For digits, the label fixes which digit, and the latent variables can capture style (thickness of writing, slant, etc.) (<a href="http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=To%20generate%20an%20image%20of,which%20the%20number%20is%20written">Conditional Variational Autoencoders</a>).</li>
+<li>For digits, the label fixes which digit, and the latent variables can capture style (thickness of writing, slant, etc.).</li>
 <li>For epidemics, one could imagine conditioning on, say, the basic reproduction number <span class="math inline">\(R_0\)</span> or other known factors, and the latent variables capture random effects or unknown influences.</li>
 </ul></li>
 <li><strong>Uncertainty modeling:</strong> cVAEs are useful for representing uncertainty. Instead of a single prediction, a cVAE can generate a <em>distribution</em> of possible outcomes for a given condition. For instance, given an initial infection count and <span class="math inline">\(R_0\)</span>, a cVAE could generate many possible epidemic trajectories (reflecting stochastic variations).</li>
@@ -577,29 +599,9 @@
 <li><strong>Why cVAE?</strong> Unlike a standard deterministic model, a cVAE provides a distribution of outcomes, not just one. This is valuable for risk assessment – e.g., what’s the worst-case scenario vs best-case scenario under a specific intervention?</li>
 <li><strong>Note:</strong> This is an advanced technique and an active research area. It combines deep learning’s generative power with the need in epidemiology to quantify uncertainty.</li>
 </ul>
+
+
 </section></section>
-<section id="conclusion-and-next-steps" class="title-slide slide level1 smaller center">
-<h1>Conclusion and Next Steps</h1>
-<ul>
-<li>We introduced Python’s basics for R users and a conducive environment (Positron) to start combining R and Python in research.</li>
-<li>We covered deep learning fundamentals – from what neural networks are to how we train them – setting the stage for using these techniques in epidemiology.</li>
-<li>With <strong>PyTorch</strong>, you have a powerful tool to implement deep learning models. We saw how tensors and autograd work, and ran through a simple example.</li>
-<li>Machine learning and deep learning are increasingly important in infectious disease modeling:
-<ul>
-<li><strong>Surrogate models</strong> can accelerate simulation-based research.</li>
-<li><strong>Advanced models</strong> like cVAEs can capture uncertainty in a principled way.</li>
-</ul></li>
-<li><strong>Next steps:</strong>
-<ul>
-<li>Hands-on practice: try running a simple PyTorch model (e.g., fit a curve) in Positron.</li>
-<li>Experiment with the SIR surrogate idea: simulate data in R, train a PyTorch model in Python.</li>
-<li>Explore real datasets: Can you use a neural network to forecast cases? How would you incorporate domain knowledge?</li>
-</ul></li>
-<li>By blending R’s strength in statistical modeling with Python’s prowess in deep learning, infectious disease modelers can build more robust, data-driven models to inform public health decisions. Happy coding and modeling!</li>
-</ul>
-
-
-</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="images/logos.png" class="slide-logo"></p>
