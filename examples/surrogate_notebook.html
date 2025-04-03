@@ -1331,24 +1331,19 @@ Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.11/dist-pac
 <p>In the code above, <code>batch_size</code> is set to 64. This means that during training, the model will see 64 samples of data before updating its internal parameters (weights and biases). This process of seeing a batch of data and then updating is called one <strong>iteration</strong>.</p>
 <p>Instead of training on the entire dataset at once (which can be computationally expensive and memory-intensive), the data is divided into smaller batches. The model iterates through these batches, making adjustments to its parameters after seeing each batch.</p>
 <section id="why-use-batches" class="level5">
-<h5 class="anchored" data-anchor-id="why-use-batches">Why Use Batches?</h5>
-<ol type="1">
-<li><p>Computational Efficiency: Processing the entire dataset in one go can be very slow, especially for large datasets. Batches make the process more manageable by breaking it down into smaller steps. This is crucial for training deep learning models which often require vast amounts of data.</p></li>
-<li><p>Memory Management: Loading the entire dataset into memory might not be feasible, especially when dealing with very large datasets or limited hardware resources. Batching allows the model to work with a smaller subset of the data at any given time, reducing memory requirements.</p></li>
-<li><p>Generalization: Training on batches can improve the model’s ability to generalize to unseen data. This is because the model is exposed to a variety of data points in each batch, preventing it from overfitting to specific examples in the training set. Updates based on a single data point at a time (e.g., with a batch size of 1 which is called stochastic gradient descent) could update the weights in a way that is not good for the model’s prediction performance over all of the data. Using batches provides a better average for what data the model tends to see and thus better update performance.</p></li>
-<li><p>Noise Reduction: The gradients (directions for updating model parameters) calculated on a batch are less noisy compared to those calculated on individual samples. This leads to more stable and smoother training, potentially helping the model converge faster to a good solution.</p></li>
-</ol>
+<h5 class="anchored" data-anchor-id="why-use-batches"><em>Why Use Batches?</em></h5>
+<p><strong>1. Computational Efficiency:</strong> Processing the entire dataset in one go can be very slow, especially for large datasets. Batches make the process more manageable by breaking it down into smaller steps. This is crucial for training deep learning models which often require vast amounts of data.</p>
+<p><strong>2. Memory Management:</strong> Loading the entire dataset into memory might not be feasible, especially when dealing with very large datasets or limited hardware resources. Batching allows the model to work with a smaller subset of the data at any given time, reducing memory requirements.</p>
+<p><strong>3. Generalization:</strong> Training on batches can improve the model’s ability to generalize to unseen data. This is because the model is exposed to a variety of data points in each batch, preventing it from overfitting to specific examples in the training set. Updates based on a single data point at a time (e.g., with a batch size of 1 which is called stochastic gradient descent) could update the weights in a way that is not good for the model’s prediction performance over all of the data. Using batches provides a better average for what data the model tends to see and thus better update performance.</p>
+<p><strong>4. Noise Reduction:</strong> The gradients (directions for updating model parameters) calculated on a batch are less noisy compared to those calculated on individual samples. This leads to more stable and smoother training, potentially helping the model converge faster to a good solution.</p>
 </section>
 <section id="choosing-the-right-batch-size" class="level5">
-<h5 class="anchored" data-anchor-id="choosing-the-right-batch-size">Choosing the Right Batch Size</h5>
+<h5 class="anchored" data-anchor-id="choosing-the-right-batch-size"><em>Choosing the Right Batch Size</em></h5>
 <p>The choice of batch size is a hyperparameter that can significantly impact the training process. There’s no one-size-fits-all answer, and the optimal batch size often depends on factors like:</p>
-<ol type="1">
-<li>Dataset Size: Larger datasets can handle larger batch sizes, while smaller datasets might require smaller batches to avoid overfitting.</li>
-<li>Model Architecture: Complex models with many parameters might benefit from larger batch sizes for better gradient estimations.</li>
-<li>Hardware: Available memory and processing power influence the maximum batch size you can use.</li>
-<li>Training Time: Larger batches can lead to faster training epochs (one pass through the entire dataset), but they might require more epochs to converge. Smaller batches require more iterations per epoch and are usually slower but are helpful in preventing issues like overfitting.</li>
-</ol>
-<p>In Practice:</p>
+<p><strong>1. Dataset Size:</strong> Larger datasets can handle larger batch sizes, while smaller datasets might require smaller batches to avoid overfitting. <strong>2. Model Architecture:</strong> Complex models with many parameters might benefit from larger batch sizes for better gradient estimations. <strong>3. Hardware:</strong> Available memory and processing power influence the maximum batch size you can use. <strong>4. Training Time:</strong> Larger batches can lead to faster training epochs (one pass through the entire dataset), but they might require more epochs to converge. Smaller batches require more iterations per epoch and are usually slower but are helpful in preventing issues like overfitting.</p>
+</section>
+<section id="in-practice" class="level5">
+<h5 class="anchored" data-anchor-id="in-practice"><em>In Practice:</em></h5>
 <ul>
 <li>Common Batch Sizes: 32, 64, 128, 256 are frequently used batch sizes.</li>
 <li>Experimentation: It’s often necessary to experiment with different batch sizes to find the best one for a particular problem. You can evaluate performance on a validation set to guide your choice.</li>
