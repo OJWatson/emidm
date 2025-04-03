@@ -80,14 +80,17 @@ virtual environments  less often     standard
 - **REPL-like development experience:** Positron has a REPL-style development environment, similar to RStudio. You can run code, see results, and modify the environment as you go, putting you closer to understanding the code you write. 
 - **Bottom line: Positron lowers the barrier for R programmers to start incorporating Python into their workflow within a single IDE.**
 
+## Google Colab
+
+[Intro to Colab Notebook](https://ojwatson.github.io/emidm/examples/notebooks_intro.html){preview-link="true" style="text-align: center"}
+
 # 3. Deep Learning Basics {.smaller}
 
 ## What is Deep Learning? {.smaller}
 
-- **Definition:** Deep learning is a subset of machine learning that uses multi-layered neural networks to simulate complex decision-making, akin to the human brain ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20a%20subset,applications%20in%20our%20lives%20today)). 
+- **Definition:** Deep learning is a subset of machine learning that uses multi-layered neural networks to simulate complex decision-making, akin to the human brain 🧠. 
 - **Key idea:** Instead of manual feature engineering, a deep neural network learns representations through layers of neurons.
-- **Why it matters:** Achieved breakthroughs in image recognition, natural language processing, etc. – many AI applications today are powered by deep learning ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20a%20subset,applications%20in%20our%20lives%20today)) ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20an%20aspect,driving%20cars%20and%20generative%20AI)).
-- **Examples:** Digital assistants (speech recognition), fraud detection, medical image analysis, and even epidemic forecasting models have benefited from deep learning techniques ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20an%20aspect,driving%20cars%20and%20generative%20AI)).
+- **Why it matters:** Achieved breakthroughs in many fields, takes advantage of GPUs, there is a small window where people think AI da 💣 and it's on lots of grant calls... (Truth 💣).
 - **In short:** Deep learning can automatically extract complex patterns from data, making it extremely powerful for modeling nonlinear relationships.
 
 ## Key Concepts: Neural Networks {.smaller}
@@ -95,9 +98,10 @@ virtual environments  less often     standard
 - **Neurons & Layers:** Basic unit is a *neuron* (takes inputs, applies weights and activation). Neurons are organized into layers (input layer -> hidden layers -> output layer). Multiple hidden layers = a “deep” network.
 - **Activation Functions:** Non-linear functions applied at neurons (e.g. ReLU, sigmoid). They enable networks to learn complex non-linear mappings.
 - **Loss Function:** Metric that quantifies error between the network’s prediction and true values (e.g. mean squared error, cross-entropy). The network’s goal is to minimize this during training.
-- **Forward Propagation:** Data flows through the network layer by layer to produce an output (prediction) ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20neural%20networks%20consist%20of,prediction%20or%20classification%20is%20made)).
-- **Backpropagation:** The training algorithm – compute the loss, then propagate the error gradients backward adjusting weights (via gradient descent) ([What Is Deep Learning? | IBM](https://www.ibm.com/think/topics/deep-learning#:~:text=Another%20process%20called%20backpropagation%C2%A0uses%20algorithms%2C,backpropagation%20enable%20a%20neural%20network)). This is how the network “learns” from mistakes.
+- **Forward Propagation:** Data flows through the network layer by layer to produce an output (prediction).
+- **Backpropagation:** The training algorithm – compute the loss, then propagate the error gradients backward adjusting weights (via gradient descent). This is how the network “learns” from mistakes.
 - **Optimization:** An optimizer (SGD, Adam, etc.) uses those gradients to update weights iteratively, gradually improving the model’s performance.
+- **In short:**: At it's core it's quite simple stats, and more complex is the types of neural network architectures for different problems. 
 
 ## Training Process Recap {.smaller}
 
@@ -113,21 +117,21 @@ virtual environments  less often     standard
 
 ## What is PyTorch? {.smaller}
 
-- **PyTorch** is an open-source deep learning framework based on Python (and Torch library). It’s one of the most popular platforms for deep learning research and deployment ([What is PyTorch?](https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20is%20an%20open%20source,between%20research%20prototyping%20and%20deployment)).
-- Developed by researchers at **Facebook (Meta)** in 2016, it accelerated from prototyping to production with a flexible, pythonic approach ([What is PyTorch?](https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20is%20an%20open%20source,between%20research%20prototyping%20and%20deployment)) ([What is PyTorch?](https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=scripting%20language,between%20research%20prototyping%20and%20deployment)).
+- **PyTorch** is an open-source deep learning framework based on Python (and Torch library). It’s one of the most popular platforms for deep learning research and deployment.
+- Developed by researchers at **Facebook (Meta)** in 2016, it accelerated from prototyping to production with a flexible, pythonic approach and is arguably one of the most robust and mature software ecosystems for deep learning.
 - **Dynamic computation graph:** PyTorch uses a “define-by-run” approach – the neural network graph is built on the fly as you run code, making it intuitive to debug and modify.
 - **Why PyTorch?** 
   - *Easy to learn:* Pythonic API feels natural if you know Python.
   - *Flexibility:* Define complex models imperatively (no static graphs).
   - *Community & Ecosystem:* Huge community, lots of pre-trained models and tutorials. Backed by Meta and the open-source community (now part of Linux Foundation).
-- **Usage:** Widely used in academia and industry (Meta uses PyTorch to power all its AI workloads ([What is PyTorch?](https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20was%20initially%20an%20internship,for%20driving%20all%20AI%20workloads))). It has become a go-to framework for computer vision, NLP, and many scientific applications.
+- **Usage:** Widely used in academia and industry (Meta uses PyTorch to power all its AI workloads) and it has become a go-to framework for many application areas. 
 
 ## Core Components of PyTorch {.smaller}
 
-- **Tensor:** Fundamental data structure in PyTorch. A tensor is a homogeneous multi-dimensional array (similar to a NumPy array) that can be processed on CPU or GPU ([PyTorch - Wikipedia](https://en.wikipedia.org/wiki/PyTorch#:~:text=match%20at%20L412%20homogeneous%20multidimensional,and%20Apple%27s%20Metal)). 
+- **Tensor:** Fundamental data structure in PyTorch. A tensor is a homogeneous multi-dimensional array (similar to a NumPy array) that can be processed on CPU or GPU. 
   - Example: `torch.tensor([[1,2],[3,4]])` is a 2x2 tensor of integers.
 - **Autograd:** PyTorch’s automatic differentiation engine. It records operations on tensors so that gradients can be computed via backpropagation. This means if you have a loss computed from tensors, you can call `.backward()` to get gradients of all parameters – no manual calculus needed.
-- **`nn` Module:** High-level neural network APIs. `torch.nn` provides building blocks like layers (Linear, Conv2d, LSTM, etc.), activation functions, loss functions, etc., to easily build complex networks ([PyTorch - Wikipedia](https://en.wikipedia.org/wiki/PyTorch#:~:text=PyTorch%20defines%20a%20module%20called,Networks%20are%20built%20by%20inheriting)).
+- **`nn` Module:** High-level neural network APIs. `torch.nn` provides building blocks like layers (Linear, Conv2d, LSTM, etc.), activation functions, loss functions, etc., to easily build complex networks.
   - You define a neural network as a class inheriting `nn.Module`, compose layers in the constructor, and define the forward pass. PyTorch takes care of gradient computation for the parameters.
 - **Optimizers:** `torch.optim` has algorithms like SGD, Adam for updating model parameters based on computed gradients.
 - **DataLoader:** Utility to load and batch your dataset conveniently, with shuffling and parallel loading.
