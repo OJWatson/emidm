@@ -431,7 +431,7 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="82e85c8b" class="cell" data-execution_count="1">
+<div id="a04af992" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -501,7 +501,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="a5fc486c" class="cell" data-execution_count="2">
+<div id="f3131e10" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -528,18 +528,6 @@
 <li><strong>3. Train a neural network:</strong> Use PyTorch to define a network (for example, a simple feed-forward network or an RNN) that takes in parameters (and time) and outputs the state. Train it on the simulation data by minimizing the error between the network’s predicted epidemic curve and the simulation’s actual values.</li>
 <li><strong>4. Validate the model:</strong> Test the surrogate on simulation runs it hasn’t seen. Check that it can predict the trajectory for new β, γ with reasonable accuracy (e.g., the peak and timing of infections match the simulation).</li>
 <li><strong>5. Use the surrogate:</strong> Now you have a fast approximation of the SIR model. You can sweep through parameter space quickly, perform uncertainty quantification (by sampling many β, γ from distributions and getting outcomes rapidly), or embed this surrogate inside larger frameworks (e.g., optimization or real-time forecasting systems).</li>
-</ul>
-</section>
-<section id="surrogate-model-visualization-validation" class="slide level2 smaller">
-<h2>Surrogate Model Visualization (Validation)</h2>
-<ul>
-<li>Once trained, we can visualize how well the surrogate matches the actual simulation:
-<ul>
-<li>Plot the infection curve from the true simulation and the surrogate’s predicted curve for a few test parameter sets. Ideally, they overlap closely.</li>
-<li>Plot predicted vs actual values (parity plot) for key outcomes (e.g.&nbsp;final epidemic size, peak infection) to quantify accuracy.</li>
-</ul></li>
-<li>If the surrogate is accurate, we can be confident using it for further experiments. For example, we could vary β continuously and see how peak infection changes, using the surrogate outputs instantly rather than running hundreds of simulations.</li>
-<li>It’s also insightful to examine the surrogate’s learned parameters. In the SEINN example, the network inferred β and γ. If those learned values align with the true parameters used in simulation, it validates that the network not only predicts well but also captures the underlying epidemic parameters.</li>
 </ul>
 </section>
 <section id="surrogate-notebook" class="slide level2 smaller">
