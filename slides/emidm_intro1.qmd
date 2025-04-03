@@ -224,15 +224,30 @@ plot_model_outputs(run_model_with_replicates(run_sir, reps=10))
 
 [Training Surrogates](https://github.com/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb){preview-link="false"}
 
-# 7. Alernative Surrogate Approaches
+# 7. Conclusion and Next Steps {.smaller}
+
+- We introduced Python again for R users but perhaps in a way focussed on actually using IDEs and emulating Rstudio experience.
+- We covered deep learning fundamentals – from what neural networks are to how we train them – setting the stage for using these techniques in epidemiology.
+- With **PyTorch**, you have a powerful tool to implement deep learning models. We saw how tensors and autograd work, and ran through a simple example.
+- Machine learning and deep learning are increasingly important in infectious disease modeling and surrogate models can accelerate simulation-based research.
+- **Next steps:** 
+  - Hands-on practice: try running a simple PyTorch model (e.g., fit a curve) in Positron.
+  - Experiment with the SIR surrogate idea: simulate data in R, train a PyTorch model in Python.
+  - Explore real datasets: Can you use a neural network to forecast cases? How would you incorporate domain knowledge?
+  - Alternative surrogate approaches
+
+# 8. Alernative Surrogate Approaches
 
 ## Conditional Variational Autoencoders (cVAEs). What is a cVAE? {.smaller}
 
-- A **Conditional Variational Autoencoder (cVAE)** is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process ([Conditional Variational Autoencoders](http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=however%2C%20produce%20an%20image%20of,the%20encoder%20and%20the%20decoder)).
+- A **Conditional Variational Autoencoder (cVAE)** is an extension of the Variational Autoencoder that incorporates additional information (conditions) into the generation process.
 - **Recap VAE:** A VAE consists of an encoder that compresses input data into a latent distribution (usually a Gaussian in a low-dimensional space) and a decoder that reconstructs data from a sample of that latent distribution. It’s trained to reconstruct inputs while keeping latent variables meaningful (via a KL divergence regularization).
-- **Conditional part:** In a cVAE, we “condition” both encoder and decoder on some extra context. For example, when dealing with images of digits, we can provide the digit label as a condition. The encoder then learns latent variables *given* that label, and the decoder can generate data conditioned on a specific label ([Conditional Variational Autoencoders](http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=however%2C%20produce%20an%20image%20of,the%20encoder%20and%20the%20decoder)).
+- **Conditional part:** In a cVAE, we “condition” both encoder and decoder on some extra context. For example, when dealing with images of digits, we can provide the digit label as a condition. The encoder then learns latent variables *given* that label, and the decoder can generate data conditioned on a specific label.
+
+## Conditional Variational Autoencoders (cVAEs). What is a cVAE? {.smaller}
+
 - **Effect:** This allows directed generation – e.g., “generate samples that look like digit 5” or, in our context, “generate epidemic curves under a certain scenario”. The latent space then captures variations *other than* the condition. 
-  - For digits, the label fixes which digit, and the latent variables can capture style (thickness of writing, slant, etc.) ([Conditional Variational Autoencoders](http://ijdykeman.github.io/ml/2016/12/21/cvae.html#:~:text=To%20generate%20an%20image%20of,which%20the%20number%20is%20written)).
+  - For digits, the label fixes which digit, and the latent variables can capture style (thickness of writing, slant, etc.).
   - For epidemics, one could imagine conditioning on, say, the basic reproduction number $R_0$ or other known factors, and the latent variables capture random effects or unknown influences.
 - **Uncertainty modeling:** cVAEs are useful for representing uncertainty. Instead of a single prediction, a cVAE can generate a *distribution* of possible outcomes for a given condition. For instance, given an initial infection count and $R_0$, a cVAE could generate many possible epidemic trajectories (reflecting stochastic variations).
 
@@ -247,16 +262,3 @@ plot_model_outputs(run_model_with_replicates(run_sir, reps=10))
 - **Why cVAE?** Unlike a standard deterministic model, a cVAE provides a distribution of outcomes, not just one. This is valuable for risk assessment – e.g., what’s the worst-case scenario vs best-case scenario under a specific intervention?
 - **Note:** This is an advanced technique and an active research area. It combines deep learning’s generative power with the need in epidemiology to quantify uncertainty.
 
-# Conclusion and Next Steps {.smaller}
-
-- We introduced Python’s basics for R users and a conducive environment (Positron) to start combining R and Python in research.
-- We covered deep learning fundamentals – from what neural networks are to how we train them – setting the stage for using these techniques in epidemiology.
-- With **PyTorch**, you have a powerful tool to implement deep learning models. We saw how tensors and autograd work, and ran through a simple example.
-- Machine learning and deep learning are increasingly important in infectious disease modeling:
-  - **Surrogate models** can accelerate simulation-based research.
-  - **Advanced models** like cVAEs can capture uncertainty in a principled way.
-- **Next steps:** 
-  - Hands-on practice: try running a simple PyTorch model (e.g., fit a curve) in Positron.
-  - Experiment with the SIR surrogate idea: simulate data in R, train a PyTorch model in Python.
-  - Explore real datasets: Can you use a neural network to forecast cases? How would you incorporate domain knowledge?
-- By blending R’s strength in statistical modeling with Python’s prowess in deep learning, infectious disease modelers can build more robust, data-driven models to inform public health decisions. Happy coding and modeling!
