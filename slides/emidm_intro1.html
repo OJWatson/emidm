@@ -346,6 +346,10 @@
 <li><strong>REPL-like development experience:</strong> Positron has a REPL-style development environment, similar to RStudio. You can run code, see results, and modify the environment as you go, putting you closer to understanding the code you write.</li>
 <li><strong>Bottom line: Positron lowers the barrier for R programmers to start incorporating Python into their workflow within a single IDE.</strong></li>
 </ul>
+</section>
+<section id="google-colab" class="slide level2">
+<h2>Google Colab</h2>
+<p><a href="https://ojwatson.github.io/emidm/examples/notebooks_intro.html" data-preview-link="true" style="text-align: center">Intro to Colab Notebook</a></p>
 </section></section>
 <section>
 <section id="deep-learning-basics" class="title-slide slide level1 smaller center">
@@ -355,10 +359,9 @@
 <section id="what-is-deep-learning" class="slide level2 smaller">
 <h2>What is Deep Learning?</h2>
 <ul>
-<li><strong>Definition:</strong> Deep learning is a subset of machine learning that uses multi-layered neural networks to simulate complex decision-making, akin to the human brain (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20a%20subset,applications%20in%20our%20lives%20today">What Is Deep Learning? | IBM</a>).</li>
+<li><strong>Definition:</strong> Deep learning is a subset of machine learning that uses multi-layered neural networks to simulate complex decision-making, akin to the human brain 🧠.</li>
 <li><strong>Key idea:</strong> Instead of manual feature engineering, a deep neural network learns representations through layers of neurons.</li>
-<li><strong>Why it matters:</strong> Achieved breakthroughs in image recognition, natural language processing, etc. – many AI applications today are powered by deep learning (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20a%20subset,applications%20in%20our%20lives%20today">What Is Deep Learning? | IBM</a>) (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20an%20aspect,driving%20cars%20and%20generative%20AI">What Is Deep Learning? | IBM</a>).</li>
-<li><strong>Examples:</strong> Digital assistants (speech recognition), fraud detection, medical image analysis, and even epidemic forecasting models have benefited from deep learning techniques (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20learning%20is%20an%20aspect,driving%20cars%20and%20generative%20AI">What Is Deep Learning? | IBM</a>).</li>
+<li><strong>Why it matters:</strong> Achieved breakthroughs in many fields, takes advantage of GPUs, there is a small window where people think AI da 💣 and it’s on lots of grant calls… (Truth 💣).</li>
 <li><strong>In short:</strong> Deep learning can automatically extract complex patterns from data, making it extremely powerful for modeling nonlinear relationships.</li>
 </ul>
 </section>
@@ -368,9 +371,10 @@
 <li><strong>Neurons &amp; Layers:</strong> Basic unit is a <em>neuron</em> (takes inputs, applies weights and activation). Neurons are organized into layers (input layer -&gt; hidden layers -&gt; output layer). Multiple hidden layers = a “deep” network.</li>
 <li><strong>Activation Functions:</strong> Non-linear functions applied at neurons (e.g.&nbsp;ReLU, sigmoid). They enable networks to learn complex non-linear mappings.</li>
 <li><strong>Loss Function:</strong> Metric that quantifies error between the network’s prediction and true values (e.g.&nbsp;mean squared error, cross-entropy). The network’s goal is to minimize this during training.</li>
-<li><strong>Forward Propagation:</strong> Data flows through the network layer by layer to produce an output (prediction) (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Deep%20neural%20networks%20consist%20of,prediction%20or%20classification%20is%20made">What Is Deep Learning? | IBM</a>).</li>
-<li><strong>Backpropagation:</strong> The training algorithm – compute the loss, then propagate the error gradients backward adjusting weights (via gradient descent) (<a href="https://www.ibm.com/think/topics/deep-learning#:~:text=Another%20process%20called%20backpropagation%C2%A0uses%20algorithms%2C,backpropagation%20enable%20a%20neural%20network">What Is Deep Learning? | IBM</a>). This is how the network “learns” from mistakes.</li>
+<li><strong>Forward Propagation:</strong> Data flows through the network layer by layer to produce an output (prediction).</li>
+<li><strong>Backpropagation:</strong> The training algorithm – compute the loss, then propagate the error gradients backward adjusting weights (via gradient descent). This is how the network “learns” from mistakes.</li>
 <li><strong>Optimization:</strong> An optimizer (SGD, Adam, etc.) uses those gradients to update weights iteratively, gradually improving the model’s performance.</li>
+<li><strong>In short:</strong>: At it’s core it’s quite simple stats, and more complex is the types of neural network architectures for different problems.</li>
 </ul>
 </section>
 <section id="training-process-recap" class="slide level2 smaller">
@@ -393,8 +397,8 @@
 <section id="what-is-pytorch" class="slide level2 smaller">
 <h2>What is PyTorch?</h2>
 <ul>
-<li><strong>PyTorch</strong> is an open-source deep learning framework based on Python (and Torch library). It’s one of the most popular platforms for deep learning research and deployment (<a href="https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20is%20an%20open%20source,between%20research%20prototyping%20and%20deployment">What is PyTorch?</a>).</li>
-<li>Developed by researchers at <strong>Facebook (Meta)</strong> in 2016, it accelerated from prototyping to production with a flexible, pythonic approach (<a href="https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20is%20an%20open%20source,between%20research%20prototyping%20and%20deployment">What is PyTorch?</a>) (<a href="https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=scripting%20language,between%20research%20prototyping%20and%20deployment">What is PyTorch?</a>).</li>
+<li><strong>PyTorch</strong> is an open-source deep learning framework based on Python (and Torch library). It’s one of the most popular platforms for deep learning research and deployment.</li>
+<li>Developed by researchers at <strong>Facebook (Meta)</strong> in 2016, it accelerated from prototyping to production with a flexible, pythonic approach and is arguably one of the most robust and mature software ecosystems for deep learning.</li>
 <li><strong>Dynamic computation graph:</strong> PyTorch uses a “define-by-run” approach – the neural network graph is built on the fly as you run code, making it intuitive to debug and modify.</li>
 <li><strong>Why PyTorch?</strong>
 <ul>
@@ -402,18 +406,18 @@
 <li><em>Flexibility:</em> Define complex models imperatively (no static graphs).</li>
 <li><em>Community &amp; Ecosystem:</em> Huge community, lots of pre-trained models and tutorials. Backed by Meta and the open-source community (now part of Linux Foundation).</li>
 </ul></li>
-<li><strong>Usage:</strong> Widely used in academia and industry (Meta uses PyTorch to power all its AI workloads (<a href="https://www.techtarget.com/searchenterpriseai/definition/PyTorch#:~:text=PyTorch%20was%20initially%20an%20internship,for%20driving%20all%20AI%20workloads">What is PyTorch?</a>)). It has become a go-to framework for computer vision, NLP, and many scientific applications.</li>
+<li><strong>Usage:</strong> Widely used in academia and industry (Meta uses PyTorch to power all its AI workloads) and it has become a go-to framework for many application areas.</li>
 </ul>
 </section>
 <section id="core-components-of-pytorch" class="slide level2 smaller">
 <h2>Core Components of PyTorch</h2>
 <ul>
-<li><strong>Tensor:</strong> Fundamental data structure in PyTorch. A tensor is a homogeneous multi-dimensional array (similar to a NumPy array) that can be processed on CPU or GPU (<a href="https://en.wikipedia.org/wiki/PyTorch#:~:text=match%20at%20L412%20homogeneous%20multidimensional,and%20Apple%27s%20Metal">PyTorch - Wikipedia</a>).
+<li><strong>Tensor:</strong> Fundamental data structure in PyTorch. A tensor is a homogeneous multi-dimensional array (similar to a NumPy array) that can be processed on CPU or GPU.
 <ul>
 <li>Example: <code>torch.tensor([[1,2],[3,4]])</code> is a 2x2 tensor of integers.</li>
 </ul></li>
 <li><strong>Autograd:</strong> PyTorch’s automatic differentiation engine. It records operations on tensors so that gradients can be computed via backpropagation. This means if you have a loss computed from tensors, you can call <code>.backward()</code> to get gradients of all parameters – no manual calculus needed.</li>
-<li><strong><code>nn</code> Module:</strong> High-level neural network APIs. <code>torch.nn</code> provides building blocks like layers (Linear, Conv2d, LSTM, etc.), activation functions, loss functions, etc., to easily build complex networks (<a href="https://en.wikipedia.org/wiki/PyTorch#:~:text=PyTorch%20defines%20a%20module%20called,Networks%20are%20built%20by%20inheriting">PyTorch - Wikipedia</a>).
+<li><strong><code>nn</code> Module:</strong> High-level neural network APIs. <code>torch.nn</code> provides building blocks like layers (Linear, Conv2d, LSTM, etc.), activation functions, loss functions, etc., to easily build complex networks.
 <ul>
 <li>You define a neural network as a class inheriting <code>nn.Module</code>, compose layers in the constructor, and define the forward pass. PyTorch takes care of gradient computation for the parameters.</li>
 </ul></li>
@@ -425,7 +429,7 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="fa660010" class="cell" data-execution_count="1">
+<div id="b3d64f92" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -495,7 +499,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="2f636076" class="cell" data-execution_count="2">
+<div id="9bccf437" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
