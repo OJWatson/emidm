@@ -316,13 +316,13 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
 <p>We will be using the helper functions in the <code>emidm</code> package, which will be installed and all relevant modules from this as well as other required packages loaded below in two steps.</p>
 <p>First we will install <code>emidm</code> from Github:</p>
-<div id="cell-5" class="cell" data-outputid="b6e29a85-dfec-4379-fe9f-e0162b2ded9b" data-execution_count="1">
+<div id="cell-5" class="cell" data-outputid="9f379976-0313-40c4-a44f-8c7b92d9e67d" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>pip install git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>OJWatson<span class="op">/</span>emidm.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Collecting git+https://github.com/OJWatson/emidm.git
-  Cloning https://github.com/OJWatson/emidm.git to /tmp/pip-req-build-xyjux6e_
-  Running command git clone --filter=blob:none --quiet https://github.com/OJWatson/emidm.git /tmp/pip-req-build-xyjux6e_
-  Resolved https://github.com/OJWatson/emidm.git to commit e06d71abe120cfc8c801797652c7193cc83acee7
+  Cloning https://github.com/OJWatson/emidm.git to /tmp/pip-req-build-vwefrxg2
+  Running command git clone --filter=blob:none --quiet https://github.com/OJWatson/emidm.git /tmp/pip-req-build-vwefrxg2
+  Resolved https://github.com/OJWatson/emidm.git to commit 3708bab08df72a34ae788405142a8022a25ca52e
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
@@ -331,14 +331,7 @@ Requirement already satisfied: pandas in /usr/local/lib/python3.11/dist-packages
 Requirement already satisfied: python-dateutil&gt;=2.8.2 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;emidm==0.1) (2.8.2)
 Requirement already satisfied: pytz&gt;=2020.1 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;emidm==0.1) (2025.2)
 Requirement already satisfied: tzdata&gt;=2022.7 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;emidm==0.1) (2025.2)
-Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil&gt;=2.8.2-&gt;pandas-&gt;emidm==0.1) (1.17.0)
-Building wheels for collected packages: emidm
-  Building wheel for emidm (pyproject.toml) ... done
-  Created wheel for emidm: filename=emidm-0.1-py3-none-any.whl size=5483 sha256=378039ec4542021209d6b33267de35724784debf2e5e1949d99501d82f1ee5bc
-  Stored in directory: /tmp/pip-ephem-wheel-cache-oollgsze/wheels/ce/16/40/b4c1e30c22fdfce27c1feecd7eec84f343a08c9f33e7efb807
-Successfully built emidm
-Installing collected packages: emidm
-Successfully installed emidm-0.1</code></pre>
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil&gt;=2.8.2-&gt;pandas-&gt;emidm==0.1) (1.17.0)</code></pre>
 </div>
 </div>
 <p>Next we will import any required modules once here. If this works then the rest of the notebook should work 🤞:</p>
@@ -375,7 +368,7 @@ Successfully installed emidm-0.1</code></pre>
 <section id="running-a-single-sir-model-simulation" class="level3">
 <h3 class="anchored" data-anchor-id="running-a-single-sir-model-simulation">Running a Single SIR Model Simulation</h3>
 <p>We can use <code>emidm</code> to ssimulate the SIR model dynamics using default parameters:</p>
-<div id="cell-10" class="cell" data-outputid="f108d9a5-77fc-4945-a1c4-2bd81223fc5e" data-execution_count="3">
+<div id="cell-10" class="cell" data-outputid="5c5e10f1-a73e-4f9d-e4f1-5f7b7c7fbfda" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Demonstrate running one model</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>single <span class="op">=</span> run_sir()</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -383,7 +376,7 @@ Successfully installed emidm-0.1</code></pre>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>single</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 
-  <div id="df-c7c55c8d-b2c2-44de-a8ab-04f4c6759d79" class="colab-df-container">
+  <div id="df-25afb226-161f-4891-9c49-26fdcf3bf4d7" class="colab-df-container">
     <div>
 
 
@@ -411,32 +404,32 @@ Successfully installed emidm-0.1</code></pre>
 <td data-quarto-table-cell-role="th">1</td>
 <td>1</td>
 <td>1000</td>
-<td>985</td>
-<td>15</td>
-<td>0</td>
+<td>988</td>
+<td>10</td>
+<td>2</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>2</td>
 <td>1000</td>
-<td>983</td>
-<td>15</td>
+<td>986</td>
+<td>12</td>
 <td>2</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>3</td>
 <td>1000</td>
-<td>982</td>
-<td>15</td>
-<td>3</td>
+<td>985</td>
+<td>10</td>
+<td>5</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>4</td>
 <td>1000</td>
-<td>979</td>
-<td>16</td>
+<td>984</td>
+<td>11</td>
 <td>5</td>
 </tr>
 <tr class="even">
@@ -451,41 +444,41 @@ Successfully installed emidm-0.1</code></pre>
 <td data-quarto-table-cell-role="th">96</td>
 <td>96</td>
 <td>1000</td>
-<td>163</td>
-<td>28</td>
-<td>809</td>
+<td>206</td>
+<td>32</td>
+<td>762</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">97</td>
 <td>97</td>
 <td>1000</td>
-<td>161</td>
-<td>29</td>
-<td>810</td>
+<td>204</td>
+<td>33</td>
+<td>763</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">98</td>
 <td>98</td>
 <td>1000</td>
-<td>160</td>
-<td>28</td>
-<td>812</td>
+<td>201</td>
+<td>33</td>
+<td>766</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">99</td>
 <td>99</td>
 <td>1000</td>
-<td>159</td>
-<td>26</td>
-<td>815</td>
+<td>200</td>
+<td>32</td>
+<td>768</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">100</td>
 <td>100</td>
 <td>1000</td>
-<td>159</td>
-<td>23</td>
-<td>818</td>
+<td>200</td>
+<td>30</td>
+<td>770</td>
 </tr>
 </tbody>
 </table>
@@ -495,7 +488,7 @@ Successfully installed emidm-0.1</code></pre>
     <div class="colab-df-buttons">
 
   <div class="colab-df-container">
-    <button class="colab-df-convert" onclick="convertToInteractive('df-c7c55c8d-b2c2-44de-a8ab-04f4c6759d79')" title="Convert this dataframe to an interactive table." style="display:none;">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-25afb226-161f-4891-9c49-26fdcf3bf4d7')" title="Convert this dataframe to an interactive table." style="display:none;">
 
   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 -960 960 960">
     <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"></path>
@@ -545,12 +538,12 @@ Successfully installed emidm-0.1</code></pre>
 
     <script>
       const buttonEl =
-        document.querySelector('#df-c7c55c8d-b2c2-44de-a8ab-04f4c6759d79 button.colab-df-convert');
+        document.querySelector('#df-25afb226-161f-4891-9c49-26fdcf3bf4d7 button.colab-df-convert');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
       async function convertToInteractive(key) {
-        const element = document.querySelector('#df-c7c55c8d-b2c2-44de-a8ab-04f4c6759d79');
+        const element = document.querySelector('#df-25afb226-161f-4891-9c49-26fdcf3bf4d7');
         const dataTable =
           await google.colab.kernel.invokeFunction('convertToInteractive',
                                                     [key], {});
@@ -570,8 +563,8 @@ Successfully installed emidm-0.1</code></pre>
   </div>
 
 
-<div id="df-438b95aa-76cb-4f0e-a3c8-98e9382a68ed">
-  <button class="colab-df-quickchart" onclick="quickchart('df-438b95aa-76cb-4f0e-a3c8-98e9382a68ed')" title="Suggest charts" style="display:none;">
+<div id="df-19e80514-6cee-4a1f-8956-9930fea08c07">
+  <button class="colab-df-quickchart" onclick="quickchart('df-19e80514-6cee-4a1f-8956-9930fea08c07')" title="Suggest charts" style="display:none;">
 
 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px">
     <g>
@@ -687,14 +680,14 @@ Successfully installed emidm-0.1</code></pre>
     }
     (() => {
       let quickchartButtonEl =
-        document.querySelector('#df-438b95aa-76cb-4f0e-a3c8-98e9382a68ed button');
+        document.querySelector('#df-19e80514-6cee-4a1f-8956-9930fea08c07 button');
       quickchartButtonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
     })();
   </script>
 </div>
 
-  <div id="id_a50c434a-9b52-4863-aef4-af6e03998123">
+  <div id="id_9e42cf67-97db-4e65-bddd-9e8d90a18ad5">
     <style>
       .colab-df-generate {
         background-color: #E8F0FE;
@@ -735,7 +728,7 @@ Successfully installed emidm-0.1</code></pre>
     <script>
       (() => {
       const buttonEl =
-        document.querySelector('#id_a50c434a-9b52-4863-aef4-af6e03998123 button.colab-df-generate');
+        document.querySelector('#id_9e42cf67-97db-4e65-bddd-9e8d90a18ad5 button.colab-df-generate');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
@@ -752,7 +745,7 @@ Successfully installed emidm-0.1</code></pre>
 </div>
 <p>The output is a <code>pandas DataFrame</code> containing the number of susceptible (S), infected (I), and recovered (R) individuals over time.</p>
 <p>To visualize the results:</p>
-<div id="cell-12" class="cell" data-outputid="e3f673c4-adf2-493e-eb2e-18bc2061a5c9" data-execution_count="4">
+<div id="cell-12" class="cell" data-outputid="d45b0d35-2913-449a-8360-ad5f22b54858" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show a single plot line</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>single.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -764,7 +757,7 @@ Successfully installed emidm-0.1</code></pre>
 </div>
 </div>
 <p>We can adjust parameters such as the transmission rate (<code>beta</code>) to observe different dynamics:</p>
-<div id="cell-14" class="cell" data-outputid="fa2583d9-b91d-47df-b7b4-1831e44551c4" data-execution_count="5">
+<div id="cell-14" class="cell" data-outputid="374b060d-1166-4a1b-cdfa-805f155275f9" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can also vary the parameters</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>alt <span class="op">=</span> run_sir(beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>alt.plot(<span class="st">"t"</span>, [<span class="st">"S"</span>, <span class="st">"I"</span>, <span class="st">"R"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -780,7 +773,7 @@ Successfully installed emidm-0.1</code></pre>
 <section id="running-multiple-stochastic-realisations" class="level3">
 <h3 class="anchored" data-anchor-id="running-multiple-stochastic-realisations">Running Multiple Stochastic Realisations</h3>
 <p>To account for stochasticity, we can run multiple realizations of the model:</p>
-<div id="cell-16" class="cell" data-outputid="67d2f461-d523-4af1-b4eb-01a0ce91c730" data-execution_count="6">
+<div id="cell-16" class="cell" data-outputid="988c7971-210c-4682-cd03-1a4bf304bc6d" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can run multiple realisations</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model <span class="op">=</span> run_sir, reps <span class="op">=</span> <span class="dv">10</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -795,7 +788,7 @@ Successfully installed emidm-0.1</code></pre>
 </div>
 </div>
 <p>And we can also pass through any of the arguments to <code>run_sir</code> to our <code>run_model_with_replicates</code> function.</p>
-<div id="cell-18" class="cell" data-outputid="ab9b272d-ace2-4476-bae1-4d882ad0c097" data-execution_count="7">
+<div id="cell-18" class="cell" data-outputid="accdc696-4b13-4e32-a6de-a48dffadb58c" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also by args to run_sir through kwargs</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> run_model_with_replicates(model<span class="op">=</span>run_sir, reps<span class="op">=</span><span class="dv">10</span>, beta <span class="op">=</span> <span class="fl">0.3</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -816,7 +809,7 @@ Successfully installed emidm-0.1</code></pre>
 <section id="sampling-parameter-space-with-latin-hypercube-sampling" class="level3">
 <h3 class="anchored" data-anchor-id="sampling-parameter-space-with-latin-hypercube-sampling">Sampling Parameter Space with Latin Hypercube Sampling</h3>
 <p>To systematically explore the parameter space, we use Latin Hypercube Sampling (LHS), which we have again provided helper functions from <code>emidm</code> for you to use.</p>
-<div id="cell-21" class="cell" data-outputid="2a4afa80-7997-4eeb-ed95-b939e1e4c98b" data-execution_count="8">
+<div id="cell-21" class="cell" data-outputid="e7a988cf-21b7-41c9-acf5-c198526488a2" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># now to generate a lhs sample based on R0 and gamma</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> beta_gamma_from_r0_gamma(n_samples, param_ranges, seed <span class="op">=</span> <span class="va">None</span>):</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    df_samples <span class="op">=</span> generate_lhs_samples(param_ranges, n_samples<span class="op">=</span>n_samples, seed<span class="op">=</span>seed)</span>
@@ -829,7 +822,7 @@ Successfully installed emidm-0.1</code></pre>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>df_samples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 
-  <div id="df-104ea186-1695-4618-a4d7-fbb4e7aff862" class="colab-df-container">
+  <div id="df-33973c68-fe96-491c-beae-8090ce5d3f9d" class="colab-df-container">
     <div>
 
 
@@ -894,7 +887,7 @@ Successfully installed emidm-0.1</code></pre>
     <div class="colab-df-buttons">
 
   <div class="colab-df-container">
-    <button class="colab-df-convert" onclick="convertToInteractive('df-104ea186-1695-4618-a4d7-fbb4e7aff862')" title="Convert this dataframe to an interactive table." style="display:none;">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-33973c68-fe96-491c-beae-8090ce5d3f9d')" title="Convert this dataframe to an interactive table." style="display:none;">
 
   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 -960 960 960">
     <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"></path>
@@ -944,12 +937,12 @@ Successfully installed emidm-0.1</code></pre>
 
     <script>
       const buttonEl =
-        document.querySelector('#df-104ea186-1695-4618-a4d7-fbb4e7aff862 button.colab-df-convert');
+        document.querySelector('#df-33973c68-fe96-491c-beae-8090ce5d3f9d button.colab-df-convert');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
       async function convertToInteractive(key) {
-        const element = document.querySelector('#df-104ea186-1695-4618-a4d7-fbb4e7aff862');
+        const element = document.querySelector('#df-33973c68-fe96-491c-beae-8090ce5d3f9d');
         const dataTable =
           await google.colab.kernel.invokeFunction('convertToInteractive',
                                                     [key], {});
@@ -969,8 +962,8 @@ Successfully installed emidm-0.1</code></pre>
   </div>
 
 
-<div id="df-95f3f487-d559-4349-b4ac-edf497c34006">
-  <button class="colab-df-quickchart" onclick="quickchart('df-95f3f487-d559-4349-b4ac-edf497c34006')" title="Suggest charts" style="display:none;">
+<div id="df-ffc334e8-f40d-4fc8-a97e-55eabd5678f8">
+  <button class="colab-df-quickchart" onclick="quickchart('df-ffc334e8-f40d-4fc8-a97e-55eabd5678f8')" title="Suggest charts" style="display:none;">
 
 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewbox="0 0 24 24" width="24px">
     <g>
@@ -1086,14 +1079,14 @@ Successfully installed emidm-0.1</code></pre>
     }
     (() => {
       let quickchartButtonEl =
-        document.querySelector('#df-95f3f487-d559-4349-b4ac-edf497c34006 button');
+        document.querySelector('#df-ffc334e8-f40d-4fc8-a97e-55eabd5678f8 button');
       quickchartButtonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
     })();
   </script>
 </div>
 
-  <div id="id_d48e7118-84e2-447c-a4b6-8d428d10a58a">
+  <div id="id_17f1659d-73d1-4186-8205-2fc06d832298">
     <style>
       .colab-df-generate {
         background-color: #E8F0FE;
@@ -1134,7 +1127,7 @@ Successfully installed emidm-0.1</code></pre>
     <script>
       (() => {
       const buttonEl =
-        document.querySelector('#id_d48e7118-84e2-447c-a4b6-8d428d10a58a button.colab-df-generate');
+        document.querySelector('#id_17f1659d-73d1-4186-8205-2fc06d832298 button.colab-df-generate');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
@@ -1160,7 +1153,7 @@ Successfully installed emidm-0.1</code></pre>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine results into one DataFrame:</span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df_all_results <span class="op">=</span> pd.concat(results, axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-24" class="cell" data-outputid="6d7a3f24-12c6-419d-d509-1110f3ea9077" data-execution_count="10">
+<div id="cell-24" class="cell" data-outputid="5df0d3e3-aa7b-4020-e6ed-2df5418a0b0b" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape dataframe into tidy long-format</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_all_results.melt(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    id_vars<span class="op">=</span>[<span class="st">"t"</span>, <span class="st">"replicate"</span>, <span class="st">"gamma"</span>, <span class="st">"beta"</span>],</span>
@@ -1208,7 +1201,7 @@ Successfully installed emidm-0.1</code></pre>
 <section id="generating-training-and-test-data" class="level3">
 <h3 class="anchored" data-anchor-id="generating-training-and-test-data">Generating Training and Test Data</h3>
 <p>Now that we have seen how LHS is being used to sample different <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\gamma\)</span> parameters and to generate simulations, we will now generate training, validation and test data in much the same way:</p>
-<div id="cell-26" class="cell" data-outputid="f65780c6-0878-49de-8e06-bf89059cbc10" data-execution_count="11">
+<div id="cell-26" class="cell" data-outputid="d7a0a298-c0e9-4566-f519-9f9dc5d3fcdc" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set random seed for reproducibility</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(<span class="dv">42</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
@@ -1244,17 +1237,17 @@ Successfully installed emidm-0.1</code></pre>
 <span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>], axis <span class="op">=</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"version_major":2,"version_minor":0,"model_id":"af2c8e831fef4c8a819e34474f7cbb5d","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"version_major":2,"version_minor":0,"model_id":"55f207ca6b89414690459becb05bb00e","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"version_major":2,"version_minor":0,"model_id":"3efef5a3540d4ca2b9e566e2c610d755","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"version_major":2,"version_minor":0,"model_id":"fb99d36aa2a543e0885db1d5a74479a0","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"version_major":2,"version_minor":0,"model_id":"7e5b4aa0e1614b9eb83386b38ea76f35","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"version_major":2,"version_minor":0,"model_id":"54a1b342527b46a58fae719e10a93ae9","quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1554,7 +1547,7 @@ Successfully installed emidm-0.1</code></pre>
 <h3 class="anchored" data-anchor-id="creating-and-training-our-models">Creating and Training Our Models</h3>
 <p>Now that we have created our NN classes, we can initialise these models, and determine whether a GPU is available for computation (it should be if you changed your Runtime earlier).</p>
 <p>If a GPU is found (<code>torch.cuda.is_available()</code> returns <code>True</code>), it sets the device to ‘cuda’ (indicating GPU usage); otherwise, it defaults to ‘cpu’ for CPU-based calculations.</p>
-<div id="cell-42" class="cell" data-outputid="df340d91-58d1-477d-fc8f-5e037be1f4ce" data-execution_count="18">
+<div id="cell-42" class="cell" data-outputid="17911128-517b-4dca-b158-c6bd92a76289" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize models</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>ffnn_model <span class="op">=</span> FFNN(input_size, hidden_size, train_dataset.time_length, output_size)</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>gru_model <span class="op">=</span> GRUModel(input_size, hidden_size, output_size, dropout_prob, num_layers)</span>
@@ -1730,7 +1723,7 @@ Successfully installed emidm-0.1</code></pre>
 <span id="cb22-114"><a href="#cb22-114" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can now actually train our models!</p>
-<div id="cell-46" class="cell" data-outputid="dcd75782-e683-402b-b592-584f84027bc9" data-execution_count="20">
+<div id="cell-46" class="cell" data-outputid="1355eec9-1e79-4832-eec4-ebad073ff4a6" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set training parameters</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="op">=</span> <span class="fl">1e-3</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">100</span></span>
@@ -1757,37 +1750,32 @@ Successfully installed emidm-0.1</code></pre>
 <pre><code>/usr/local/lib/python3.11/dist-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>New best model saved at epoch 1 with validation loss: 0.005281
-New best model saved at epoch 2 with validation loss: 0.002965
-New best model saved at epoch 3 with validation loss: 0.002393
-New best model saved at epoch 5 with validation loss: 0.002065
-Epoch 10/100, ffnn - Train Loss: 0.0036, Val Loss: 0.0019
-New best model saved at epoch 10 with validation loss: 0.001927
-New best model saved at epoch 15 with validation loss: 0.001915
-New best model saved at epoch 17 with validation loss: 0.001790
-Epoch 20/100, ffnn - Train Loss: 0.0034, Val Loss: 0.0023
-Validation loss did not improve. Patience: 3/10
-New best model saved at epoch 24 with validation loss: 0.001753
-Epoch 30/100, ffnn - Train Loss: 0.0033, Val Loss: 0.0018
-Validation loss did not improve. Patience: 6/10
-Early stopping triggered after 34 epochs. Best was epoch 24.
+<pre><code>New best model saved at epoch 1 with validation loss: 0.005242
+New best model saved at epoch 2 with validation loss: 0.003290
+New best model saved at epoch 3 with validation loss: 0.002707
+New best model saved at epoch 9 with validation loss: 0.002256
+Epoch 10/100, ffnn - Train Loss: 0.0037, Val Loss: 0.0023
+Validation loss did not improve. Patience: 1/10
+New best model saved at epoch 12 with validation loss: 0.002102
+Epoch 20/100, ffnn - Train Loss: 0.0033, Val Loss: 0.0021
+Validation loss did not improve. Patience: 8/10
+Early stopping triggered after 22 epochs. Best was epoch 12.
 Training GRU model...</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/usr/local/lib/python3.11/dist-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>New best model saved at epoch 1 with validation loss: 0.008749
-New best model saved at epoch 2 with validation loss: 0.005271
-New best model saved at epoch 3 with validation loss: 0.002927
-New best model saved at epoch 4 with validation loss: 0.002352
-New best model saved at epoch 5 with validation loss: 0.002053
-New best model saved at epoch 6 with validation loss: 0.002019
-Epoch 10/100, gru - Train Loss: 0.0022, Val Loss: 0.0020
-Validation loss did not improve. Patience: 4/10
-New best model saved at epoch 11 with validation loss: 0.001739
-New best model saved at epoch 17 with validation loss: 0.001685
-Epoch 20/100, gru - Train Loss: 0.0020, Val Loss: 0.0017
+<pre><code>New best model saved at epoch 1 with validation loss: 0.011058
+New best model saved at epoch 2 with validation loss: 0.006320
+New best model saved at epoch 3 with validation loss: 0.003598
+New best model saved at epoch 4 with validation loss: 0.002484
+New best model saved at epoch 9 with validation loss: 0.002197
+Epoch 10/100, gru - Train Loss: 0.0025, Val Loss: 0.0025
+Validation loss did not improve. Patience: 1/10
+New best model saved at epoch 14 with validation loss: 0.002080
+New best model saved at epoch 17 with validation loss: 0.002057
+Epoch 20/100, gru - Train Loss: 0.0021, Val Loss: 0.0023
 Validation loss did not improve. Patience: 3/10
 Early stopping triggered after 27 epochs. Best was epoch 17.
 Training LSTM model...</code></pre>
@@ -1796,21 +1784,18 @@ Training LSTM model...</code></pre>
 <pre><code>/usr/local/lib/python3.11/dist-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>New best model saved at epoch 1 with validation loss: 0.007317
-New best model saved at epoch 2 with validation loss: 0.004088
-New best model saved at epoch 3 with validation loss: 0.002148
-New best model saved at epoch 4 with validation loss: 0.002083
-New best model saved at epoch 6 with validation loss: 0.002010
-New best model saved at epoch 7 with validation loss: 0.001768
-Epoch 10/100, lstm - Train Loss: 0.0023, Val Loss: 0.0025
+<pre><code>New best model saved at epoch 1 with validation loss: 0.008221
+New best model saved at epoch 2 with validation loss: 0.004299
+New best model saved at epoch 3 with validation loss: 0.003685
+New best model saved at epoch 4 with validation loss: 0.002275
+New best model saved at epoch 7 with validation loss: 0.002167
+Epoch 10/100, lstm - Train Loss: 0.0024, Val Loss: 0.0022
 Validation loss did not improve. Patience: 3/10
-New best model saved at epoch 15 with validation loss: 0.001752
-Epoch 20/100, lstm - Train Loss: 0.0021, Val Loss: 0.0018
-Validation loss did not improve. Patience: 5/10
-New best model saved at epoch 21 with validation loss: 0.001680
-Epoch 30/100, lstm - Train Loss: 0.0019, Val Loss: 0.0018
-Validation loss did not improve. Patience: 9/10
-Early stopping triggered after 31 epochs. Best was epoch 21.</code></pre>
+New best model saved at epoch 11 with validation loss: 0.002145
+New best model saved at epoch 16 with validation loss: 0.002080
+Epoch 20/100, lstm - Train Loss: 0.0022, Val Loss: 0.0027
+Validation loss did not improve. Patience: 4/10
+Early stopping triggered after 26 epochs. Best was epoch 16.</code></pre>
 </div>
 </div>
 </section>
@@ -1820,7 +1805,7 @@ Early stopping triggered after 31 epochs. Best was epoch 21.</code></pre>
 <p>Below we visualize the training history of three different neural network models (FFNN, GRU, and LSTM), showing the training loss and validation loss over the training epochs and highlighting the epoch where each model achieved its best validation performance.</p>
 <p>This is important to track the learning process of each model and evaluate their overall performance, and potentially assess for overfitting to the training data, in which training loss can be low but the validation loss is not decreasing. This could require changing model parameters such as <code>hidden_size</code>, the number of hidden layers in the network, or using more regularisation techniques.</p>
 <p>However, for these simple models, we will see that the models train well and reaching best performance quickly.</p>
-<div id="cell-48" class="cell" data-outputid="1261e7f0-d25a-477d-e4b1-f6ebd1a43180" data-execution_count="21">
+<div id="cell-48" class="cell" data-outputid="114dc172-f104-41c4-b580-9aa77f3e6e9c" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot FFNN losses</span></span>
@@ -1951,7 +1936,7 @@ Early stopping triggered after 31 epochs. Best was epoch 21.</code></pre>
 <span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can then wrangle this into long data and return to our beloved ggplot style for plotting the model predictions and the replicates of the stochastic SIR model.</p>
-<div id="cell-55" class="cell" data-outputid="46659d20-fe95-4271-abe0-04f3cda797e1" data-execution_count="24">
+<div id="cell-55" class="cell" data-outputid="92cce0a9-e95e-467b-df86-162a8bf23c01" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape dataframe into tidy long-format</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>df_long_preds <span class="op">=</span> df_predictions.melt(</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    id_vars<span class="op">=</span>[<span class="st">"t"</span>, <span class="st">"gamma"</span>, <span class="st">"beta"</span>, <span class="st">"replicate"</span>, <span class="st">"model"</span>],  <span class="co"># Include model in id_vars</span></span>
@@ -1999,7 +1984,7 @@ Early stopping triggered after 31 epochs. Best was epoch 21.</code></pre>
 <p>The section below will allow you to engage in a hands-on approach to actually using your trained emulator!</p>
 <p>Eveyrthing that we have done so far looks good, however we’ve not actually shown you how to use the emulator, below we have written a little script that allows you to interface with the emulators you’ve trained and the SIR model such that you can visually see the outputs of your emulators in real time.</p>
 <p>Have a go and try different parameter combinations, can you guess what will happen if you feed in a beta and gamma value that sits outside of the trained range?</p>
-<div id="cell-59" class="cell" data-cellview="form" data-execution_count="27">
+<div id="cell-59" class="cell" data-cellview="form" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#@title Interactive Emulator Validation Widget (Hidden for Github)</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Uncomment to get interactive widget in notebook - does not render in Github Jupyter Render Currently</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2165,7 +2150,7 @@ Early stopping triggered after 31 epochs. Best was epoch 21.</code></pre>
 <p>Error metrics provide essential information about model performance. In epidemiological modeling, understanding how well our models predict disease spread under different transmission (beta) and recovery (gamma) parameters is crucial. The heatmaps we’ll generate visualize performance across the parameter space, highlighting where models excel and where they struggle. These standardized metrics (scaled from 0-1) allow for fair comparisons between different models and across different parameter combinations. Higher values (greener colors) always indicate better performance.</p>
 <p>In essence, the code below systematically evaluates the accuracy of three different neural network models (FFNN, GRU, LSTM) in emulating an SIR epidemiological model. By generating high-resolution heatmaps, it visually compares their performance across a range of infection and recovery rates, providing valuable insights into the models’ strengths and weaknesses in predicting disease dynamics, and how the performance varies across the parameter space that was used in training and that which is outside this space.</p>
 <p><strong>Don’t worry too much about this code, and focus on looking at the outputs and thinking about whether the results surprise you</strong></p>
-<div id="cell-62" class="cell" data-outputid="d38cb65b-c0e0-477c-c655-d21e5f8c1568">
+<div id="cell-62" class="cell" data-outputid="aa5be1e3-9f87-4f40-a3df-726dd4c5438a" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Higher Resolution Standardized Error Metrics Heatmap</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -2441,10 +2426,55 @@ For all metrics, higher values (greener) indicate better performance.
 Warning: Higher resolution means more computations and longer runtime.
 Using 20x20 grid (higher = smaller squares, but longer runtime)
 Generating high-resolution standardized error heatmaps with 20x20 grid...
-Progress: 5.0% complete (20/400 points). Time remaining: ~0.6 minutes
+Progress: 5.0% complete (20/400 points). Time remaining: ~0.5 minutes
 Progress: 10.0% complete (40/400 points). Time remaining: ~0.5 minutes
 Progress: 15.0% complete (60/400 points). Time remaining: ~0.5 minutes
-Progress: 20.0% complete (80/400 points). Time remaining: ~0.5 minutes</code></pre>
+Progress: 20.0% complete (80/400 points). Time remaining: ~0.5 minutes
+Progress: 25.0% complete (100/400 points). Time remaining: ~0.5 minutes
+Progress: 30.0% complete (120/400 points). Time remaining: ~0.4 minutes
+Progress: 35.0% complete (140/400 points). Time remaining: ~0.4 minutes
+Progress: 40.0% complete (160/400 points). Time remaining: ~0.3 minutes
+Progress: 45.0% complete (180/400 points). Time remaining: ~0.3 minutes
+Progress: 50.0% complete (200/400 points). Time remaining: ~0.3 minutes
+Progress: 55.0% complete (220/400 points). Time remaining: ~0.3 minutes
+Progress: 60.0% complete (240/400 points). Time remaining: ~0.2 minutes
+Progress: 65.0% complete (260/400 points). Time remaining: ~0.2 minutes
+Progress: 70.0% complete (280/400 points). Time remaining: ~0.2 minutes
+Progress: 75.0% complete (300/400 points). Time remaining: ~0.1 minutes
+Progress: 80.0% complete (320/400 points). Time remaining: ~0.1 minutes
+Progress: 85.0% complete (340/400 points). Time remaining: ~0.1 minutes
+Progress: 90.0% complete (360/400 points). Time remaining: ~0.1 minutes
+Progress: 95.0% complete (380/400 points). Time remaining: ~0.0 minutes
+Progress: 100.0% complete (400/400 points). Time remaining: ~0.0 minutes
+Heatmap generation completed in 0.59 minutes</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="surrogate_notebook_files/figure-html/cell-27-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="surrogate_notebook_files/figure-html/cell-27-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="surrogate_notebook_files/figure-html/cell-27-output-4.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="surrogate_notebook_files/figure-html/cell-27-output-5.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>When looking at the heatmap above, think through these 3 questions to help guide your thinking:</p>
@@ -2543,7 +2573,7 @@ Progress: 20.0% complete (80/400 points). Time remaining: ~0.5 minutes</code></p
 
 </main> <!-- /main -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"af2c8e831fef4c8a819e34474f7cbb5d":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_8f70531b7737497b9f1def360c9acd76","IPY_MODEL_ea10268d623947149376d2fb8b5387ac","IPY_MODEL_fa1b3b8dba4f40fb9412c2fb2eb7b19e"],"layout":"IPY_MODEL_ec7cd17fa13047319b6fa9a74da511c8"}},"8f70531b7737497b9f1def360c9acd76":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_cfb7a1221ac7412d83c7fe43777f4391","placeholder":"​","style":"IPY_MODEL_4751697e6a9d4514a7d03da0fc81d766","value":"100%"}},"ea10268d623947149376d2fb8b5387ac":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_3fa93728eccd410197c36dacd19f77c3","max":1000,"min":0,"orientation":"horizontal","style":"IPY_MODEL_dbc63072761646dcb8afd0340886322d","value":1000}},"fa1b3b8dba4f40fb9412c2fb2eb7b19e":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_31b876fe19df4c3b964c1a92904222ff","placeholder":"​","style":"IPY_MODEL_fdcff4eebb2e4a5e9b53f67928d41660","value":" 1000/1000 [01:30&lt;00:00, 12.85it/s]"}},"ec7cd17fa13047319b6fa9a74da511c8":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"cfb7a1221ac7412d83c7fe43777f4391":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"4751697e6a9d4514a7d03da0fc81d766":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"3fa93728eccd410197c36dacd19f77c3":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"dbc63072761646dcb8afd0340886322d":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"31b876fe19df4c3b964c1a92904222ff":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"fdcff4eebb2e4a5e9b53f67928d41660":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"3efef5a3540d4ca2b9e566e2c610d755":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_52ed6221e2264e43b5c9968466ba0a2a","IPY_MODEL_a6f09abcca274b24a4eb160ab522b0e1","IPY_MODEL_537d8827ab3a404fa74e37858ad62a70"],"layout":"IPY_MODEL_c00fd6a0908a45ee8da2ebaa965eb559"}},"52ed6221e2264e43b5c9968466ba0a2a":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_537124a61e3b4a47b10d468f4abb42ab","placeholder":"​","style":"IPY_MODEL_54197071a4fa49e380d3e859bb1d2fba","value":"100%"}},"a6f09abcca274b24a4eb160ab522b0e1":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_d3fb33112d3f452b93682756eded381b","max":200,"min":0,"orientation":"horizontal","style":"IPY_MODEL_41f8bf13c06243e3bd43c54b1da689c9","value":200}},"537d8827ab3a404fa74e37858ad62a70":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_f506cb28ccde405a8bbfb973414afa54","placeholder":"​","style":"IPY_MODEL_53d214c93fd34f30b0baa4b4c7492d45","value":" 200/200 [00:16&lt;00:00, 12.86it/s]"}},"c00fd6a0908a45ee8da2ebaa965eb559":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"537124a61e3b4a47b10d468f4abb42ab":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"54197071a4fa49e380d3e859bb1d2fba":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"d3fb33112d3f452b93682756eded381b":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"41f8bf13c06243e3bd43c54b1da689c9":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"f506cb28ccde405a8bbfb973414afa54":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"53d214c93fd34f30b0baa4b4c7492d45":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"7e5b4aa0e1614b9eb83386b38ea76f35":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_03ac7a5a757b4ddf981ad6e88657e953","IPY_MODEL_f5185f9c9efc4eff8bc5285b49e05051","IPY_MODEL_23f9f955918b4ff687679e9b2e8967fd"],"layout":"IPY_MODEL_3b4cbd39f57741089c847b77f23a0476"}},"03ac7a5a757b4ddf981ad6e88657e953":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_9308a1bbb2e24c419d46b0fa4258ccf0","placeholder":"​","style":"IPY_MODEL_ac03bbfb97904b0899a98a0e0c6afca6","value":"100%"}},"f5185f9c9efc4eff8bc5285b49e05051":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_b4405fa52be34bdb94ed9d8569da7cb2","max":100,"min":0,"orientation":"horizontal","style":"IPY_MODEL_773ab6326813412d84936ddf5d451e46","value":100}},"23f9f955918b4ff687679e9b2e8967fd":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_7f9cf22dbd194938a60e479c895ecb59","placeholder":"​","style":"IPY_MODEL_d30112eabef849ca8d2d403137bec91d","value":" 100/100 [00:07&lt;00:00, 13.20it/s]"}},"3b4cbd39f57741089c847b77f23a0476":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"9308a1bbb2e24c419d46b0fa4258ccf0":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"ac03bbfb97904b0899a98a0e0c6afca6":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"b4405fa52be34bdb94ed9d8569da7cb2":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"773ab6326813412d84936ddf5d451e46":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"7f9cf22dbd194938a60e479c895ecb59":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"d30112eabef849ca8d2d403137bec91d":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}}}
+{"55f207ca6b89414690459becb05bb00e":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_0b6b3316afa140f88aa379827cbc9a90","IPY_MODEL_4cd41e5a8bcc429a8ef4ec0611c8118c","IPY_MODEL_f90ecb64dd3a448993c3b95616a6eb89"],"layout":"IPY_MODEL_e61304f447734809a382f27db55dfb82"}},"0b6b3316afa140f88aa379827cbc9a90":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_37eb1e621abe48b0a0b788f2b9af9e6d","placeholder":"​","style":"IPY_MODEL_03c33eb646c842fbb07532f2ebf8edc7","value":"100%"}},"4cd41e5a8bcc429a8ef4ec0611c8118c":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_7b76f532212445deb7f6a29033b84e67","max":1000,"min":0,"orientation":"horizontal","style":"IPY_MODEL_930985a940394eff9d0dadab71999cac","value":1000}},"f90ecb64dd3a448993c3b95616a6eb89":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_fdfc6b7829124a3b805ee93502833ca7","placeholder":"​","style":"IPY_MODEL_5c8e885c25454295b1dfa5a30f9d7692","value":" 1000/1000 [01:29&lt;00:00, 13.35it/s]"}},"e61304f447734809a382f27db55dfb82":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"37eb1e621abe48b0a0b788f2b9af9e6d":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"03c33eb646c842fbb07532f2ebf8edc7":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"7b76f532212445deb7f6a29033b84e67":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"930985a940394eff9d0dadab71999cac":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"fdfc6b7829124a3b805ee93502833ca7":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"5c8e885c25454295b1dfa5a30f9d7692":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"fb99d36aa2a543e0885db1d5a74479a0":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_13089b1225934735bf0c3be553c9b313","IPY_MODEL_82ed7064b4da4bb4959002611f765c36","IPY_MODEL_b9a65ea65197492395cffc305e79210a"],"layout":"IPY_MODEL_a890370405ed4cbd8e794de5a27b2411"}},"13089b1225934735bf0c3be553c9b313":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_fe19f941cbe84333b624318c98f2af66","placeholder":"​","style":"IPY_MODEL_5a96903d05764c69b52e97d82653f122","value":"100%"}},"82ed7064b4da4bb4959002611f765c36":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_6dd1ff7cfc3b4a56bc1f940b94354443","max":200,"min":0,"orientation":"horizontal","style":"IPY_MODEL_86261871b2af41648e972497c421c4c2","value":200}},"b9a65ea65197492395cffc305e79210a":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_4c76a14fd4eb44d1a6b4a9fd0230f9f2","placeholder":"​","style":"IPY_MODEL_295757da7bff495482dcc3faf1e1d3be","value":" 200/200 [00:16&lt;00:00, 13.13it/s]"}},"a890370405ed4cbd8e794de5a27b2411":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"fe19f941cbe84333b624318c98f2af66":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"5a96903d05764c69b52e97d82653f122":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"6dd1ff7cfc3b4a56bc1f940b94354443":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"86261871b2af41648e972497c421c4c2":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"4c76a14fd4eb44d1a6b4a9fd0230f9f2":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"295757da7bff495482dcc3faf1e1d3be":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"54a1b342527b46a58fae719e10a93ae9":{"model_module":"@jupyter-widgets/controls","model_name":"HBoxModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_cd3c7329e0804a5591503ae7dd35e21a","IPY_MODEL_68cf614995884b249da21794082a9740","IPY_MODEL_0a2a568e7dc64acd9971c56d2c35565e"],"layout":"IPY_MODEL_c2c3af5745f44f95835491f2c0ff95b1"}},"cd3c7329e0804a5591503ae7dd35e21a":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_b914a6152d214967b3a92b7edcf5bb5a","placeholder":"​","style":"IPY_MODEL_92c99c338ea34bb7b64c187704ac4e5a","value":"100%"}},"68cf614995884b249da21794082a9740":{"model_module":"@jupyter-widgets/controls","model_name":"FloatProgressModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"ProgressView","bar_style":"success","description":"","description_tooltip":null,"layout":"IPY_MODEL_de755795dd524ae6a0741973443acecb","max":100,"min":0,"orientation":"horizontal","style":"IPY_MODEL_42c64059f1024f9ebdea6bf81524019d","value":100}},"0a2a568e7dc64acd9971c56d2c35565e":{"model_module":"@jupyter-widgets/controls","model_name":"HTMLModel","model_module_version":"1.5.0","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"1.5.0","_view_name":"HTMLView","description":"","description_tooltip":null,"layout":"IPY_MODEL_a2085a3b982b48c18690eb2e27a8ea3f","placeholder":"​","style":"IPY_MODEL_ceaeeb8d554e435eb24058060f5976ae","value":" 100/100 [00:08&lt;00:00, 13.07it/s]"}},"c2c3af5745f44f95835491f2c0ff95b1":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b914a6152d214967b3a92b7edcf5bb5a":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"92c99c338ea34bb7b64c187704ac4e5a":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}},"de755795dd524ae6a0741973443acecb":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"42c64059f1024f9ebdea6bf81524019d":{"model_module":"@jupyter-widgets/controls","model_name":"ProgressStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"a2085a3b982b48c18690eb2e27a8ea3f":{"model_module":"@jupyter-widgets/base","model_name":"LayoutModel","model_module_version":"1.2.0","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"ceaeeb8d554e435eb24058060f5976ae":{"model_module":"@jupyter-widgets/controls","model_name":"DescriptionStyleModel","model_module_version":"1.5.0","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"1.5.0","_model_name":"DescriptionStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","description_width":""}}}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
