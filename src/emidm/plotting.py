@@ -48,7 +48,7 @@ def sir_facet_plot(
         facet=lambda d: ("β = " + d["beta"].round(3).astype(str)).str.cat(
             [
                 ",\nγ = " + d["gamma"].round(3).astype(str),
-                ",\nI₀ = " + d["I0"].round(2).astype(str),
+                ",\nI₀ = " + d["I0"].astype(int).astype(str),
             ],
             sep="",
         ),
