@@ -42,6 +42,12 @@ def run_sir(
         at each time step
     """
 
+    # Integer convert
+    I0 = int(I0)
+    R0 = int(R0)
+    N = int(N)
+    T = int(T)
+
     # initialise compartments
     res = pd.DataFrame(
         {

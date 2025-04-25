@@ -17,7 +17,7 @@ def sir_facet_plot(
     df : pandas.DataFrame
         Wide-format data with columns::
 
-            t, replicate, beta, gamma, S, I, R
+            t, replicate, beta, gamma, I0, S, I, R
 
     show : bool, default True
         When *True* the figure is rendered immediately via ``p.draw()``;
@@ -39,7 +39,7 @@ def sir_facet_plot(
     # 1. Reshape to 'long' (tidy) format
     # ---------------------------------------------------------------------
     df_long = df.melt(
-        id_vars=["t", "replicate", "gamma", "beta"],
+        id_vars=["t", "replicate", "gamma", "beta", "I0"],
         value_vars=["S", "I", "R"],
         var_name="Compartment",
         value_name="Value",
@@ -51,6 +51,9 @@ def sir_facet_plot(
             + ",\n"
             + "gamma = "
             + d["gamma"].round(3).astype(str)
+            + ",\n"
+            + "I0 = "
+            + int(d["I0"]).astype(str)
         ),
     )
 
