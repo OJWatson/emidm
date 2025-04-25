@@ -84,6 +84,41 @@
     "text": "Extensions for Further Exploration\nIf you’ve completed the main sections of this notebook and have some extra time, consider exploring these extensions to deepen your understanding of surrogate modeling.\n\n1. Hyperparameter Tuning\nChallenge: Experiment with different hyperparameters of the neural network models (e.g., hidden size, number of layers, dropout rate, learning rate) to see how they affect performance.\nHint: Use a grid search or random search approach to systematically explore different hyperparameter combinations and evaluate their impact on validation loss.\nCode Snippet (Grid Search Example):\nimport itertools\n\n# Define hyperparameter ranges\nhidden_sizes = [32, 64, 128]\nnum_layers = [1, 2, 3]\ndropout_rates = [0.1, 0.2, 0.3]\n\n# Create all possible combinations\nhyperparameter_combinations = list(itertools.product(hidden_sizes, num_layers, dropout_rates))\n\n# Loop through combinations and train models\nfor hidden_size, num_layers, dropout_rate in hyperparameter_combinations:\n\n# Create and train model with current hyperparameters\n# ...\n\n\n2. Capturing Stochastic Uncertainty\nChallenge: Modify the models to predict the variance in stochastic replicates over time, rather than just the point estimate. This can be used to create a surrogate that captures stochastic uncertainty, providing a more comprehensive representation of the SIR model’s behavior.\nHint: Instead of predicting only the mean values of S and I, train the models to predict both the mean and variance (or standard deviation) for each time step. You’ll need to adjust the output layer of the models and modify the loss function to account for both mean and variance predictions. You can consider using metrics like the negative log-likelihood (NLL) for evaluating the performance of models predicting distributions.\nCode Snippet (Modifying the FFNN model):\nclass FFNN(nn.Module):\n\n    def forward(self, x):\n        # Output now includes both mean and variance\n        output = self.network(x)\n        output = output.view(-1, self.time_steps, self.output_channels, 2)\n        mean = self.sigmoid(output[:, :, :, 0])\n        variance = self.softplus(output[:, :, :, 1])  \n        return mean, variance\n\nFurther Hint: Instead of predicting only the mean values of S and I, train the models to predict both the mean and variance (or standard deviation) for each time step. You’ll need to adjust the output layer of the models and modify the loss function to account for both mean and variance predictions. Importantly, you’ll also need to change the SIRTimeSeriesDataset class to ensure that all stochastic replicates for a given parameter set are available during training, as the model now needs to learn the distribution of outcomes. You can consider using metrics like the negative log-likelihood (NLL) for evaluating the performance of models predicting distributions.\n\n\n\n3. Surrogate-Assisted Inference\nChallenge: Use the trained surrogate model to perform tasks like parameter estimation or sensitivity analysis, which are typically computationally expensive with the original SIR model.\nHint: You can use optimization algorithms to find parameter values that minimize the difference between the surrogate’s predictions and observed data. For parameter estimation, you can define an objective function that calculates the loss between the surrogate’s predictions and the observed data for a given set of parameters. Then, use an optimization algorithm like scipy.optimize.minimize to find the parameter values that minimize this loss. For sensitivity analysis, you can vary the input parameters of the surrogate model and observe the corresponding changes in the output to understand the model’s sensitivity to different parameters.\nCode Snippet (Parameter Estimation):\nscipy.optimize import minimize\n\ndef objective_function(params, surrogate_model, observed_data):\n  # ... (calculate surrogate predictions using params) ...\n  # ... (calculate difference between predictions and observed_data) ...\n  return loss\n\n# Perform optimization\nresult = minimize(objective_function, initial_params, args=(surrogate_model, observed_data))\n\n\nFurther Hint: You can generate your own observed data by simulating an SIR epidemic using the functions from emidm. Or you could get data from a real outbreak from https://www.reconverse.org/outbreaks/, e.g. the outbreak of influenza A (H1N1) in 1978 at a British boarding school of 763 children and changing your data generation to use a different N."
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "emidm",
+    "section": "",
+    "text": "Installation\nExample Usage\nLicense"
+  },
+  {
+    "objectID": "index.html#table-of-contents",
+    "href": "index.html#table-of-contents",
+    "title": "emidm",
+    "section": "",
+    "text": "Installation\nExample Usage\nLicense"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "emidm",
+    "section": "Installation",
+    "text": "Installation\npip install git+https://github.com/OJWatson/emidm.git\nOr\ngit clone https://github.com/OJWatson/emidm.git\ncd emidm\npip install ."
+  },
+  {
+    "objectID": "index.html#example-usage",
+    "href": "index.html#example-usage",
+    "title": "emidm",
+    "section": "Example Usage",
+    "text": "Example Usage\n\nfrom emidm.sir import run_sir, run_model_with_replicates, plot_model_outputs\nsingle = run_sir()\nsingle.plot(\"t\", [\"S\", \"I\", \"R\"])"
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "emidm",
+    "section": "License",
+    "text": "License\nemidm is distributed under the terms of the MIT license."
+  },
+  {
     "objectID": "slides/emidm_intro1.html#python-vs-r-syntax-structure-reminders",
     "href": "slides/emidm_intro1.html#python-vs-r-syntax-structure-reminders",
     "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
@@ -236,41 +271,6 @@
     "title": "Introduction to Deep Learning Frameworks with Python and PyTorch",
     "section": "Potential Application of cVAE in Epidemiology",
     "text": "Potential Application of cVAE in Epidemiology\n\nScenario: We have many observed epidemic curves (from simulations or real data) under various conditions (e.g. different intervention strategies). We want to model the distribution of epidemic outcomes for a new condition.\nUsing cVAE: We could train a cVAE where:\n\nThe input to the encoder is an epidemic trajectory with its condition (e.g. “with lockdown” vs “no lockdown”).\nThe condition is also fed into the decoder.\nThe cVAE learns a latent space of other factors (like unobserved socio-behavioral factors or stochastic effects).\n\nOnce trained, for a given condition (say “lockdown from day 30”), we can sample different latent vectors to generate a variety of plausible epidemic curves that all reflect that condition. This gives a principled way to explore uncertainty and variability in outcomes.\nWhy cVAE? Unlike a standard deterministic model, a cVAE provides a distribution of outcomes, not just one. This is valuable for risk assessment – e.g., what’s the worst-case scenario vs best-case scenario under a specific intervention?\nNote: This is an advanced technique and an active research area. It combines deep learning’s generative power with the need in epidemiology to quantify uncertainty."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "emidm",
-    "section": "",
-    "text": "Installation\nExample Usage\nLicense"
-  },
-  {
-    "objectID": "index.html#table-of-contents",
-    "href": "index.html#table-of-contents",
-    "title": "emidm",
-    "section": "",
-    "text": "Installation\nExample Usage\nLicense"
-  },
-  {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
-    "title": "emidm",
-    "section": "Installation",
-    "text": "Installation\npip install git+https://github.com/OJWatson/emidm.git\nOr\ngit clone https://github.com/OJWatson/emidm.git\ncd emidm\npip install ."
-  },
-  {
-    "objectID": "index.html#example-usage",
-    "href": "index.html#example-usage",
-    "title": "emidm",
-    "section": "Example Usage",
-    "text": "Example Usage\n\nfrom emidm.sir import run_sir, run_model_with_replicates, plot_model_outputs\nsingle = run_sir()\nsingle.plot(\"t\", [\"S\", \"I\", \"R\"])"
-  },
-  {
-    "objectID": "index.html#license",
-    "href": "index.html#license",
-    "title": "emidm",
-    "section": "License",
-    "text": "License\nemidm is distributed under the terms of the MIT license."
   },
   {
     "objectID": "examples/notebooks_intro.html",
