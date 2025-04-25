@@ -4,7 +4,7 @@ import pandas as pd
 from plotnine import ggplot, aes, geom_line, facet_wrap, theme_bw  # main grammar
 
 
-def sir_long_plot(
+def sir_facet_plot(
     df: pd.DataFrame,
     *,
     show: bool = True,
