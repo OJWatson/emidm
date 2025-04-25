@@ -43,9 +43,10 @@ def sir_facet_plot(
         value_vars=["S", "I", "R"],
         var_name="Compartment",
         value_name="Value",
-    ).assign(
-        uid=lambda d: d["Compartment"] + d["replicate"].astype(str),
     )
+
+    # Add a unique identifier
+    df_long["uid"] = df_long["Compartment"] + "_" + df_long["replicate"].astype(str)
 
     # Build the 'facet' label properly row by row
     df_long["facet"] = df_long.apply(
