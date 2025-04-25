@@ -80,3 +80,53 @@ def sir_facet_plot(
     else:
         # Skip drawing (e.g. during testing or pipelines)
         return None
+
+
+import matplotlib.pyplot as plt
+
+
+def plot_training_histories(histories):
+    """
+    Plot training and validation losses for one or multiple models.
+
+    Args:
+        histories (dict):
+            Dictionary where keys are model names (str) and values are dictionaries
+            containing 'epochs', 'train_loss', 'val_loss', and 'best_epoch'.
+            Example:
+                {
+                    "FFNN": {"epochs": [...], "train_loss": [...], "val_loss": [...], "best_epoch": int},
+                    "GRU": {"epochs": [...], "train_loss": [...], "val_loss": [...], "best_epoch": int},
+                    ...
+                }
+
+    Returns:
+        None.
+        Displays the plot.
+    """
+    num_models = len(histories)
+
+    plt.figure(
+        figsize=(5 * num_models, 4)
+    )  # Adjust figure size based on number of models
+
+    for idx, (model_name, history) in enumerate(histories.items(), start=1):
+        plt.subplot(1, num_models, idx)
+
+        plt.plot(history["epochs"], history["train_loss"], label="Train Loss")
+        plt.plot(history["epochs"], history["val_loss"], label="Validation Loss")
+        plt.axvline(
+            x=history["best_epoch"],
+            color="r",
+            linestyle="--",
+            label=f"Best epoch ({history['best_epoch']})",
+        )
+
+        plt.title(f"{model_name} Model Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend()
+        plt.grid(alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
