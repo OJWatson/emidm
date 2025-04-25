@@ -45,12 +45,15 @@ def sir_facet_plot(
         value_name="Value",
     ).assign(
         uid=lambda d: d["Compartment"] + d["replicate"].astype(str),
-        facet=lambda d: ("β = " + d["beta"].round(3).astype(str)).str.cat(
-            [
-                ",\nγ = " + d["gamma"].round(3).astype(str),
-                ",\nI₀ = " + d["I0"].astype(int).astype(str),
-            ],
-            sep="",
+        facet=lambda d: (
+            "beta = "
+            + d["beta"].round(3).astype(str)
+            + ",\n"
+            + "gamma = "
+            + d["gamma"].round(3).astype(str)
+            + ",\n"
+            + "I0 = "
+            + d["I0"].astype(str)
         ),
     )
 
