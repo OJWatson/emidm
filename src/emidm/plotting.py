@@ -45,9 +45,16 @@ def sir_facet_plot(
         value_name="Value",
     ).assign(
         uid=lambda d: d["Compartment"] + d["replicate"].astype(str),
-        facet=lambda d: ("β = " + d["beta"].round(3).astype(str))
-        .str.cat(d["gamma"].round(3).astype(str).radd(",\nγ = "), sep="")
-        .str.cat(d["I0"].round(3).astype(str).radd(",\nI₀ = "), sep=""),
+    )
+
+    # Now create the facet labels row-by-row
+    df_long["facet"] = (
+        "β = "
+        + df_long["beta"].round(3).astype(str)
+        + ",\nγ = "
+        + df_long["gamma"].round(3).astype(str)
+        + ",\nI₀ = "
+        + df_long["I0"].round(3).astype(str)
     )
 
     # ---------------------------------------------------------------------
