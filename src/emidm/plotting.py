@@ -53,7 +53,7 @@ def sir_facet_plot(
             + d["gamma"].round(3).astype(str)
             + ",\n"
             + "I0 = "
-            + d["I0"].astype(str)
+            + d["I0"].round(3).astype(str)
         ),
     )
 
