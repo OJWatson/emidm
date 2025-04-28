@@ -364,7 +364,7 @@ window.Quarto = {
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>pip install git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>OJWatson<span class="op">/</span>emidm.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Next we will import any required modules once here. If this works then the rest of the notebook should work 🤞:</p>
-<div id="cell-10" class="cell" data-execution_count="4">
+<div id="cell-10" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports from our own package</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.plotting <span class="im">import</span> sir_facet_plot, plot_training_histories</span>
@@ -421,12 +421,12 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p><strong>Hint</strong>: You will likely need to come back to the description of this dataset to help with later sections of the assessment.</p>
 </blockquote>
-<div id="cell-15" class="cell" data-cellview="form" data-outputid="3498c730-1297-4d58-a1ed-9b7946ce4d70" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="5">
+<div id="cell-15" class="cell" data-cellview="form" data-outputid="ccb9430f-4b5b-4262-bf5d-89e999afb991" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @title Slido Poll 1: Size of our population {"vertical-output":true}</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the associated webpage in a new window</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/c6b3a34b-21f1-423b-9d7f-23fc44ce5f15'</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>IPython.display.IFrame(url, width <span class="op">=</span> <span class="dv">700</span>, height <span class="op">=</span> <span class="dv">400</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="9">
 
         <iframe width="700" height="400" src="https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/c6b3a34b-21f1-423b-9d7f-23fc44ce5f15" frameborder="0" allowfullscreen=""></iframe>
         
@@ -770,12 +770,12 @@ window.Quarto = {
 <span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.tensor(features_normalized, dtype<span class="op">=</span>torch.float32), <span class="op">\</span></span>
 <span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a>               torch.tensor(sample[<span class="st">'targets'</span>], dtype<span class="op">=</span>torch.float32)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-47" class="cell" data-cellview="form" data-outputid="5bd8de6e-712e-4594-fabe-df63f04c4a37" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="6">
+<div id="cell-47" class="cell" data-cellview="form" data-outputid="b19ced6b-bba2-4dcd-f375-351a8041185d" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @title Slido Poll 3: Output Normalisation {"vertical-output":false}</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the associated webpage in a new window</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1'</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>IPython.display.IFrame(url, width <span class="op">=</span> <span class="dv">700</span>, height <span class="op">=</span> <span class="dv">400</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="10">
 
         <iframe width="700" height="400" src="https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1" frameborder="0" allowfullscreen=""></iframe>
         
