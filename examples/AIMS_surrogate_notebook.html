@@ -239,13 +239,13 @@ window.Quarto = {
   <li><a href="#evaluate-the-model" id="toc-evaluate-the-model" class="nav-link" data-scroll-target="#evaluate-the-model">6. Evaluate the model</a></li>
   <li><a href="#assessment-3." id="toc-assessment-3." class="nav-link" data-scroll-target="#assessment-3.">Assessment 3.</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#longer-feedback" id="toc-longer-feedback" class="nav-link" data-scroll-target="#longer-feedback"><strong>Longer Feedback</strong></a></li>
   <li><a href="#extensions-for-further-exploration" id="toc-extensions-for-further-exploration" class="nav-link" data-scroll-target="#extensions-for-further-exploration">Extensions for Further Exploration</a>
   <ul class="collapse">
   <li><a href="#hyperparameter-tuning" id="toc-hyperparameter-tuning" class="nav-link" data-scroll-target="#hyperparameter-tuning">1. Hyperparameter Tuning</a></li>
   <li><a href="#capturing-stochastic-uncertainty" id="toc-capturing-stochastic-uncertainty" class="nav-link" data-scroll-target="#capturing-stochastic-uncertainty">2. Capturing Stochastic Uncertainty</a></li>
   <li><a href="#surrogate-assisted-inference" id="toc-surrogate-assisted-inference" class="nav-link" data-scroll-target="#surrogate-assisted-inference">3. Surrogate-Assisted Inference</a></li>
   </ul></li>
-  <li><a href="#feedback" id="toc-feedback" class="nav-link" data-scroll-target="#feedback">Feedback</a></li>
   </ul>
 </nav>
     </div>
@@ -364,7 +364,7 @@ window.Quarto = {
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>pip install git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>OJWatson<span class="op">/</span>emidm.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Next we will import any required modules once here. If this works then the rest of the notebook should work 🤞:</p>
-<div id="cell-10" class="cell" data-execution_count="8">
+<div id="cell-10" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports from our own package</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> emidm.plotting <span class="im">import</span> sir_facet_plot, plot_training_histories</span>
@@ -421,7 +421,7 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p><strong>Hint</strong>: You will likely need to come back to the description of this dataset to help with later sections of the assessment.</p>
 </blockquote>
-<div id="cell-15" class="cell" data-cellview="form" data-outputid="ccb9430f-4b5b-4262-bf5d-89e999afb991" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="9">
+<div id="cell-15" class="cell" data-cellview="form" data-outputid="ccb9430f-4b5b-4262-bf5d-89e999afb991" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @title Slido Poll 1: Size of our population {"vertical-output":true}</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the associated webpage in a new window</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/c6b3a34b-21f1-423b-9d7f-23fc44ce5f15'</span></span>
@@ -770,7 +770,7 @@ window.Quarto = {
 <span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.tensor(features_normalized, dtype<span class="op">=</span>torch.float32), <span class="op">\</span></span>
 <span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a>               torch.tensor(sample[<span class="st">'targets'</span>], dtype<span class="op">=</span>torch.float32)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-47" class="cell" data-cellview="form" data-outputid="b19ced6b-bba2-4dcd-f375-351a8041185d" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="10">
+<div id="cell-47" class="cell" data-cellview="form" data-outputid="b19ced6b-bba2-4dcd-f375-351a8041185d" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @title Slido Poll 3: Output Normalisation {"vertical-output":false}</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the associated webpage in a new window</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1'</span></span>
@@ -1879,6 +1879,23 @@ window.Quarto = {
 <li><p><strong>Model Validation:</strong> We assessed the trained models’ performance by predicting on a held-out test dataset and comparing the predictions to the ground truth SIR model simulations.</p></li>
 <li><p><strong>Visualization:</strong> We visualized the training history, showing the training and validation losses over epochs, and highlighted the best-performing epochs for each model.</p></li>
 </ol>
+<div id="cell-88" class="cell" data-cellview="form" data-outputid="ef9fb440-8534-451a-ee3e-68b261b814d3" data-quarto-private-1="{&quot;key&quot;:&quot;colab&quot;,&quot;value&quot;:{&quot;base_uri&quot;:&quot;https://localhost:8080/&quot;,&quot;height&quot;:421}}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># @title 1-minute Paper Feedback {"vertical-output":false}</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the associated webpage in a new window</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://app.sli.do/event/5CjdyPAdbqa72Pf55UQRZz/embed/polls/4654a249-1336-4d69-bff9-fbbbd6790e6c'</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>IPython.display.IFrame(url, width <span class="op">=</span> <span class="dv">700</span>, height <span class="op">=</span> <span class="dv">400</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+
+        <iframe width="700" height="400" src="https://app.sli.do/event/5CjdyPAdbqa72Pf55UQRZz/embed/polls/4654a249-1336-4d69-bff9-fbbbd6790e6c" frameborder="0" allowfullscreen=""></iframe>
+        
+</div>
+</div>
+</section>
+<section id="longer-feedback" class="level2">
+<h2 class="anchored" data-anchor-id="longer-feedback"><strong>Longer Feedback</strong></h2>
+<p>I would be really grateful for your time in completing the feedback form for this session.</p>
+<p>You can find the form <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=B3WJK4zudUWDC0-CZ8PTBx_JkR_maLNHu6WeXZ96mQhUOEhZNVlVN1dPQkpXVzgwRzVRWDVEMllOQy4u">here</a>.</p>
+<p>Thank you and hope you enjoyed the tutorial!</p>
 </section>
 <section id="extensions-for-further-exploration" class="level2">
 <h2 class="anchored" data-anchor-id="extensions-for-further-exploration">Extensions for Further Exploration</h2>
@@ -1888,36 +1905,36 @@ window.Quarto = {
 <p><strong>Challenge:</strong> Experiment with different hyperparameters of the neural network models (e.g., hidden size, number of layers, dropout rate, learning rate) to see how they affect performance.</p>
 <p><strong>Hint:</strong> Use a grid search or random search approach to systematically explore different hyperparameter combinations and evaluate their impact on validation loss.</p>
 <p><strong>Code Snippet (Grid Search Example):</strong></p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define hyperparameter ranges</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>hidden_sizes <span class="op">=</span> [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>]</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>num_layers <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>dropout_rates <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>]</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create all possible combinations</span></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>hyperparameter_combinations <span class="op">=</span> <span class="bu">list</span>(itertools.product(hidden_sizes, num_layers, dropout_rates))</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through combinations and train models</span></span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hidden_size, num_layers, dropout_rate <span class="kw">in</span> hyperparameter_combinations:</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and train model with current hyperparameters</span></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define hyperparameter ranges</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>hidden_sizes <span class="op">=</span> [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>]</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>num_layers <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>dropout_rates <span class="op">=</span> [<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>]</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create all possible combinations</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>hyperparameter_combinations <span class="op">=</span> <span class="bu">list</span>(itertools.product(hidden_sizes, num_layers, dropout_rates))</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through combinations and train models</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hidden_size, num_layers, dropout_rate <span class="kw">in</span> hyperparameter_combinations:</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and train model with current hyperparameters</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="capturing-stochastic-uncertainty" class="level3">
 <h3 class="anchored" data-anchor-id="capturing-stochastic-uncertainty">2. Capturing Stochastic Uncertainty</h3>
 <p><strong>Challenge:</strong> Modify the models to predict the variance in stochastic replicates over time, rather than just the point estimate. This can be used to create a surrogate that captures stochastic uncertainty, providing a more comprehensive representation of the SIR model’s behavior.</p>
 <p><strong>Hint:</strong> Instead of predicting only the mean values of S and I, train the models to predict both the mean and variance (or standard deviation) for each time step. You’ll need to adjust the output layer of the models and modify the loss function to account for both mean and variance predictions. You can consider using metrics like the negative log-likelihood (NLL) for evaluating the performance of models predicting distributions.</p>
 <p><strong>Code Snippet (Modifying the FFNN model):</strong></p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FFNN(nn.Module):</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Output now includes both mean and variance</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> <span class="va">self</span>.network(x)</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> output.view(<span class="op">-</span><span class="dv">1</span>, <span class="va">self</span>.time_steps, <span class="va">self</span>.output_channels, <span class="dv">2</span>)</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>        mean <span class="op">=</span> <span class="va">self</span>.sigmoid(output[:, :, :, <span class="dv">0</span>])</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>        variance <span class="op">=</span> <span class="va">self</span>.softplus(output[:, :, :, <span class="dv">1</span>])  </span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mean, variance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FFNN(nn.Module):</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Output now includes both mean and variance</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> <span class="va">self</span>.network(x)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> output.view(<span class="op">-</span><span class="dv">1</span>, <span class="va">self</span>.time_steps, <span class="va">self</span>.output_channels, <span class="dv">2</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>        mean <span class="op">=</span> <span class="va">self</span>.sigmoid(output[:, :, :, <span class="dv">0</span>])</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>        variance <span class="op">=</span> <span class="va">self</span>.softplus(output[:, :, :, <span class="dv">1</span>])  </span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mean, variance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <blockquote class="blockquote">
 <p>Further Hint: Instead of predicting only the mean values of S and I, train the models to predict both the mean and variance (or standard deviation) for each time step. You’ll need to adjust the output layer of the models and modify the loss function to account for both mean and variance predictions. <strong>Importantly, you’ll also need to change the SIRTimeSeriesDataset class to ensure that all stochastic replicates for a given parameter set are available during training, as the model now needs to learn the distribution of outcomes.</strong> You can consider using metrics like the negative log-likelihood (NLL) for evaluating the performance of models predicting distributions.</p>
 </blockquote>
@@ -1927,29 +1944,23 @@ window.Quarto = {
 <p><strong>Challenge:</strong> Use the trained surrogate model to perform tasks like parameter estimation or sensitivity analysis, which are typically computationally expensive with the original SIR model.</p>
 <p><strong>Hint:</strong> You can use optimization algorithms to find parameter values that minimize the difference between the surrogate’s predictions and observed data. For parameter estimation, you can define an objective function that calculates the loss between the surrogate’s predictions and the observed data for a given set of parameters. Then, use an optimization algorithm like <code>scipy.optimize.minimize</code> to find the parameter values that minimize this loss. For sensitivity analysis, you can vary the input parameters of the surrogate model and observe the corresponding changes in the output to understand the model’s sensitivity to different parameters.</p>
 <p><strong>Code Snippet (Parameter Estimation):</strong></p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>scipy.optimize <span class="im">import</span> minimize</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> objective_function(params, surrogate_model, observed_data):</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... (calculate surrogate predictions using params) ...</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... (calculate difference between predictions and observed_data) ...</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> loss</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform optimization</span></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> minimize(objective_function, initial_params, args<span class="op">=</span>(surrogate_model, observed_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>scipy.optimize <span class="im">import</span> minimize</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> objective_function(params, surrogate_model, observed_data):</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... (calculate surrogate predictions using params) ...</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... (calculate difference between predictions and observed_data) ...</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> loss</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform optimization</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> minimize(objective_function, initial_params, args<span class="op">=</span>(surrogate_model, observed_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <blockquote class="blockquote">
 <blockquote class="blockquote">
 <p>Further Hint: You can generate your own observed data by simulating an SIR epidemic using the functions from <code>emidm</code>. Or you could get data from a real outbreak from <a href="https://www.reconverse.org/outbreaks/">https://www.reconverse.org/outbreaks/</a>, e.g.&nbsp;the outbreak of influenza A (H1N1) in 1978 at a British boarding school of 763 children and changing your data generation to use a different <code>N</code>.</p>
 </blockquote>
 </blockquote>
-</section>
-</section>
-<section id="feedback" class="level2">
-<h2 class="anchored" data-anchor-id="feedback">Feedback</h2>
-<p>I would be really grateful for your time in completing the feedback form for this session.</p>
-<p>You can find the form <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=B3WJK4zudUWDC0-CZ8PTBx_JkR_maLNHu6WeXZ96mQhUOEhZNVlVN1dPQkpXVzgwRzVRWDVEMllOQy4u">here</a>.</p>
-<p>Thank you and hope you enjoyed the tutorial!</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
