@@ -30,7 +30,7 @@ jobs:
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
         run: |
-          pytest --cov=emidm --cov-report=xml
+          pytest -p pytest_cov --cov=emidm --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
