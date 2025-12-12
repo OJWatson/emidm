@@ -1,7 +1,7 @@
+import matplotlib.pyplot as plt
 from typing import Optional
 
 import pandas as pd
-from plotnine import ggplot, aes, geom_line, facet_wrap, theme_bw  # main grammar
 
 
 def sir_facet_plot(
@@ -46,7 +46,8 @@ def sir_facet_plot(
     )
 
     # Add a unique identifier
-    df_long["uid"] = df_long["Compartment"] + "_" + df_long["replicate"].astype(str)
+    df_long["uid"] = df_long["Compartment"] + \
+        "_" + df_long["replicate"].astype(str)
 
     # Build the 'facet' label properly row by row
     df_long["facet"] = df_long.apply(
@@ -57,14 +58,21 @@ def sir_facet_plot(
     # ---------------------------------------------------------------------
     # 2. Build the ggplot figure
     # ---------------------------------------------------------------------
+    try:
+        import plotnine as p9
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "sir_facet_plot requires 'plotnine' to be installed. Install it via `pip install plotnine`."
+        ) from e
+
     p = (
-        ggplot(
+        p9.ggplot(
             df_long,
-            aes(x="t", y="Value", group="uid", colour="Compartment"),
+            p9.aes(x="t", y="Value", group="uid", colour="Compartment"),
         )
-        + geom_line(alpha=0.7)
-        + facet_wrap("facet")
-        + theme_bw()
+        + p9.geom_line(alpha=0.7)
+        + p9.facet_wrap("facet")
+        + p9.theme_bw()
     )
 
     # ---------------------------------------------------------------------
@@ -77,9 +85,6 @@ def sir_facet_plot(
     else:
         # Skip drawing (e.g. during testing or pipelines)
         return None
-
-
-import matplotlib.pyplot as plt
 
 
 def plot_training_histories(histories):
@@ -111,7 +116,8 @@ def plot_training_histories(histories):
         plt.subplot(1, num_models, idx)
 
         plt.plot(history["epochs"], history["train_loss"], label="Train Loss")
-        plt.plot(history["epochs"], history["val_loss"], label="Validation Loss")
+        plt.plot(history["epochs"], history["val_loss"],
+                 label="Validation Loss")
         plt.axvline(
             x=history["best_epoch"],
             color="r",

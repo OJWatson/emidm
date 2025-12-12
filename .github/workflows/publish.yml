@@ -3,7 +3,7 @@ on:
   push:
     branches: main
 
-name: Quarto Publish
+name: Publish Website
 
 jobs:
   build-deploy:
@@ -14,12 +14,54 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package (docs)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[docs]"
+
+      - name: Build Sphinx HTML
+        run: |
+          sphinx-build -W -b html docs docs/_build/html
+
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Render and Publish
-        uses: quarto-dev/quarto-actions/publish@v2
+      - name: Render Quarto assets (slides + notebooks)
+        run: |
+          quarto render slides/emidm_intro1.qmd --no-execute
+          quarto render examples/notebooks_intro.ipynb --no-execute
+          quarto render examples/surrogate_notebook.ipynb --no-execute
+          quarto render examples/AIMS_surrogate_notebook.ipynb --no-execute
+
+      - name: Copy Quarto outputs into Sphinx site
+        run: |
+          mkdir -p docs/_build/html/slides
+          mkdir -p docs/_build/html/examples
+
+          # Quarto (website project) writes outputs under _site/
+          cp -r _site/slides/emidm_intro1.html docs/_build/html/slides/
+          if [ -d _site/slides/emidm_intro1_files ]; then cp -r _site/slides/emidm_intro1_files docs/_build/html/slides/; fi
+
+          cp -r _site/examples/notebooks_intro.html docs/_build/html/examples/
+          if [ -d _site/examples/notebooks_intro_files ]; then cp -r _site/examples/notebooks_intro_files docs/_build/html/examples/; fi
+
+          cp -r _site/examples/surrogate_notebook.html docs/_build/html/examples/
+          if [ -d _site/examples/surrogate_notebook_files ]; then cp -r _site/examples/surrogate_notebook_files docs/_build/html/examples/; fi
+
+          cp -r _site/examples/AIMS_surrogate_notebook.html docs/_build/html/examples/
+          if [ -d _site/examples/AIMS_surrogate_notebook_files ]; then cp -r _site/examples/AIMS_surrogate_notebook_files docs/_build/html/examples/; fi
+
+          # Shared Quarto assets (JS/CSS) are typically under site_libs/
+          if [ -d _site/site_libs ]; then cp -r _site/site_libs docs/_build/html/; fi
+          if [ -f _site/styles.css ]; then cp -r _site/styles.css docs/_build/html/; fi
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          target: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: docs/_build/html

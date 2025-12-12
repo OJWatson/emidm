@@ -3,3 +3,15 @@ slides/emidm_intro1_files/
 .vscode/
 /.quarto/
 /_site/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+
+/background_docs/
+
+/docs/_build/
+/build/
+/dist/

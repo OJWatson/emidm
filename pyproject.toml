@@ -29,6 +29,32 @@ dependencies = [
   "matplotlib (>=3.10.0)"
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+]
+
+docs = [
+  "sphinx>=8",
+  "pydata-sphinx-theme>=0.16",
+  "myst-parser>=4",
+  "jupyter>=1",
+]
+
+jax = [
+  "jax>=0.4.20",
+  "jaxlib>=0.4.20",
+  "optax>=0.2.2",
+]
+
+bayes = [
+  "blackjax>=1.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [project.urls]
 Documentation = "https://github.com/OJWatson/emidm#readme"
 Issues = "https://github.com/OJWatson/emidm/issues"

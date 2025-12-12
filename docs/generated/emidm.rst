@@ -1,0 +1,6 @@
+﻿emidm
+=====
+
+.. automodule:: emidm
+
+   
