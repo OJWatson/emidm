@@ -1,4 +1,5 @@
-\venv/
+venv/
+.venv/
 slides/emidm_intro1_files/
 .vscode/
 /.quarto/
