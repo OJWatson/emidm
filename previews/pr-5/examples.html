@@ -31,6 +31,7 @@
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -44,8 +45,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Slides" href="slides.html" />
-    <link rel="prev" title="Calibration Demo" href="calibration.html" />
+    <link rel="next" title="Calibrating a Differentiable SIR Model" href="notebooks/calibration.html" />
+    <link rel="prev" title="emidm" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -124,23 +125,16 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="api.html">
-    API Reference
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="calibration.html">
-    Calibration Demo
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
   </a>
 </li>
 
@@ -240,23 +234,16 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="api.html">
-    API Reference
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="calibration.html">
-    Calibration Demo
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
   </a>
 </li>
 
@@ -310,7 +297,13 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/calibration.html">Calibrating a Differentiable SIR Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/intro.html">Introduction to Jupyter and Colab Notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/surrogate.html">Training Surrogates</a></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -368,18 +361,58 @@
                   
   <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
-<p>Rendered notebooks:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="examples/notebooks_intro.html">Notebooks introduction</a></p></li>
-<li><p><a class="reference external" href="examples/surrogate_notebook.html">Surrogate training</a></p></li>
-<li><p><a class="reference external" href="examples/AIMS_surrogate_notebook.html">AIMS surrogate notebook</a></p></li>
+<p>These tutorials demonstrate how to use <strong>emidm</strong> for epidemiological modelling.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/calibration.html">Calibrating a Differentiable SIR Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#step-1-generate-synthetic-data">Step 1: Generate Synthetic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#step-2-define-the-loss-function">Step 2: Define the Loss Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#step-3-optimize-using-gradient-descent">Step 3: Optimize β Using Gradient Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#step-4-compare-fitted-vs-true-model">Step 4: Compare Fitted vs True Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html#summary-n-nin-this-tutorial-we-demonstrated-n-n1-differentiable-simulation-using-run-diff-sir-to-simulate-epidemics-with-gradients-n2-gradient-based-calibration-using-optimize-params-to-fit-model-parameters-n3-model-comparison-visualizing-how-well-the-fitted-model-recovers-the-true-dynamics-n-nthe-key-advantage-of-differentiable-models-is-that-we-can-use-efficient-gradient-based-optimization-instead-of-slower-derivative-free-methods-like-grid-search-or-mcmc-this-becomes-especially-important-for-n-n-high-dimensional-parameter-spaces-when-fitting-many-parameters-simultaneously-n-complex-models-where-each-simulation-is-computationally-expensive-n-uncertainty-quantification-combining-with-variational-inference-or-hamiltonian-monte-carlo-n-nsee-the-api-documentation-for-more-details-on-the-available-models-and-utilities">Summary\n\nIn this tutorial, we demonstrated:\n\n1. <strong>Differentiable simulation</strong>: Using <code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> to simulate epidemics with gradients\n2. <strong>Gradient-based calibration</strong>: Using <code class="docutils literal notranslate"><span class="pre">optimize_params</span></code> to fit model parameters\n3. <strong>Model comparison</strong>: Visualizing how well the fitted model recovers the true dynamics\n\nThe key advantage of differentiable models is that we can use efficient gradient-based optimization instead of slower derivative-free methods (like grid search or MCMC). This becomes especially important for:\n\n- <strong>High-dimensional parameter spaces</strong>: When fitting many parameters simultaneously\n- <strong>Complex models</strong>: Where each simulation is computationally expensive\n- <strong>Uncertainty quantification</strong>: Combining with variational inference or Hamiltonian Monte Carlo\n\nSee the <span class="xref myst">API documentation</span> for more details on the available models and utilities.</a></li>
 </ul>
-<p>Open in Colab:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/notebooks_intro.ipynb">Notebooks introduction (Colab)</a></p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb">Surrogate training (Colab)</a></p></li>
-<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/AIMS_surrogate_notebook.ipynb">AIMS surrogate (Colab)</a></p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/intro.html">Introduction to Jupyter and Colab Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#what-is-a-notebook">What is a Notebook?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#run-order-matters">Run Order Matters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#key-components-of-the-notebook-interface">Key Components of the Notebook Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#code-cells">Code Cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#changing-runtime-type-in-colab-gpus-and-tpus">Changing Runtime Type in Colab (GPUs and TPUs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#saving-and-managing-files-in-colab">Saving and Managing Files in Colab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#common-keyboard-shortcuts">Common Keyboard Shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#example-code-cell-plotting-the-iris-dataset">Example Code Cell: Plotting the Iris Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html#additional-resources">Additional Resources</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/surrogate.html">Training Surrogates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#objectives">Objectives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#enabling-gpu-acceleration">Enabling GPU Acceleration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#generate-simulation-data">1. Generate Simulation Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#prepare-training-dataset">2. Prepare Training Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#train-a-neural-network">3. Train a neural network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#validate-the-model">4. Validate the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#run-the-model">5. Run the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#evaluate-the-model">6. Evaluate the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#conclusion">Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html#extensions-for-further-exploration">Extensions for Further Exploration</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="open-in-colab">
+<h2>Open in Colab<a class="headerlink" href="#open-in-colab" title="Link to this heading">#</a></h2>
+<p>You can also run these notebooks directly in Google Colab:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/docs/notebooks/calibration.ipynb">Calibration Demo (Colab)</a></p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/notebooks_intro.ipynb">Introduction (Colab)</a></p></li>
+<li><p><a class="reference external" href="https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb">Surrogate Training (Colab)</a></p></li>
+</ul>
+</section>
 </section>
 
 
@@ -393,20 +426,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="calibration.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Calibration Demo</p>
+        <p class="prev-next-title">emidm</p>
       </div>
     </a>
     <a class="right-next"
-       href="slides.html"
+       href="notebooks/calibration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Slides</p>
+        <p class="prev-next-title">Calibrating a Differentiable SIR Model</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -420,6 +453,18 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-in-colab">Open in Colab</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

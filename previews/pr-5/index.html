@@ -31,6 +31,7 @@
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -44,7 +45,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="next" title="Examples" href="examples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -124,22 +125,15 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="api.html">
-    API Reference
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="calibration.html">
-    Calibration Demo
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="examples.html">
     Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
   </a>
 </li>
 
@@ -242,22 +236,15 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="api.html">
-    API Reference
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="calibration.html">
-    Calibration Demo
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="examples.html">
     Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
   </a>
 </li>
 
@@ -336,10 +323,24 @@
                   
   <section id="emidm">
 <h1>emidm<a class="headerlink" href="#emidm" title="Link to this heading">#</a></h1>
-<p>A Python package for infectious disease modelling.</p>
+<p>A Python package for differentiable infectious disease modelling.</p>
+<p><strong>emidm</strong> provides:</p>
+<ul class="simple">
+<li><p>Stochastic SIR and age-structured SAFIR/SEIR models</p></li>
+<li><p>Differentiable versions using JAX for gradient-based calibration</p></li>
+<li><p>Optimization utilities with Optax</p></li>
+<li><p>Bayesian inference scaffolding with BlackJAX</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/calibration.html">Calibrating a Differentiable SIR Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/intro.html">Introduction to Jupyter and Colab Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/surrogate.html">Training Surrogates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#open-in-colab">Open in Colab</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/emidm.html">emidm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/emidm.sir.html">emidm.sir</a></li>
@@ -352,8 +353,6 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/emidm.plotting.html">emidm.plotting</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="calibration.html">Calibration Demo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="slides.html">Slides</a></li>
 </ul>
 </div>
@@ -370,11 +369,11 @@
                   
 <div class="prev-next-area">
     <a class="right-next"
-       href="api.html"
+       href="examples.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">API Reference</p>
+        <p class="prev-next-title">Examples</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
