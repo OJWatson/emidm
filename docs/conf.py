@@ -10,8 +10,20 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "myst_parser",
+    "myst_nb",
 ]
+
+# myst-nb configuration
+# Don't execute notebooks during build (they should have saved outputs)
+nb_execution_mode = "off"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".md": "myst-nb",
+}
+
+# Suppress non-critical warnings
+suppress_warnings = ["myst.header"]
 
 autosummary_generate = True
 

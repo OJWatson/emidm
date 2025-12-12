@@ -31,32 +31,19 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Render Quarto assets (slides + notebooks)
+      - name: Render Quarto slides
         run: |
           quarto render slides/emidm_intro1.qmd --no-execute
-          quarto render examples/notebooks_intro.ipynb --no-execute
-          quarto render examples/surrogate_notebook.ipynb --no-execute
-          quarto render examples/AIMS_surrogate_notebook.ipynb --no-execute
 
-      - name: Copy Quarto outputs into Sphinx site
+      - name: Copy Quarto slides into Sphinx site
         run: |
           mkdir -p docs/_build/html/slides
-          mkdir -p docs/_build/html/examples
 
           # Quarto (website project) writes outputs under _site/
           cp -r _site/slides/emidm_intro1.html docs/_build/html/slides/
           if [ -d _site/slides/emidm_intro1_files ]; then cp -r _site/slides/emidm_intro1_files docs/_build/html/slides/; fi
 
-          cp -r _site/examples/notebooks_intro.html docs/_build/html/examples/
-          if [ -d _site/examples/notebooks_intro_files ]; then cp -r _site/examples/notebooks_intro_files docs/_build/html/examples/; fi
-
-          cp -r _site/examples/surrogate_notebook.html docs/_build/html/examples/
-          if [ -d _site/examples/surrogate_notebook_files ]; then cp -r _site/examples/surrogate_notebook_files docs/_build/html/examples/; fi
-
-          cp -r _site/examples/AIMS_surrogate_notebook.html docs/_build/html/examples/
-          if [ -d _site/examples/AIMS_surrogate_notebook_files ]; then cp -r _site/examples/AIMS_surrogate_notebook_files docs/_build/html/examples/; fi
-
-          # Shared Quarto assets (JS/CSS) are typically under site_libs/
+          # Shared Quarto assets (JS/CSS) for slides
           if [ -d _site/site_libs ]; then cp -r _site/site_libs docs/_build/html/; fi
           if [ -f _site/styles.css ]; then cp -r _site/styles.css docs/_build/html/; fi
 

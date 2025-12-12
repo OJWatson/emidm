@@ -1,14 +1,21 @@
 Examples
 ========
 
-Rendered notebooks:
+These tutorials demonstrate how to use **emidm** for epidemiological modelling.
 
-- `Notebooks introduction <examples/notebooks_intro.html>`_
-- `Surrogate training <examples/surrogate_notebook.html>`_
-- `AIMS surrogate notebook <examples/AIMS_surrogate_notebook.html>`_
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
 
-Open in Colab:
+   notebooks/calibration
+   notebooks/intro
+   notebooks/surrogate
 
-- `Notebooks introduction (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/notebooks_intro.ipynb>`_
-- `Surrogate training (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb>`_
-- `AIMS surrogate (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/AIMS_surrogate_notebook.ipynb>`_
+Open in Colab
+-------------
+
+You can also run these notebooks directly in Google Colab:
+
+- `Calibration Demo (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/docs/notebooks/calibration.ipynb>`_
+- `Introduction (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/notebooks_intro.ipynb>`_
+- `Surrogate Training (Colab) <https://colab.research.google.com/github/OJWatson/emidm/blob/main/examples/surrogate_notebook.ipynb>`_

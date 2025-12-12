@@ -38,8 +38,10 @@ dev = [
 docs = [
   "sphinx>=8",
   "pydata-sphinx-theme>=0.16",
-  "myst-parser>=4",
+  "myst-nb>=1.1",
+  "ipykernel>=6",
   "jupyter>=1",
+  "matplotlib>=3.8",
 ]
 
 jax = [
