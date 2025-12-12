@@ -6,7 +6,7 @@ def optimize_params(*, loss_fn, init_params, n_steps: int = 200, learning_rate: 
 
     This is intentionally lightweight: the user supplies a differentiable `loss_fn(params)`.
 
-    Returns `(params, history)` where history is a dict with `loss` array.
+    Returns `(params, history)` where history is a dict with `loss` and `params` arrays.
     """
     try:
         import jax
@@ -30,9 +30,11 @@ def optimize_params(*, loss_fn, init_params, n_steps: int = 200, learning_rate: 
         return params, opt_state, loss
 
     losses = []
+    params_history = []
     for _ in range(int(n_steps)):
         params, opt_state, loss = step(params, opt_state)
         losses.append(loss)
+        params_history.append(params)
 
-    history = {"loss": jnp.stack(losses)}
+    history = {"loss": jnp.stack(losses), "params": jnp.stack(params_history)}
     return params, history
