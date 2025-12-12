@@ -1,7 +1,6 @@
-from emidm.optim import optimize_params
 import jax.numpy as jnp
+from emidm.optim import optimize_params
 import pytest
-
 
 jax = pytest.importorskip("jax")
 optax = pytest.importorskip("optax")
@@ -9,7 +8,7 @@ optax = pytest.importorskip("optax")
 
 def test_optimize_params_reduces_simple_quadratic():
     def loss_fn(x):
-        return jnp.square(x - 3.0)
+        return (x - 3.0) ** 2
 
     params0 = jnp.array(0.0)
     params1, hist = optimize_params(
