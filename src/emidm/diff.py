@@ -115,7 +115,52 @@ def run_diff_sir(
 ):
     """Run a differentiable SIR simulation using straight-through Gumbel-Softmax.
 
-    Returns a dict with keys: `t`, `S`, `I`, `R` as JAX arrays.
+    This model uses the Gumbel-Softmax reparameterization trick to make discrete
+    stochastic transitions differentiable, enabling gradient-based optimization
+    of model parameters.
+
+    Parameters
+    ----------
+    N_agents : int, default 200
+        Number of agents in the simulation.
+    I0 : int, default 5
+        Initial number of infected individuals.
+    beta : float, default 0.2
+        Transmission rate (used if R_t is None).
+    gamma : float, default 0.1
+        Recovery rate.
+    T : int, default 50
+        Total simulation time.
+    dt : int, default 1
+        Time step size.
+    R_t : array-like, optional
+        Time-varying reproduction number. If provided, must have length T/dt + 1.
+        Beta is computed as R_t * gamma at each time step.
+    key : jax.random.PRNGKey, optional
+        Random key for JAX. If None, uses PRNGKey(0).
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard).
+
+    Returns
+    -------
+    dict
+        Dictionary with keys 't', 'S', 'I', 'R' as JAX arrays.
+
+    Examples
+    --------
+    >>> from emidm import run_diff_sir, DiffConfig
+    >>> import jax
+    >>>
+    >>> result = run_diff_sir(
+    ...     N_agents=100,
+    ...     I0=5,
+    ...     beta=0.3,
+    ...     gamma=0.1,
+    ...     T=50,
+    ...     config=DiffConfig(tau=0.5, hard=True),
+    ...     key=jax.random.PRNGKey(42),
+    ... )
+    >>> print(result["I"].max())  # Peak infections
     """
     _require_jax()
     import jax
@@ -184,116 +229,12 @@ def run_diff_sir(
     }
 
 
-def run_diff_safir_simple(
-    *,
-    N_agents: int = 200,
-    I0: int = 5,
-    beta: float = 0.2,
-    gamma: float = 0.1,
-    ifr: float = 0.01,
-    T: int = 50,
-    dt: int = 1,
-    R_t=None,
-    key=None,
-    config: DiffConfig = DiffConfig(),
-):
-    """Run a differentiable Safir/SIRD simulation using straight-through Gumbel-Softmax.
-
-    Returns a dict with keys: `t`, `S`, `I`, `R`, `D` as JAX arrays.
-    """
-    _require_jax()
-    import jax
-    import jax.numpy as jnp
-
-    if key is None:
-        key = jax.random.PRNGKey(0)
-
-    ifr = float(ifr)
-
-    N_agents = int(N_agents)
-    T = int(T)
-    dt = int(dt)
-
-    ts = jnp.arange(0, T + 1, dt)
-    beta_seq = _prepare_beta_t_sequence(beta=beta, gamma=gamma, R_t=R_t, ts=ts)
-
-    key, k_init = jax.random.split(key)
-    state0_sir = _init_onehot_state_sir(N_agents=N_agents, I0=I0, key=k_init)
-    D0 = jnp.zeros((N_agents,), dtype=jnp.float32)
-    state0 = jnp.concatenate([state0_sir, D0[:, None]], axis=-1)  # S,I,R,D
-
-    def step(carry, idx):
-        state, key = carry
-        S = state[:, 0]
-        I = state[:, 1]
-        R = state[:, 2]
-        D = state[:, 3]
-
-        I_total = jnp.sum(I)
-        beta_t = beta_seq[idx]
-
-        p_infect = 1.0 - jnp.exp(-beta_t * I_total / N_agents * dt)
-        p_remove = 1.0 - jnp.exp(-gamma * dt)
-
-        key, k_inf, k_rem, k_die = jax.random.split(key, 4)
-        keys_inf = jax.random.split(k_inf, N_agents)
-        keys_rem = jax.random.split(k_rem, N_agents)
-        keys_die = jax.random.split(k_die, N_agents)
-
-        infect = jax.vmap(lambda kk: _gumbel_softmax_bernoulli(kk, p_infect, tau=config.tau, hard=config.hard))(
-            keys_inf
-        )
-        remove = jax.vmap(lambda kk: _gumbel_softmax_bernoulli(kk, p_remove, tau=config.tau, hard=config.hard))(
-            keys_rem
-        )
-        die = jax.vmap(lambda kk: _gumbel_softmax_bernoulli(kk, ifr, tau=config.tau, hard=config.hard))(
-            keys_die
-        )
-
-        new_I = infect * S
-        removed = remove * I
-        new_D = removed * die
-        new_R = removed * (1.0 - die)
-
-        S_next = S - new_I
-        I_next = I + new_I - removed
-        R_next = R + new_R
-        D_next = D + new_D
-
-        state_next = jnp.stack([S_next, I_next, R_next, D_next], axis=-1)
-        totals = jnp.array(
-            [jnp.sum(S_next), jnp.sum(I_next),
-             jnp.sum(R_next), jnp.sum(D_next)]
-        )
-        return (state_next, key), totals
-
-    idxs = jnp.arange(1, ts.shape[0])
-    (stateT, _), totals = jax.lax.scan(step, (state0, key), idxs)
-
-    totals0 = jnp.array(
-        [
-            jnp.sum(state0[:, 0]),
-            jnp.sum(state0[:, 1]),
-            jnp.sum(state0[:, 2]),
-            jnp.sum(state0[:, 3]),
-        ]
-    )
-    totals = jnp.vstack([totals0[None, :], totals])
-
-    return {
-        "t": ts,
-        "S": totals[:, 0],
-        "I": totals[:, 1],
-        "R": totals[:, 2],
-        "D": totals[:, 3],
-    }
-
-
 def run_diff_safir(
     *,
     population,
     contact_matrix,
     R0: float = 2.0,
+    R_t=None,
     time_horizon: int = 200,
     dt: float = 0.1,
     seed: int = 0,
@@ -311,10 +252,70 @@ def run_diff_safir(
 ):
     """Age-structured differentiable SAFIR/SEIR model with contact matrices.
 
-    This follows the structure in `Differentiable SAFIR Model in JAX (SEIR with Gumbel-Softmax)`:
+    This model implements an age-structured SEIR model with hospitalization and death,
+    using Gumbel-Softmax for differentiable stochastic transitions.
 
-    States: S, E1, E2, Iasy, Imild, Icase, R, D.
-    Outputs are *daily* totals (arrays length = time_horizon + 1).
+    Compartments: S -> E1 -> E2 -> (Iasy | Imild | Icase) -> R or D
+
+    Parameters
+    ----------
+    population : array-like
+        Population size per age group.
+    contact_matrix : array-like
+        Contact matrix (n_age x n_age).
+    R0 : float, default 2.0
+        Basic reproduction number (used if R_t is None).
+    R_t : array-like, optional
+        Time-varying reproduction number. If provided, must have length time_horizon + 1.
+        Uses constant interpolation per day.
+    time_horizon : int, default 200
+        Number of days to simulate.
+    dt : float, default 0.1
+        Sub-daily time step (must evenly divide 1 day).
+    seed : int, default 0
+        Random seed.
+    tau : float, default 0.1
+        Gumbel-Softmax temperature parameter.
+    hard : bool, default True
+        Whether to use straight-through gradient estimator.
+    n_seed : int, default 10
+        Number of initial infections to seed.
+    prob_hosp : array-like, optional
+        Age-specific probability of hospitalization given infection.
+    prob_asymp : float, default 0.3
+        Probability of asymptomatic infection (given non-hospitalized).
+    prob_non_sev_death : array-like, optional
+        Age-specific death probability for non-severe hospitalized cases.
+    prob_sev_death : array-like, optional
+        Age-specific death probability for severe (ICU) cases.
+    frac_ICU : float, default 0.3
+        Fraction of hospitalized cases requiring ICU.
+    dur_E : float, default 4.6
+        Mean duration of exposed period (days).
+    dur_IMild : float, default 2.1
+        Mean duration of mild/asymptomatic infectious period (days).
+    dur_ICase : float, default 4.5
+        Mean duration from symptom onset to hospitalization (days).
+
+    Returns
+    -------
+    dict
+        Dictionary with keys 't', 'S', 'E', 'I', 'R', 'D' as JAX arrays.
+        Daily totals (length = time_horizon + 1).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from emidm import run_diff_safir
+    >>>
+    >>> population = np.array([1000, 2000, 1500])  # 3 age groups
+    >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
+    >>> result = run_diff_safir(
+    ...     population=population,
+    ...     contact_matrix=contact_matrix,
+    ...     R0=2.5,
+    ...     time_horizon=100,
+    ... )
     """
     _require_jax()
     import jax
@@ -357,7 +358,19 @@ def run_diff_safir(
     rel_inf_period = (1.0 - prob_hosp) * dur_IMild + prob_hosp * dur_ICase
     M = contact_matrix * rel_inf_period[None, :]
     eigvals = jnp.linalg.eigvals(M)
-    beta = R0 / jnp.max(jnp.real(eigvals))
+    beta_base = R0 / jnp.max(jnp.real(eigvals))
+
+    # Prepare time-varying beta_t sequence (constant interpolation per day)
+    days = int(time_horizon)
+    if R_t is not None:
+        R_t_arr = jnp.asarray(R_t, dtype=jnp.float32)
+        if R_t_arr.shape[0] != days + 1:
+            raise ValueError(
+                f"R_t must have length time_horizon + 1 = {days + 1}, got {R_t_arr.shape[0]}"
+            )
+        beta_t_daily = beta_base * R_t_arr / R0
+    else:
+        beta_t_daily = jnp.full(days + 1, beta_base, dtype=jnp.float32)
 
     pop_int = jnp.floor(population).astype(jnp.int32)
     N = int(jnp.sum(pop_int))
@@ -398,13 +411,13 @@ def run_diff_safir(
     # key already created above; keep using it
 
     def step_sub(carry, _):
-        state, key = carry
+        state, key, beta_t = carry
 
         infectious = state[:, Iasy] + state[:, Imild] + state[:, Icase]
         inf_by_age = jnp.zeros(
             (n_age,), dtype=jnp.float32).at[age_index].add(infectious)
         I_frac = jnp.where(population > 0, inf_by_age / population, 0.0)
-        lambda_age = beta * (contact_matrix @ I_frac)
+        lambda_age = beta_t * (contact_matrix @ I_frac)
         p_inf = 1.0 - jnp.exp(-lambda_age[age_index] * dt)
         p_inf = jnp.clip(p_inf, 0.0, 1.0)
 
@@ -448,12 +461,13 @@ def run_diff_safir(
         key, sub = jax.random.split(key)
         next_state = _gumbel_softmax_categorical(
             sub, probs_next, tau=tau, hard=hard)
-        return (next_state, key), None
+        return (next_state, key, beta_t), None
 
-    def one_day(carry, _):
+    def one_day(carry, day_idx):
         state, key = carry
-        (state, key), _ = jax.lax.scan(step_sub,
-                                       (state, key), None, length=steps_per_day)
+        beta_t = beta_t_daily[day_idx]
+        (state, key, _), _ = jax.lax.scan(step_sub,
+                                          (state, key, beta_t), None, length=steps_per_day)
 
         S_count = jnp.sum(state[:, S])
         E_count = jnp.sum(state[:, E1] + state[:, E2])
@@ -463,10 +477,10 @@ def run_diff_safir(
         daily = jnp.stack([S_count, E_count, I_count, R_count, D_count])
         return (state, key), daily
 
-    days = int(time_horizon)
     # record day 0 + days steps
+    day_indices = jnp.arange(days + 1)
     (stateT, keyT), daily_series = jax.lax.scan(
-        one_day, (state, key), None, length=days + 1)
+        one_day, (state, key), day_indices)
     t = jnp.arange(days + 1)
     return {
         "t": t,

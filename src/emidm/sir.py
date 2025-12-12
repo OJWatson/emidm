@@ -22,6 +22,57 @@ def simulate_sir(
     n_replicates: int = 1,
     seed: int | None = None,
 ) -> pd.DataFrame:
+    """Simulate a stochastic SIR model with optional time-varying reproduction number.
+
+    This is the main SIR simulation function supporting multiple replicates and
+    time-varying transmission rates.
+
+    Parameters
+    ----------
+    I0 : int, default 10
+        Initial number of infected individuals.
+    R0 : int, default 0
+        Initial number of recovered individuals (not the reproduction number).
+    N : int, default 1000
+        Total population size.
+    beta : float, default 0.2
+        Transmission rate (used if R_t is None).
+    gamma : float, default 0.1
+        Recovery rate.
+    R_t : Sequence or Callable, optional
+        Time-varying reproduction number. Can be:
+        - A sequence of length T+1 with R_t values at each time step
+        - A callable R_t(t) returning the reproduction number at time t
+        If provided, beta is computed as R_t * gamma at each time step.
+    T : int, default 100
+        Total simulation time.
+    dt : int, default 1
+        Time step size.
+    n_replicates : int, default 1
+        Number of stochastic replicates to run.
+    seed : int, optional
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns: t, replicate, N, I0, beta, beta_t, gamma, S, I, R.
+
+    Examples
+    --------
+    >>> from emidm import simulate_sir
+    >>>
+    >>> # Basic simulation
+    >>> df = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
+    >>>
+    >>> # With time-varying R_t
+    >>> import numpy as np
+    >>> R_t = np.concatenate([np.full(50, 2.5), np.full(51, 0.8)])  # Intervention at t=50
+    >>> df = simulate_sir(N=10000, I0=10, R_t=R_t, gamma=0.1, T=100)
+    >>>
+    >>> # Multiple replicates
+    >>> df = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100, n_replicates=100, seed=42)
+    """
     I0 = int(I0)
     R0 = int(R0)
     N = int(N)

@@ -97,6 +97,7 @@ def simulate_safir(
     population: np.ndarray,
     contact_matrix: np.ndarray,
     R0: float = 2.0,
+    R_t: np.ndarray | None = None,
     time_horizon: int = 200,
     dt: float = 0.1,
     seed: int | None = 0,
@@ -149,8 +150,20 @@ def simulate_safir(
     prob_die = np.clip(prob_die, 0.0, 1.0)
 
     rel_inf_period = (1.0 - prob_hosp) * dur_IMild + prob_hosp * dur_ICase
-    beta = _compute_beta_from_R0(
+    beta_base = _compute_beta_from_R0(
         R0=R0, contact_matrix=contact_matrix, rel_inf_period=rel_inf_period)
+
+    # Prepare time-varying R_t -> beta_t sequence (constant interpolation per day)
+    if R_t is not None:
+        R_t_arr = np.asarray(R_t, dtype=float)
+        if R_t_arr.shape[0] != time_horizon + 1:
+            raise ValueError(
+                f"R_t must have length time_horizon + 1 = {time_horizon + 1}, got {R_t_arr.shape[0]}"
+            )
+        # beta_t[day] = beta_base * R_t[day] / R0
+        beta_t_daily = beta_base * R_t_arr / R0
+    else:
+        beta_t_daily = np.full(time_horizon + 1, beta_base, dtype=float)
 
     steps_per_day = int(round(1.0 / dt))
     if not np.isclose(steps_per_day * dt, 1.0):
@@ -210,7 +223,8 @@ def simulate_safir(
                 with np.errstate(divide="ignore", invalid="ignore"):
                     I_frac = np.where(pop_int > 0, I_tot / pop_int, 0.0)
 
-                lambda_age = beta * (contact_matrix @ I_frac)
+                beta_t = beta_t_daily[day]
+                lambda_age = beta_t * (contact_matrix @ I_frac)
                 p_inf = 1.0 - np.exp(-lambda_age * dt)
                 p_inf = np.clip(p_inf, 0.0, 1.0)
 
@@ -271,6 +285,7 @@ def run_safir(
     population: np.ndarray,
     contact_matrix: np.ndarray,
     R0: float = 2.0,
+    R_t: np.ndarray | None = None,
     time_horizon: int = 200,
     dt: float = 0.1,
     seed: int | None = 0,
@@ -281,6 +296,7 @@ def run_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=R0,
+        R_t=R_t,
         time_horizon=time_horizon,
         dt=dt,
         seed=seed,

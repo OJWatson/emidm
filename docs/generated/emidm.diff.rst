@@ -9,7 +9,6 @@
    .. autosummary::
    
       run_diff_safir
-      run_diff_safir_simple
       run_diff_sir
    
    .. rubric:: Classes

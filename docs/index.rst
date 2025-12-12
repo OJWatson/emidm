@@ -59,6 +59,8 @@ For JAX support (differentiable models):
    :maxdepth: 2
    :caption: Contents
 
+   user_guide
    tutorials
    api
+   development
    slides
