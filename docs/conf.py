@@ -23,7 +23,7 @@ source_suffix = {
 }
 
 # Suppress non-critical warnings
-suppress_warnings = ["myst.header"]
+suppress_warnings = ["myst.header", "mystnb.unknown_mime_type"]
 
 autosummary_generate = True
 
