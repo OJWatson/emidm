@@ -379,7 +379,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
@@ -400,7 +400,7 @@
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
 <span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
 <span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.2</span>
 <span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">200</span>
@@ -424,11 +424,20 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:2025-12-12 16:06:55,287:jax._src.xla_bridge:794: An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated epidemic with β = 0.35
+Peak infections: 46 at day 18
+</pre></div>
+</div>
+</div>
 </div>
 <p>Let’s visualize the synthetic epidemic:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
 <span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Susceptible&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -447,6 +456,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/5c88ad97d3b176997398c063f39d2eb25a3b9fc1b39186d8d3767d7414401e4f.png" src="../_images/5c88ad97d3b176997398c063f39d2eb25a3b9fc1b39186d8d3767d7414401e4f.png" />
+</div>
 </div>
 </section>
 <section id="step-2-define-the-loss-function">
@@ -455,7 +467,7 @@
 <p>Because <code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> is differentiable, JAX can compute gradients of this loss with respect to β.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The observed infection curve we want to fit</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The observed infection curve we want to fit</span>
 <span class="n">observed_I</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
@@ -478,6 +490,12 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss at β = 0.15: 603.97
+Loss at β = 0.35 (true): 40.06
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-3-optimize-using-gradient-descent">
@@ -486,7 +504,7 @@
 <p>We start from an initial guess of β = 0.15 and let the optimizer find the true value.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial guess (deliberately wrong)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial guess (deliberately wrong)</span>
 <span class="n">beta_init</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span>
 
 <span class="c1"># Run optimization</span>
@@ -505,14 +523,22 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Optimization complete!
+  Initial β: 0.150
+  Fitted β:  0.393
+  True β:    0.350
+  Error:     0.0429
+</pre></div>
+</div>
+</div>
 </div>
 <p>Let’s visualize the optimization trajectory:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
 <span class="c1"># Loss curve</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Optimization step&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Loss (MSE)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
@@ -520,20 +546,25 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 
-<span class="c1"># Parameter trajectory</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Estimated β&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;True β = </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Optimization step&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;β&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Parameter Trajectory&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">14</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="c1"># Parameter trajectory</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="ne">---&gt; </span><span class="mi">14</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Estimated β&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;True β = </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Optimization step&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="ne">KeyError</span>: &#39;params&#39;
+</pre></div>
+</div>
+<img alt="../_images/2876b27b785d3d66e74801aec7ac35bde0fd8b95a20cd3a6e60c2af5faa808cf.png" src="../_images/2876b27b785d3d66e74801aec7ac35bde0fd8b95a20cd3a6e60c2af5faa808cf.png" />
 </div>
 </div>
 </section>
@@ -547,7 +578,7 @@
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate predictions with fitted and initial parameters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate predictions with fitted and initial parameters</span>
 <span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
     <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
@@ -578,10 +609,26 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/23e46e85b597687c4e36cc697bb389d73f989a1a2ea9b79153e09258942a77a7.png" src="../_images/23e46e85b597687c4e36cc697bb389d73f989a1a2ea9b79153e09258942a77a7.png" />
+</div>
 </div>
 </section>
-<section id="summary-n-nin-this-tutorial-we-demonstrated-n-n1-differentiable-simulation-using-run-diff-sir-to-simulate-epidemics-with-gradients-n2-gradient-based-calibration-using-optimize-params-to-fit-model-parameters-n3-model-comparison-visualizing-how-well-the-fitted-model-recovers-the-true-dynamics-n-nthe-key-advantage-of-differentiable-models-is-that-we-can-use-efficient-gradient-based-optimization-instead-of-slower-derivative-free-methods-like-grid-search-or-mcmc-this-becomes-especially-important-for-n-n-high-dimensional-parameter-spaces-when-fitting-many-parameters-simultaneously-n-complex-models-where-each-simulation-is-computationally-expensive-n-uncertainty-quantification-combining-with-variational-inference-or-hamiltonian-monte-carlo-n-nsee-the-api-documentation-for-more-details-on-the-available-models-and-utilities">
-<h2>Summary\n\nIn this tutorial, we demonstrated:\n\n1. <strong>Differentiable simulation</strong>: Using <code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> to simulate epidemics with gradients\n2. <strong>Gradient-based calibration</strong>: Using <code class="docutils literal notranslate"><span class="pre">optimize_params</span></code> to fit model parameters\n3. <strong>Model comparison</strong>: Visualizing how well the fitted model recovers the true dynamics\n\nThe key advantage of differentiable models is that we can use efficient gradient-based optimization instead of slower derivative-free methods (like grid search or MCMC). This becomes especially important for:\n\n- <strong>High-dimensional parameter spaces</strong>: When fitting many parameters simultaneously\n- <strong>Complex models</strong>: Where each simulation is computationally expensive\n- <strong>Uncertainty quantification</strong>: Combining with variational inference or Hamiltonian Monte Carlo\n\nSee the <a class="reference internal" href="../api.html"><span class="std std-doc">API documentation</span></a> for more details on the available models and utilities.<a class="headerlink" href="#summary-n-nin-this-tutorial-we-demonstrated-n-n1-differentiable-simulation-using-run-diff-sir-to-simulate-epidemics-with-gradients-n2-gradient-based-calibration-using-optimize-params-to-fit-model-parameters-n3-model-comparison-visualizing-how-well-the-fitted-model-recovers-the-true-dynamics-n-nthe-key-advantage-of-differentiable-models-is-that-we-can-use-efficient-gradient-based-optimization-instead-of-slower-derivative-free-methods-like-grid-search-or-mcmc-this-becomes-especially-important-for-n-n-high-dimensional-parameter-spaces-when-fitting-many-parameters-simultaneously-n-complex-models-where-each-simulation-is-computationally-expensive-n-uncertainty-quantification-combining-with-variational-inference-or-hamiltonian-monte-carlo-n-nsee-the-api-documentation-for-more-details-on-the-available-models-and-utilities" title="Link to this heading">#</a></h2>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>In this tutorial, we demonstrated:</p>
+<ol class="arabic simple">
+<li><p><strong>Differentiable simulation</strong>: Using <code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> to simulate epidemics with gradients</p></li>
+<li><p><strong>Gradient-based calibration</strong>: Using <code class="docutils literal notranslate"><span class="pre">optimize_params</span></code> to fit model parameters</p></li>
+<li><p><strong>Model comparison</strong>: Visualizing how well the fitted model recovers the true dynamics</p></li>
+</ol>
+<p>The key advantage of differentiable models is that we can use efficient gradient-based optimization instead of slower derivative-free methods (like grid search or MCMC). This becomes especially important for:</p>
+<ul class="simple">
+<li><p><strong>High-dimensional parameter spaces</strong>: When fitting many parameters simultaneously</p></li>
+<li><p><strong>Complex models</strong>: Where each simulation is computationally expensive</p></li>
+<li><p><strong>Uncertainty quantification</strong>: Combining with variational inference or Hamiltonian Monte Carlo</p></li>
+</ul>
+<p>See the <a class="reference internal" href="../api.html"><span class="std std-doc">API documentation</span></a> for more details on the available models and utilities.</p>
 </section>
 </section>
 
@@ -637,7 +684,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-define-the-loss-function">Step 2: Define the Loss Function</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-optimize-using-gradient-descent">Step 3: Optimize β Using Gradient Descent</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-compare-fitted-vs-true-model">Step 4: Compare Fitted vs True Model</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-n-nin-this-tutorial-we-demonstrated-n-n1-differentiable-simulation-using-run-diff-sir-to-simulate-epidemics-with-gradients-n2-gradient-based-calibration-using-optimize-params-to-fit-model-parameters-n3-model-comparison-visualizing-how-well-the-fitted-model-recovers-the-true-dynamics-n-nthe-key-advantage-of-differentiable-models-is-that-we-can-use-efficient-gradient-based-optimization-instead-of-slower-derivative-free-methods-like-grid-search-or-mcmc-this-becomes-especially-important-for-n-n-high-dimensional-parameter-spaces-when-fitting-many-parameters-simultaneously-n-complex-models-where-each-simulation-is-computationally-expensive-n-uncertainty-quantification-combining-with-variational-inference-or-hamiltonian-monte-carlo-n-nsee-the-api-documentation-for-more-details-on-the-available-models-and-utilities">Summary\n\nIn this tutorial, we demonstrated:\n\n1. <strong>Differentiable simulation</strong>: Using <code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> to simulate epidemics with gradients\n2. <strong>Gradient-based calibration</strong>: Using <code class="docutils literal notranslate"><span class="pre">optimize_params</span></code> to fit model parameters\n3. <strong>Model comparison</strong>: Visualizing how well the fitted model recovers the true dynamics\n\nThe key advantage of differentiable models is that we can use efficient gradient-based optimization instead of slower derivative-free methods (like grid search or MCMC). This becomes especially important for:\n\n- <strong>High-dimensional parameter spaces</strong>: When fitting many parameters simultaneously\n- <strong>Complex models</strong>: Where each simulation is computationally expensive\n- <strong>Uncertainty quantification</strong>: Combining with variational inference or Hamiltonian Monte Carlo\n\nSee the <span class="xref myst">API documentation</span> for more details on the available models and utilities.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
   </nav></div>
 
