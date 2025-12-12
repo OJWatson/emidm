@@ -1,7 +1,6 @@
-import jax.numpy as jnp
 from emidm.optim import optimize_params
+import jax.numpy as jnp
 import pytest
-
 jax = pytest.importorskip("jax")
 optax = pytest.importorskip("optax")
 
