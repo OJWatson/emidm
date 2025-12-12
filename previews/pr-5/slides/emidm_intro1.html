@@ -432,7 +432,7 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="a0523aba" class="cell">
+<div id="da867d55" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
 <span id="cb1-2"><a></a></span>
 <span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
@@ -499,7 +499,7 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="e21f90f7" class="cell">
+<div id="fd38e44f" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
 <span id="cb2-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
