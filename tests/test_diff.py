@@ -1,7 +1,6 @@
 from emidm.diff import DiffConfig, run_diff_safir, run_diff_safir_simple, run_diff_sir
 import pytest
 
-
 jax = pytest.importorskip("jax")
 
 
