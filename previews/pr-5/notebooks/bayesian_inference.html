@@ -413,7 +413,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -436,8 +436,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JAX backend: gpu
-JAX devices: [cuda(id=0)]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JAX backend: cpu
+JAX devices: [CpuDevice(id=0)]
 </pre></div>
 </div>
 </div>
@@ -448,7 +448,7 @@ JAX devices: [cuda(id=0)]
 <p>We’ll create synthetic epidemic data with known parameters, then try to recover them with uncertainty estimates.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
 <span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
 <span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Smaller for faster demo</span>
@@ -485,10 +485,7 @@ JAX devices: [cuda(id=0)]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-13 08:23:52.776402: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
-</pre></div>
-</div>
-<img alt="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" src="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" />
+<img alt="../_images/5e4dac8bd1f86dd2de364d01e63669d02d65d14f2df4573f4990c126e0f7b680.png" src="../_images/5e4dac8bd1f86dd2de364d01e63669d02d65d14f2df4573f4990c126e0f7b680.png" />
 </div>
 </div>
 </section>
@@ -502,7 +499,7 @@ JAX devices: [cuda(id=0)]
 <p>The posterior is proportional to: <code class="docutils literal notranslate"><span class="pre">posterior</span> <span class="pre">∝</span> <span class="pre">likelihood</span> <span class="pre">×</span> <span class="pre">prior</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For efficient MCMC, we need to minimize Python overhead.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For efficient MCMC, we need to minimize Python overhead.</span>
 <span class="c1"># Pre-compute everything that doesn&#39;t depend on beta.</span>
 
 <span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -568,7 +565,9 @@ JAX devices: [cuda(id=0)]
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Compiling...
-Done!
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
 Log-posterior at β=0.3: -10.61
 Log-posterior at β=0.35 (true): -3.77
 </pre></div>
@@ -581,7 +580,7 @@ Log-posterior at β=0.35 (true): -3.77
 <p>We’ll use BlackJAX’s NUTS (No-U-Turn Sampler) algorithm, which is an adaptive form of Hamiltonian Monte Carlo that automatically tunes the step size and trajectory length.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">HAS_BLACKJAX</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">HAS_BLACKJAX</span><span class="p">:</span>
     <span class="c1"># Use NUTS for efficient sampling</span>
     <span class="n">nuts</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span>
         <span class="n">log_posterior_jit</span><span class="p">,</span> 
@@ -628,9 +627,12 @@ Log-posterior at β=0.35 (true): -3.77
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Compiling sampler...
-Running sampling (500 samples)...
-
-Collected 400 samples (after burn-in)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running sampling (500 samples)...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collected 400 samples (after burn-in)
 Posterior mean: 0.3670
 Posterior std: 0.0193
 True value: 0.35
@@ -644,7 +646,7 @@ True value: 0.35
 <p>Let’s visualize the posterior distribution and check convergence.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     
     <span class="c1"># Trace plot</span>
@@ -690,7 +692,7 @@ True value: 0.35
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/1984db9f3c8aa52dbd068d1f530b9d6a1e87d383d211336b40323417d12d86ca.png" src="../_images/1984db9f3c8aa52dbd068d1f530b9d6a1e87d383d211336b40323417d12d86ca.png" />
+<img alt="../_images/48c39155b6e2683b2cff2ae47c88bb89b00a44008252533fd976c658a38a0805.png" src="../_images/48c39155b6e2683b2cff2ae47c88bb89b00a44008252533fd976c658a38a0805.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Posterior Summary:
   Mean: 0.3670
   Std:  0.0193
@@ -707,7 +709,7 @@ True value: 0.35
 <p>We can use samples from the posterior to generate predictions and visualize uncertainty in the model fit.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Generate predictions from posterior samples using vmap for speed</span>
     <span class="n">n_pred</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -745,7 +747,7 @@ True value: 0.35
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6f543656776f23e342238701ffa1c22ce4815b7a08c3f4276d980e9a858abb30.png" src="../_images/6f543656776f23e342238701ffa1c22ce4815b7a08c3f4276d980e9a858abb30.png" />
+<img alt="../_images/83ae1c8d6e3e636fcd74943c7c7e9594796c238576fdb7036e28115f8fcbdb55.png" src="../_images/83ae1c8d6e3e636fcd74943c7c7e9594796c238576fdb7036e28115f8fcbdb55.png" />
 </div>
 </div>
 </section>
