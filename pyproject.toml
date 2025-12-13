@@ -47,7 +47,7 @@ docs = [
 jax = [
   "jax>=0.4.20",
   "jaxlib>=0.4.20",
-  "optax>=0.2.2",
+  "optax>=0.1.7",
 ]
 
 bayes = [

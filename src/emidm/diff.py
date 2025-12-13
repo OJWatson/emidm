@@ -262,6 +262,107 @@ def run_diff_sir(
     }
 
 
+def run_diff_sir_replicates(
+    *,
+    N_agents: int = 200,
+    I0: int = 5,
+    beta: float = 0.2,
+    gamma: float = 0.1,
+    T: int = 50,
+    dt: int = 1,
+    R_t=None,
+    seed: int = 0,
+    reps: int = 10,
+    config: DiffConfig = DiffConfig(),
+):
+    """
+    Run multiple replicates of the differentiable SIR model efficiently using vmap.
+
+    This is much faster than running `run_diff_sir` in a loop because it uses
+    JAX's vmap to parallelize across replicates.
+
+    Parameters
+    ----------
+    N_agents : int, default 200
+        Number of agents in the simulation.
+    I0 : int, default 5
+        Initial number of infected individuals.
+    beta : float, default 0.2
+        Transmission rate (used if R_t is None).
+    gamma : float, default 0.1
+        Recovery rate.
+    T : int, default 50
+        Total simulation time.
+    dt : int, default 1
+        Time step size.
+    R_t : array-like, optional
+        Time-varying reproduction number.
+    seed : int, default 0
+        Base seed for generating JAX random keys.
+    reps : int, default 10
+        Number of replicates to run.
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard).
+
+    Returns
+    -------
+    dict
+        Dictionary with keys 't', 'S', 'I', 'R' as JAX arrays.
+        S, I, R have shape (reps, T+1).
+
+    Examples
+    --------
+    >>> from emidm.diff import run_diff_sir_replicates, DiffConfig
+    >>> results = run_diff_sir_replicates(
+    ...     N_agents=1000,
+    ...     I0=5,
+    ...     beta=0.3,
+    ...     gamma=0.1,
+    ...     T=50,
+    ...     reps=10,
+    ...     config=DiffConfig(tau=0.5, hard=True),
+    ... )
+    >>> print(results["I"].shape)  # (10, 51)
+    """
+    _require_jax()
+    import jax
+    import jax.numpy as jnp
+
+    N_agents = int(N_agents)
+    T = int(T)
+    dt = int(dt)
+    reps = int(reps)
+
+    ts = jnp.arange(0, T + 1, dt)
+    beta_seq = _prepare_beta_t_sequence(beta=beta, gamma=gamma, R_t=R_t, ts=ts)
+
+    # Generate keys for each replicate
+    base_key = jax.random.PRNGKey(seed)
+    keys = jax.random.split(base_key, reps * 2)  # reps for init, reps for run
+    init_keys = keys[:reps]
+    run_keys = keys[reps:]
+
+    # Initialize states for all replicates using vmap
+    states0 = jax.vmap(
+        lambda k: _init_onehot_state_sir(N_agents=N_agents, I0=I0, key=k)
+    )(init_keys)
+
+    # Run all replicates in parallel using vmap
+    def run_one(state0, key):
+        return _run_diff_sir_core(
+            beta_seq, state0, key, N_agents, gamma, dt, config.tau, config.hard
+        )
+
+    all_totals = jax.vmap(run_one)(states0, run_keys)
+
+    return {
+        "t": ts,
+        "S": all_totals[:, :, 0],
+        "I": all_totals[:, :, 1],
+        "R": all_totals[:, :, 2],
+    }
+
+
 def run_diff_safir(
     *,
     population,

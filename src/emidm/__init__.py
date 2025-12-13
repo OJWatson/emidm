@@ -6,7 +6,7 @@ from .__about__ import __version__
 
 from .sir import run_sir, run_model_with_replicates, simulate_sir
 from .safir import run_safir, simulate_safir
-from .diff import DiffConfig, run_diff_safir, run_diff_sir
+from .diff import DiffConfig, run_diff_safir, run_diff_sir, run_diff_sir_replicates
 from .inference import run_blackjax_nuts
 from .optim import optimize_params, mse_loss, poisson_nll, gaussian_nll, make_sir_loss
 from .plotting import (
@@ -30,6 +30,7 @@ __all__ = [
     "DiffConfig",
     "run_diff_sir",
     "run_diff_safir",
+    "run_diff_sir_replicates",
     # Optimization & inference
     "optimize_params",
     "mse_loss",
