@@ -444,12 +444,11 @@ JAX devices: [cuda(id=0)]
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
 <span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
 <span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.2</span>
-<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">T</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">80</span>
 <span class="n">I0</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="c1"># Generate synthetic data</span>
-<span class="c1"># Using hard=False for smoother gradients during optimization</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
     <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
@@ -457,7 +456,7 @@ JAX devices: [cuda(id=0)]
     <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
     <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
     <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
     <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -467,11 +466,8 @@ JAX devices: [cuda(id=0)]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-13 08:36:07.375648: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated epidemic with β = 0.35
-Peak infections: 33 at day 8
+Peak infections: 327 at day 25
 </pre></div>
 </div>
 </div>
@@ -482,20 +478,39 @@ Peak infections: 33 at day 8
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The observed infection curve we want to fit</span>
 <span class="n">observed_I</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute MSE between predicted and observed infections.&quot;&quot;&quot;</span>
-    <span class="n">pred</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-        <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
-        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
-        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
-        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>  <span class="c1"># Soft Gumbel-Softmax for smooth gradients</span>
-        <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># Fixed key for reproducibility during optimization</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">pred</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">observed_I</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># For robust optimization, average the loss over multiple replicates</span>
+<span class="c1"># This reduces the effect of stochastic noise in any single trajectory</span>
+<span class="n">N_REPLICATES</span> <span class="o">=</span> <span class="mi">10</span>
 
-<span class="c1"># Test the loss function</span>
+<span class="c1"># Pre-compute keys for replicates</span>
+<span class="n">replicate_keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">N_REPLICATES</span><span class="p">)</span>
+
+<span class="c1"># Pre-compute initial states for each replicate (for efficiency)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">_init_onehot_state_sir</span><span class="p">,</span> <span class="n">_run_diff_sir_core</span>
+
+<span class="n">_states0</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+<span class="p">)(</span><span class="n">replicate_keys</span><span class="p">)</span>
+
+<span class="c1"># Fast loss function using vmap over replicates</span>
+<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute MSE averaged over multiple replicates for robust optimization.&quot;&quot;&quot;</span>
+    <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
+    
+    <span class="c1"># Run all replicates in parallel</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_one</span><span class="p">(</span><span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span><span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Return I</span>
+    
+    <span class="n">all_I</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">run_one</span><span class="p">)(</span><span class="n">_states0</span><span class="p">,</span> <span class="n">replicate_keys</span><span class="p">)</span>
+    
+    <span class="c1"># Average MSE across replicates</span>
+    <span class="n">mse_per_rep</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">all_I</span> <span class="o">-</span> <span class="n">observed_I</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mse_per_rep</span><span class="p">)</span>
+
+<span class="c1"># Test the loss function (also compiles it)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compiling loss function...&quot;</span><span class="p">)</span>
 <span class="n">test_beta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss at β = 0.15: </span><span class="si">{</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss at β = 0.35 (true): </span><span class="si">{</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -503,7 +518,7 @@ Peak infections: 33 at day 8
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3a762afb9c1312f141ebdd8c99396a4f46506d977986e6b89103a87a6cac75d0.png" src="../_images/3a762afb9c1312f141ebdd8c99396a4f46506d977986e6b89103a87a6cac75d0.png" />
+<img alt="../_images/96bd8bed507fcc21c6e13c5bcd4260e912a088f2fb317a584335a3b048dc1683.png" src="../_images/96bd8bed507fcc21c6e13c5bcd4260e912a088f2fb317a584335a3b048dc1683.png" />
 </div>
 </div>
 </section>
@@ -524,7 +539,7 @@ Peak infections: 33 at day 8
         <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
         <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
         <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
         <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># Fixed key for reproducibility during optimization</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">pred</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">observed_I</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
@@ -537,8 +552,8 @@ Peak infections: 33 at day 8
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss at β = 0.15: 398.26
-Loss at β = 0.35 (true): 392.23
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss at β = 0.15: 22919.17
+Loss at β = 0.35 (true): 1280.72
 </pre></div>
 </div>
 </div>
@@ -550,60 +565,36 @@ Loss at β = 0.35 (true): 392.23
 <p>We start from an initial guess of β = 0.15 and let the optimizer find the true value.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate predictions with fitted and initial parameters</span>
-<span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial guess (deliberately wrong)</span>
+<span class="n">beta_init</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span>
+
+<span class="c1"># Run optimization</span>
+<span class="n">beta_hat</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">optimize_params</span><span class="p">(</span>
+    <span class="n">loss_fn</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span>
+    <span class="n">init_params</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span>
+    <span class="n">n_steps</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">pred_initial</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-<span class="p">)</span>
-
-<span class="c1"># Plot comparison</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-
-<span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">observed_I</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observed (true)&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">pred_fitted</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fitted (β = </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">beta_hat</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">pred_initial</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Initial (β = </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">beta_init</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (days)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number infected&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Model Calibration: Fitted vs True Infection Curve&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Optimization complete!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Initial β: </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">beta_init</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Fitted β:  </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">beta_hat</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  True β:    </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Error:     </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">beta_hat</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">BETA_TRUE</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Optimization complete!
   Initial β: 0.150
-  Fitted β:  0.528
+  Fitted β:  0.335
   True β:    0.350
-  Error:     0.1779
+  Error:     0.0153
 </pre></div>
 </div>
 </div>
 </div>
 <p>Let’s visualize the optimization trajectory:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">history</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;loss&#39;, &#39;params&#39;])
-</pre></div>
-</div>
-</div>
-</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
@@ -633,7 +624,7 @@ Loss at β = 0.35 (true): 392.23
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ba69e3640772fce9f8bd9bd5dc815501c944acd5665c21e3d37ad01a9aec7553.png" src="../_images/ba69e3640772fce9f8bd9bd5dc815501c944acd5665c21e3d37ad01a9aec7553.png" />
+<img alt="../_images/64f8f7eeb25cfb87a8dd6a3a0a9316b320905d3c8cd9d32380944c1d2738bf81.png" src="../_images/64f8f7eeb25cfb87a8dd6a3a0a9316b320905d3c8cd9d32380944c1d2738bf81.png" />
 </div>
 </div>
 </section>
@@ -650,12 +641,12 @@ Loss at β = 0.35 (true): 392.23
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate predictions with fitted and initial parameters</span>
 <span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
     <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="n">pred_initial</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
     <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># Plot comparison</span>
@@ -679,7 +670,7 @@ Loss at β = 0.35 (true): 392.23
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7b99730ecdb58a47cd986a131acfeba1d5dee87b8d9e88358a54e36017a8cbf8.png" src="../_images/7b99730ecdb58a47cd986a131acfeba1d5dee87b8d9e88358a54e36017a8cbf8.png" />
+<img alt="../_images/97c7bc2e8dee0e7876927956a41530b1557f4110cb7b91b18d6872bdbc26459e.png" src="../_images/97c7bc2e8dee0e7876927956a41530b1557f4110cb7b91b18d6872bdbc26459e.png" />
 </div>
 </div>
 </section>
