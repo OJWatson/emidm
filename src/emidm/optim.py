@@ -164,13 +164,12 @@ def optimize_params(*, loss_fn, init_params, n_steps: int = 200, learning_rate: 
 
     Examples
     --------
-    >>> from emidm.optim import optimize_params, mse_loss
-    >>> from emidm.diff import run_diff_sir
+    >>> from emidm import optimize_params, mse_loss, run_diff_sir
     >>> import jax.numpy as jnp
     >>>
     >>> # Define loss function
     >>> def loss_fn(beta):
-    ...     result = run_diff_sir(beta=beta, N_agents=100, I0=5, T=30)
+    ...     result = run_diff_sir(N=100, I0=5, beta=beta, T=30)
     ...     return mse_loss(result["I"], observed_data)
     >>>
     >>> # Optimize

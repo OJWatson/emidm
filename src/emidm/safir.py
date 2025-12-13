@@ -1,5 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
-import pandas as pd
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 _DEFAULT_PROB_HOSP = np.array(
@@ -98,7 +103,7 @@ def simulate_safir(
     contact_matrix: np.ndarray,
     R0: float = 2.0,
     R_t: np.ndarray | None = None,
-    time_horizon: int = 200,
+    T: int = 200,
     dt: float = 0.1,
     seed: int | None = 0,
     n_seed: int = 10,
@@ -110,12 +115,63 @@ def simulate_safir(
     dur_E: float = 4.6,
     dur_IMild: float = 2.1,
     dur_ICase: float = 4.5,
-    n_replicates: int = 1,
-) -> pd.DataFrame:
+    reps: int = 1,
+) -> dict:
+    """Simulate an age-structured SAFIR/SEIR model.
+
+    This model implements an age-structured SEIR model with hospitalization and death.
+    Compartments: S -> E1 -> E2 -> (Iasy | Imild | Icase) -> R or D
+
+    Parameters
+    ----------
+    population : array-like
+        Population size per age group.
+    contact_matrix : array-like
+        Contact matrix (n_age x n_age).
+    R0 : float, default 2.0
+        Basic reproduction number.
+    R_t : array-like, optional
+        Time-varying reproduction number. If provided, must have length T + 1.
+    T : int, default 200
+        Number of days to simulate (time_horizon).
+    dt : float, default 0.1
+        Sub-daily time step (must evenly divide 1 day).
+    seed : int, optional
+        Random seed for reproducibility.
+    n_seed : int, default 10
+        Number of initial infections to seed.
+    prob_hosp : array-like, optional
+        Age-specific probability of hospitalization.
+    prob_asymp : float, default 0.3
+        Probability of asymptomatic infection.
+    prob_non_sev_death : array-like, optional
+        Age-specific death probability for non-severe cases.
+    prob_sev_death : array-like, optional
+        Age-specific death probability for severe (ICU) cases.
+    frac_ICU : float, default 0.3
+        Fraction of hospitalized cases requiring ICU.
+    dur_E : float, default 4.6
+        Mean duration of exposed period (days).
+    dur_IMild : float, default 2.1
+        Mean duration of mild/asymptomatic infectious period.
+    dur_ICase : float, default 4.5
+        Mean duration from symptom onset to hospitalization.
+    reps : int, default 1
+        Number of stochastic replicates to run.
+
+    Returns
+    -------
+    dict
+        Dictionary with keys:
+        - 't': time points (days)
+        - 'S', 'E', 'I', 'R', 'D': compartment totals
+        Arrays have shape (reps, T+1) if reps > 1, else (T+1,).
+    """
     population = np.asarray(population, dtype=float)
     contact_matrix = np.asarray(contact_matrix, dtype=float)
     n_age = int(population.shape[0])
-    n_replicates = int(n_replicates)
+    reps = int(reps)
+    time_horizon = int(T)
 
     if contact_matrix.shape != (n_age, n_age):
         raise ValueError("contact_matrix must have shape (n_age, n_age)")
@@ -158,9 +214,8 @@ def simulate_safir(
         R_t_arr = np.asarray(R_t, dtype=float)
         if R_t_arr.shape[0] != time_horizon + 1:
             raise ValueError(
-                f"R_t must have length time_horizon + 1 = {time_horizon + 1}, got {R_t_arr.shape[0]}"
+                f"R_t must have length T + 1 = {time_horizon + 1}, got {R_t_arr.shape[0]}"
             )
-        # beta_t[day] = beta_base * R_t[day] / R0
         beta_t_daily = beta_base * R_t_arr / R0
     else:
         beta_t_daily = np.full(time_horizon + 1, beta_base, dtype=float)
@@ -174,8 +229,14 @@ def simulate_safir(
     p_Imild = 1.0 - np.exp(-dt / dur_IMild)
     p_Icase = 1.0 - np.exp(-dt / dur_ICase)
 
-    rows: list[dict] = []
-    for rep in range(n_replicates):
+    n_days = time_horizon + 1
+    S_all = np.zeros((reps, n_days), dtype=np.int64)
+    E_all = np.zeros((reps, n_days), dtype=np.int64)
+    I_all = np.zeros((reps, n_days), dtype=np.int64)
+    R_all = np.zeros((reps, n_days), dtype=np.int64)
+    D_all = np.zeros((reps, n_days), dtype=np.int64)
+
+    for rep in range(reps):
         rng = np.random.default_rng(None if seed is None else seed + rep)
 
         S = pop_int.copy()
@@ -196,26 +257,15 @@ def simulate_safir(
             S = S - seed_by_age
             E1 = E1 + seed_by_age
 
-        for day in range(int(time_horizon) + 1):
-            # record daily totals (at start of day)
-            for a in range(n_age):
-                rows.append(
-                    {
-                        "day": day,
-                        "age": a,
-                        "replicate": rep,
-                        "S": int(S[a]),
-                        "E1": int(E1[a]),
-                        "E2": int(E2[a]),
-                        "Iasy": int(Iasy[a]),
-                        "Imild": int(Imild[a]),
-                        "Icase": int(Icase[a]),
-                        "R": int(R[a]),
-                        "D": int(D[a]),
-                    }
-                )
+        for day in range(time_horizon + 1):
+            # Record daily totals
+            S_all[rep, day] = S.sum()
+            E_all[rep, day] = E1.sum() + E2.sum()
+            I_all[rep, day] = Iasy.sum() + Imild.sum() + Icase.sum()
+            R_all[rep, day] = R.sum()
+            D_all[rep, day] = D.sum()
 
-            if day == int(time_horizon):
+            if day == time_horizon:
                 break
 
             for _ in range(steps_per_day):
@@ -274,10 +324,27 @@ def simulate_safir(
                 R = R + n_IasyR + n_ImildR + n_IcaseR
                 D = D + n_IcaseD
 
-    df = pd.DataFrame(rows)
-    df["E"] = df["E1"] + df["E2"]
-    df["I"] = df["Iasy"] + df["Imild"] + df["Icase"]
-    return df
+    t_arr = np.arange(time_horizon + 1)
+
+    # Return 1D arrays if single replicate, 2D if multiple
+    if reps == 1:
+        return {
+            "t": t_arr,
+            "S": S_all[0],
+            "E": E_all[0],
+            "I": I_all[0],
+            "R": R_all[0],
+            "D": D_all[0],
+        }
+    else:
+        return {
+            "t": t_arr,
+            "S": S_all,
+            "E": E_all,
+            "I": I_all,
+            "R": R_all,
+            "D": D_all,
+        }
 
 
 def run_safir(
@@ -286,25 +353,128 @@ def run_safir(
     contact_matrix: np.ndarray,
     R0: float = 2.0,
     R_t: np.ndarray | None = None,
-    time_horizon: int = 200,
+    T: int = 200,
     dt: float = 0.1,
     seed: int | None = 0,
     n_seed: int = 10,
     **kwargs,
-) -> pd.DataFrame:
-    df = simulate_safir(
+) -> dict:
+    """Run an age-structured SAFIR/SEIR model simulation.
+
+    This is the primary interface for running a single SAFIR simulation.
+
+    Parameters
+    ----------
+    population : array-like
+        Population size per age group.
+    contact_matrix : array-like
+        Contact matrix (n_age x n_age).
+    R0 : float, default 2.0
+        Basic reproduction number.
+    R_t : array-like, optional
+        Time-varying reproduction number.
+    T : int, default 200
+        Number of days to simulate.
+    dt : float, default 0.1
+        Sub-daily time step.
+    seed : int, optional
+        Random seed for reproducibility.
+    n_seed : int, default 10
+        Number of initial infections to seed.
+    **kwargs
+        Additional parameters passed to simulate_safir.
+
+    Returns
+    -------
+    dict
+        Dictionary with keys 't', 'S', 'E', 'I', 'R', 'D' as numpy arrays.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from emidm import run_safir
+    >>> population = np.array([1000, 2000, 1500])
+    >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
+    >>> result = run_safir(population=population, contact_matrix=contact_matrix, R0=2.5, T=100)
+    >>> result["I"].max()  # Peak infections
+    """
+    return simulate_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=R0,
         R_t=R_t,
-        time_horizon=time_horizon,
+        T=T,
         dt=dt,
         seed=seed,
         n_seed=n_seed,
-        n_replicates=1,
+        reps=1,
         **kwargs,
     )
-    g = df.groupby(["day", "replicate"], as_index=False)[
-        ["S", "E", "I", "R", "D"]
-    ].sum()
-    return g.drop(columns=["replicate"]).reset_index(drop=True)
+
+
+def run_safir_replicates(
+    *,
+    population: np.ndarray,
+    contact_matrix: np.ndarray,
+    R0: float = 2.0,
+    R_t: np.ndarray | None = None,
+    T: int = 200,
+    dt: float = 0.1,
+    seed: int | None = 0,
+    n_seed: int = 10,
+    reps: int = 10,
+    **kwargs,
+) -> dict:
+    """Run multiple replicates of the SAFIR/SEIR model.
+
+    Parameters
+    ----------
+    population : array-like
+        Population size per age group.
+    contact_matrix : array-like
+        Contact matrix (n_age x n_age).
+    R0 : float, default 2.0
+        Basic reproduction number.
+    R_t : array-like, optional
+        Time-varying reproduction number.
+    T : int, default 200
+        Number of days to simulate.
+    dt : float, default 0.1
+        Sub-daily time step.
+    seed : int, optional
+        Random seed for reproducibility.
+    n_seed : int, default 10
+        Number of initial infections to seed.
+    reps : int, default 10
+        Number of stochastic replicates to run.
+    **kwargs
+        Additional parameters passed to simulate_safir.
+
+    Returns
+    -------
+    dict
+        Dictionary with keys:
+        - 't': time points (shape: (T+1,))
+        - 'S', 'E', 'I', 'R', 'D': compartment totals (shape: (reps, T+1))
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from emidm import run_safir_replicates
+    >>> population = np.array([1000, 2000, 1500])
+    >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
+    >>> result = run_safir_replicates(population=population, contact_matrix=contact_matrix, reps=50)
+    >>> result["I"].mean(axis=0)  # Mean infection trajectory
+    """
+    return simulate_safir(
+        population=population,
+        contact_matrix=contact_matrix,
+        R0=R0,
+        R_t=R_t,
+        T=T,
+        dt=dt,
+        seed=seed,
+        n_seed=n_seed,
+        reps=reps,
+        **kwargs,
+    )

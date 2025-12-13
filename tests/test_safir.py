@@ -1,63 +1,80 @@
-import pandas as pd
+import numpy as np
 
-from emidm.safir import run_safir, simulate_safir
+from emidm.safir import run_safir, run_safir_replicates, simulate_safir
 
 
-def test_simulate_safir_conserves_population_by_age():
+def test_simulate_safir_conserves_population():
     population = [50, 70]
     contact_matrix = [[10.0, 2.0], [2.0, 8.0]]
-    df = simulate_safir(
+    result = simulate_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=2.0,
-        time_horizon=10,
+        T=10,
         dt=0.5,
         seed=0,
         n_seed=5,
     )
-
-    df = df.assign(total=df["S"] + df["E1"] + df["E2"] +
-                   df["Iasy"] + df["Imild"] + df["Icase"] + df["R"] + df["D"])
-    pop_int = pd.Series(population).astype(int)
-    for age in pop_int.index:
-        assert (df.loc[df["age"] == age, "total"] == pop_int.loc[age]).all()
+    totals = result["S"] + result["E"] + \
+        result["I"] + result["R"] + result["D"]
+    assert np.all(totals == sum(map(int, population)))
 
 
 def test_run_safir_conserves_population_aggregate():
     population = [40, 60]
     contact_matrix = [[5.0, 1.0], [1.0, 4.0]]
-    df = run_safir(
+    result = run_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=1.5,
-        time_horizon=8,
+        T=8,
         dt=0.5,
         seed=0,
         n_seed=5,
     )
-    totals = df["S"] + df["E"] + df["I"] + df["R"] + df["D"]
-    assert (totals == sum(map(int, population))).all()
+    totals = result["S"] + result["E"] + \
+        result["I"] + result["R"] + result["D"]
+    assert np.all(totals == sum(map(int, population)))
 
 
 def test_simulate_safir_is_reproducible_with_seed():
     population = [30, 30]
     contact_matrix = [[8.0, 2.0], [2.0, 6.0]]
-    df1 = simulate_safir(
+    result1 = simulate_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=2.0,
-        time_horizon=6,
+        T=6,
         dt=0.5,
         seed=123,
         n_seed=4,
     )
-    df2 = simulate_safir(
+    result2 = simulate_safir(
         population=population,
         contact_matrix=contact_matrix,
         R0=2.0,
-        time_horizon=6,
+        T=6,
         dt=0.5,
         seed=123,
         n_seed=4,
     )
-    pd.testing.assert_frame_equal(df1, df2)
+    np.testing.assert_array_equal(result1["S"], result2["S"])
+    np.testing.assert_array_equal(result1["I"], result2["I"])
+
+
+def test_run_safir_replicates_shape():
+    population = [40, 60]
+    contact_matrix = [[5.0, 1.0], [1.0, 4.0]]
+    result = run_safir_replicates(
+        population=population,
+        contact_matrix=contact_matrix,
+        R0=1.5,
+        T=8,
+        dt=0.5,
+        seed=0,
+        n_seed=5,
+        reps=3,
+    )
+    assert result["S"].shape == (3, 9)
+    assert result["I"].shape == (3, 9)
+    assert result["t"].shape == (9,)
