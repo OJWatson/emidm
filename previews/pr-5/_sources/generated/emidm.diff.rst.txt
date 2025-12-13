@@ -9,6 +9,7 @@
    .. autosummary::
    
       run_diff_safir
+      run_diff_safir_replicates
       run_diff_sir
       run_diff_sir_replicates
    

@@ -45,7 +45,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'development';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Slides" href="slides.html" />
+    <link rel="next" title="Contributing New Models to emidm" href="contributing_models.html" />
     <link rel="prev" title="emidm.plotting" href="generated/emidm.plotting.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -325,7 +325,14 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="contributing_models.html">Contributing New Models to emidm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jax_fundamentals.html">JAX Fundamentals for Epidemiological Modelling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_structure.html">Model Structure in emidm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="end_to_end_differentiability.html">End-to-End Differentiability in Epidemiological Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_jax_models.html">Writing JAX Models for emidm</a></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -497,36 +504,51 @@ open<span class="w"> </span>_build/html/index.html<span class="w">  </span><span
 <li><p><strong>Tests</strong>: Add tests in <code class="docutils literal notranslate"><span class="pre">tests/</span></code></p></li>
 <li><p><strong>Documentation</strong>: Update docstrings and add to user guide</p></li>
 </ol>
+<p>See <a class="reference internal" href="contributing_models.html"><span class="doc">Contributing New Models to emidm</span></a> for detailed interface requirements and a complete
+checklist for new model contributions.</p>
+<section id="understanding-jax-models">
+<h3>Understanding JAX Models<a class="headerlink" href="#understanding-jax-models" title="Link to this heading">#</a></h3>
+<p>For differentiable models, we provide comprehensive documentation:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing_models.html">Contributing New Models to emidm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jax_fundamentals.html">JAX Fundamentals for Epidemiological Modelling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_structure.html">Model Structure in emidm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="end_to_end_differentiability.html">End-to-End Differentiability in Epidemiological Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_jax_models.html">Writing JAX Models for emidm</a></li>
+</ul>
+</div>
+<p>These guides cover:</p>
+<ul class="simple">
+<li><p><strong>JAX Fundamentals</strong>: JIT compilation, automatic differentiation, functional programming</p></li>
+<li><p><strong>Model Structure</strong>: Two-layer architecture, static vs dynamic arguments, scan loops</p></li>
+<li><p><strong>End-to-End Differentiability</strong>: Gumbel-Softmax trick, straight-through estimator</p></li>
+<li><p><strong>Writing JAX Models</strong>: Step-by-step guide with complete SEIR example</p></li>
+</ul>
 <p>Key considerations for differentiable models:</p>
 <ul class="simple">
 <li><p>Use JAX arrays (<code class="docutils literal notranslate"><span class="pre">jnp</span></code>) instead of NumPy</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">jax.lax.scan</span></code> for time loops (enables efficient compilation)</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">_gumbel_softmax_bernoulli</span></code> or <code class="docutils literal notranslate"><span class="pre">_gumbel_softmax_categorical</span></code> for stochastic events</p></li>
+<li><p>Use Gumbel-Softmax for stochastic transitions</p></li>
 <li><p>Ensure all operations are differentiable (no Python control flow on JAX values)</p></li>
+<li><p>Mark shape-determining arguments as static for JIT compilation</p></li>
 </ul>
 <p>Example pattern:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_diff_new_model</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DiffConfig</span><span class="p">):</span>
-    <span class="n">_require_jax</span><span class="p">()</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_diff_model_core</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="n">state</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">carry</span>
-        <span class="c1"># ... compute transition probabilities ...</span>
-
         <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="c1"># Use Gumbel-Softmax for stochastic transitions</span>
-        <span class="n">outcome</span> <span class="o">=</span> <span class="n">_gumbel_softmax_bernoulli</span><span class="p">(</span>
-            <span class="n">subkey</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hard</span>
-        <span class="p">)</span>
-        <span class="c1"># ... update state ...</span>
+        <span class="c1"># ... compute transitions with Gumbel-Softmax ...</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">output</span>
 
-    <span class="c1"># Use scan for efficient compilation</span>
-    <span class="p">(</span><span class="n">final_state</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">outputs</span>
 </pre></div>
 </div>
+</section>
 </section>
 <section id="continuous-integration">
 <h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">#</a></h2>
@@ -589,11 +611,11 @@ open<span class="w"> </span>_build/html/index.html<span class="w">  </span><span
       </div>
     </a>
     <a class="right-next"
-       href="slides.html"
+       href="contributing_models.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Slides</p>
+        <p class="prev-next-title">Contributing New Models to emidm</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -621,7 +643,10 @@ open<span class="w"> </span>_build/html/index.html<span class="w">  </span><span
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tests">Running Tests</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-documentation">Building Documentation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-style">Code Style</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-new-models">Adding New Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-new-models">Adding New Models</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-jax-models">Understanding JAX Models</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-process">Release Process</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
