@@ -624,3 +624,139 @@ def run_diff_safir(
         "R": daily_series[:, 3],
         "D": daily_series[:, 4],
     }
+
+
+def run_diff_safir_replicates(
+    *,
+    population,
+    contact_matrix,
+    R0: float = 2.0,
+    R_t=None,
+    T: int = 200,
+    dt: float = 0.1,
+    seed: int = 0,
+    reps: int = 10,
+    tau: float = 0.1,
+    hard: bool = True,
+    n_seed: int = 10,
+    prob_hosp=None,
+    prob_asymp: float = 0.3,
+    prob_non_sev_death=None,
+    prob_sev_death=None,
+    frac_ICU: float = 0.3,
+    dur_E: float = 4.6,
+    dur_IMild: float = 2.1,
+    dur_ICase: float = 4.5,
+):
+    """Run multiple replicates of the differentiable SAFIR/SEIR model.
+
+    This function runs multiple independent replicates of the age-structured
+    differentiable SAFIR model. Unlike run_diff_sir_replicates, this cannot
+    use vmap due to the complexity of the SAFIR model, so replicates are
+    run sequentially but still benefit from JIT compilation.
+
+    Parameters
+    ----------
+    population : array-like
+        Population size per age group.
+    contact_matrix : array-like
+        Contact matrix (n_age x n_age).
+    R0 : float, default 2.0
+        Basic reproduction number (used if R_t is None).
+    R_t : array-like, optional
+        Time-varying reproduction number. If provided, must have length T + 1.
+    T : int, default 200
+        Number of days to simulate.
+    dt : float, default 0.1
+        Sub-daily time step (must evenly divide 1 day).
+    seed : int, default 0
+        Random seed for reproducibility.
+    reps : int, default 10
+        Number of replicates to run.
+    tau : float, default 0.1
+        Gumbel-Softmax temperature parameter.
+    hard : bool, default True
+        Whether to use straight-through gradient estimator.
+    n_seed : int, default 10
+        Number of initial infections to seed.
+    prob_hosp : array-like, optional
+        Age-specific probability of hospitalization.
+    prob_asymp : float, default 0.3
+        Probability of asymptomatic infection.
+    prob_non_sev_death : array-like, optional
+        Age-specific death probability for non-severe cases.
+    prob_sev_death : array-like, optional
+        Age-specific death probability for severe (ICU) cases.
+    frac_ICU : float, default 0.3
+        Fraction of hospitalized cases requiring ICU.
+    dur_E : float, default 4.6
+        Mean duration of exposed period (days).
+    dur_IMild : float, default 2.1
+        Mean duration of mild/asymptomatic infectious period.
+    dur_ICase : float, default 4.5
+        Mean duration from symptom onset to hospitalization.
+
+    Returns
+    -------
+    dict
+        Dictionary with keys:
+        - 't': time points (shape: (T+1,))
+        - 'S', 'E', 'I', 'R', 'D': compartment totals (shape: (reps, T+1))
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from emidm import run_diff_safir_replicates
+    >>> population = np.array([1000, 2000, 1500])
+    >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
+    >>> result = run_diff_safir_replicates(
+    ...     population=population,
+    ...     contact_matrix=contact_matrix,
+    ...     R0=2.5,
+    ...     T=100,
+    ...     reps=10,
+    ... )
+    >>> result["I"].shape  # (10, 101)
+    """
+    _require_jax()
+    import jax.numpy as jnp
+
+    reps = int(reps)
+    time_horizon = int(T)
+
+    # Run replicates sequentially (SAFIR is too complex for simple vmap)
+    results = []
+    for rep in range(reps):
+        rep_seed = seed + rep
+        result = run_diff_safir(
+            population=population,
+            contact_matrix=contact_matrix,
+            R0=R0,
+            R_t=R_t,
+            T=T,
+            dt=dt,
+            seed=rep_seed,
+            tau=tau,
+            hard=hard,
+            n_seed=n_seed,
+            prob_hosp=prob_hosp,
+            prob_asymp=prob_asymp,
+            prob_non_sev_death=prob_non_sev_death,
+            prob_sev_death=prob_sev_death,
+            frac_ICU=frac_ICU,
+            dur_E=dur_E,
+            dur_IMild=dur_IMild,
+            dur_ICase=dur_ICase,
+        )
+        results.append(result)
+
+    # Stack results
+    t = results[0]["t"]
+    return {
+        "t": t,
+        "S": jnp.stack([r["S"] for r in results]),
+        "E": jnp.stack([r["E"] for r in results]),
+        "I": jnp.stack([r["I"] for r in results]),
+        "R": jnp.stack([r["R"] for r in results]),
+        "D": jnp.stack([r["D"] for r in results]),
+    }

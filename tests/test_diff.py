@@ -1,4 +1,4 @@
-from emidm.diff import DiffConfig, run_diff_safir, run_diff_sir
+from emidm.diff import DiffConfig, run_diff_safir, run_diff_safir_replicates, run_diff_sir
 import pytest
 
 jax = pytest.importorskip("jax")
@@ -155,3 +155,35 @@ def test_time_varying_rt_diff_safir():
     assert out["t"].shape[0] == T + 1
     totals = out["S"] + out["E"] + out["I"] + out["R"] + out["D"]
     assert jnp.all(totals == 100)
+
+
+def test_run_diff_safir_replicates_shape():
+    """Test that run_diff_safir_replicates returns correct shapes."""
+    import jax.numpy as jnp
+
+    population = [40, 60]
+    contact_matrix = [[5.0, 2.0], [2.0, 4.0]]
+
+    out = run_diff_safir_replicates(
+        population=population,
+        contact_matrix=contact_matrix,
+        R0=2.0,
+        T=10,
+        dt=0.5,
+        seed=0,
+        reps=3,
+        tau=0.5,
+    )
+
+    assert out["t"].shape == (11,)
+    assert out["S"].shape == (3, 11)
+    assert out["E"].shape == (3, 11)
+    assert out["I"].shape == (3, 11)
+    assert out["R"].shape == (3, 11)
+    assert out["D"].shape == (3, 11)
+
+    # Check conservation for each replicate
+    for rep in range(3):
+        totals = out["S"][rep] + out["E"][rep] + \
+            out["I"][rep] + out["R"][rep] + out["D"][rep]
+        assert jnp.all(totals == 100)

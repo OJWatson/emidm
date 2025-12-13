@@ -20,7 +20,13 @@ from .sir import (
 from .safir import run_safir, run_safir_replicates, simulate_safir
 
 # Differentiable models
-from .diff import DiffConfig, run_diff_safir, run_diff_sir, run_diff_sir_replicates
+from .diff import (
+    DiffConfig,
+    run_diff_safir,
+    run_diff_safir_replicates,
+    run_diff_sir,
+    run_diff_sir_replicates,
+)
 
 # Inference
 from .inference import run_blackjax_nuts
@@ -41,6 +47,15 @@ from .plotting import (
 # Sampling utilities
 from .sampler import generate_lhs_samples
 
+# Model registry
+from .registry import (
+    get_model,
+    get_model_info,
+    list_models,
+    model_summary,
+    register_model,
+)
+
 __all__ = [
     "__version__",
     # Utilities
@@ -60,6 +75,7 @@ __all__ = [
     "run_diff_sir",
     "run_diff_sir_replicates",
     "run_diff_safir",
+    "run_diff_safir_replicates",
     # Optimization & inference
     "optimize_params",
     "mse_loss",
@@ -76,4 +92,10 @@ __all__ = [
     "plot_training_histories",
     # Sampling
     "generate_lhs_samples",
+    # Model registry
+    "get_model",
+    "get_model_info",
+    "list_models",
+    "model_summary",
+    "register_model",
 ]
