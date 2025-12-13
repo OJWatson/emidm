@@ -127,36 +127,52 @@ To add a new epidemiological model:
 3. **Tests**: Add tests in ``tests/``
 4. **Documentation**: Update docstrings and add to user guide
 
+See :doc:`contributing_models` for detailed interface requirements and a complete
+checklist for new model contributions.
+
+Understanding JAX Models
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+For differentiable models, we provide comprehensive documentation:
+
+.. toctree::
+   :maxdepth: 1
+
+   jax_fundamentals
+   model_structure
+   end_to_end_differentiability
+   writing_jax_models
+
+These guides cover:
+
+- **JAX Fundamentals**: JIT compilation, automatic differentiation, functional programming
+- **Model Structure**: Two-layer architecture, static vs dynamic arguments, scan loops
+- **End-to-End Differentiability**: Gumbel-Softmax trick, straight-through estimator
+- **Writing JAX Models**: Step-by-step guide with complete SEIR example
+
 Key considerations for differentiable models:
 
 - Use JAX arrays (``jnp``) instead of NumPy
 - Use ``jax.lax.scan`` for time loops (enables efficient compilation)
-- Use ``_gumbel_softmax_bernoulli`` or ``_gumbel_softmax_categorical`` for stochastic events
+- Use Gumbel-Softmax for stochastic transitions
 - Ensure all operations are differentiable (no Python control flow on JAX values)
+- Mark shape-determining arguments as static for JIT compilation
 
 Example pattern:
 
 .. code-block:: python
 
-   def run_diff_new_model(*, params, key, config: DiffConfig):
-       _require_jax()
-       import jax
-       import jax.numpy as jnp
+   from functools import partial
 
-       def step(carry, idx):
+   @partial(jax.jit, static_argnames=["N", "T"])
+   def _run_diff_model_core(state, key, beta, gamma, N, T):
+       def step(carry, t):
            state, key = carry
-           # ... compute transition probabilities ...
-
            key, subkey = jax.random.split(key)
-           # Use Gumbel-Softmax for stochastic transitions
-           outcome = _gumbel_softmax_bernoulli(
-               subkey, prob, tau=config.tau, hard=config.hard
-           )
-           # ... update state ...
+           # ... compute transitions with Gumbel-Softmax ...
            return (new_state, key), output
 
-       # Use scan for efficient compilation
-       (final_state, _), outputs = jax.lax.scan(step, init, indices)
+       _, outputs = jax.lax.scan(step, (state, key), jnp.arange(T))
        return outputs
 
 Continuous Integration
