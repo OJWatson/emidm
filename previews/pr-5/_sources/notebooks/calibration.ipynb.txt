@@ -137,7 +137,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
+   "execution_count": null,
    "metadata": {
     "execution": {
      "iopub.execute_input": "2025-12-13T10:45:28.735572Z",
@@ -187,7 +187,7 @@
     "\n",
     "# Pre-compute initial states using vmap\n",
     "states0 = jax.vmap(\n",
-    "    lambda k: _init_onehot_state_sir(N_agents=N_AGENTS, I0=I0, key=k)\n",
+    "    lambda k: _init_onehot_state_sir(N=N, I0=I0, key=k)\n",
     ")(init_keys)\n",
     "\n",
     "@jax.jit\n",
@@ -198,7 +198,7 @@
     "    # Run all replicates in parallel using vmap\n",
     "    def run_one(state0, key):\n",
     "        totals = _run_diff_sir_core(\n",
-    "            beta_seq, state0, key, N_AGENTS, GAMMA, 1, TAU, False  # hard=False for gradients\n",
+    "            beta_seq, state0, key, N, GAMMA, 1, TAU, False  # hard=False for gradients\n",
     "        )\n",
     "        return totals[:, 1]  # Return I trajectory\n",
     "    \n",
@@ -342,7 +342,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": null,
    "metadata": {
     "execution": {
      "iopub.execute_input": "2025-12-13T10:54:17.539108Z",
@@ -373,13 +373,13 @@
     "# Generate predictions with fitted and initial parameters using replicates\n",
     "# This uses vmap for fast parallel execution\n",
     "pred_fitted = run_diff_sir_replicates(\n",
-    "    N_agents=N_AGENTS, I0=I0, beta=beta_hat, gamma=GAMMA, T=T,\n",
+    "    N=N, I0=I0, beta=beta_hat, gamma=GAMMA, T=T,\n",
     "    reps=N_VIZ_REPS, seed=0,\n",
     "    config=DiffConfig(tau=0.1, hard=True),\n",
     ")\n",
     "\n",
     "pred_initial = run_diff_sir_replicates(\n",
-    "    N_agents=N_AGENTS, I0=I0, beta=beta_init, gamma=GAMMA, T=T,\n",
+    "    N=N, I0=I0, beta=beta_init, gamma=GAMMA, T=T,\n",
     "    reps=N_VIZ_REPS, seed=0,\n",
     "    config=DiffConfig(tau=0.1, hard=True),\n",
     ")\n",

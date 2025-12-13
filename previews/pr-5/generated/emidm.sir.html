@@ -400,16 +400,19 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_model_outputs</span></code>(df[, x, replicate, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_model_outputs</span></code>(data[, x, replicate, ...])</p></td>
 <td><p>Plot the outputs of a model run.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code>([model, reps, seed])</p></td>
-<td><p>Runs the specified model multiple times and returns a concatenated DataFrame with results from each replicate labeled.</p></td>
+<td><p>Run a model multiple times and return results as a DataFrame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir</span></code>([I0, R0, N, beta, gamma, T, dt, seed])</p></td>
-<td><p>Run an SIR model from the given parameters</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir</span></code>(*[, N, I0, R0_init, beta, gamma, ...])</p></td>
+<td><p>Run a stochastic SIR model simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sir</span></code>(*[, I0, R0, N, beta, gamma, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir_replicates</span></code>(*[, N, I0, R0_init, ...])</p></td>
+<td><p>Run multiple replicates of the stochastic SIR model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sir</span></code>(*[, N, I0, R0_init, beta, ...])</p></td>
 <td><p>Simulate a stochastic SIR model with optional time-varying reproduction number.</p></td>
 </tr>
 </tbody>

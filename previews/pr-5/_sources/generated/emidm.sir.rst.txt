@@ -11,5 +11,6 @@
       plot_model_outputs
       run_model_with_replicates
       run_sir
+      run_sir_replicates
       simulate_sir
    

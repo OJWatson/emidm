@@ -9,5 +9,6 @@
    .. autosummary::
    
       run_safir
+      run_safir_replicates
       simulate_safir
    

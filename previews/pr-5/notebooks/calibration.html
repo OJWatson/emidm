@@ -497,7 +497,7 @@ Peak infections: 290 at day 35
 
 <span class="c1"># Pre-compute initial states using vmap</span>
 <span class="n">states0</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
 <span class="p">)(</span><span class="n">init_keys</span><span class="p">)</span>
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
@@ -508,7 +508,7 @@ Peak infections: 290 at day 35
     <span class="c1"># Run all replicates in parallel using vmap</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">run_one</span><span class="p">(</span><span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
-            <span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">TAU</span><span class="p">,</span> <span class="kc">False</span>  <span class="c1"># hard=False for gradients</span>
+            <span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">TAU</span><span class="p">,</span> <span class="kc">False</span>  <span class="c1"># hard=False for gradients</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Return I trajectory</span>
     
@@ -628,13 +628,13 @@ Peak infections: 290 at day 35
 <span class="c1"># Generate predictions with fitted and initial parameters using replicates</span>
 <span class="c1"># This uses vmap for fast parallel execution</span>
 <span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir_replicates</span><span class="p">(</span>
-    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+    <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">reps</span><span class="o">=</span><span class="n">N_VIZ_REPS</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="n">pred_initial</span> <span class="o">=</span> <span class="n">run_diff_sir_replicates</span><span class="p">(</span>
-    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+    <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">reps</span><span class="o">=</span><span class="n">N_VIZ_REPS</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 <span class="p">)</span>
