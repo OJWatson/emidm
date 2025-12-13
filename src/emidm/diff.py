@@ -101,6 +101,77 @@ def _init_onehot_state_sir(*, N_agents: int, I0: int, key=None):
     return jnp.stack([susceptible_mask, infected_mask, recovered_mask], axis=-1)
 
 
+def _run_diff_sir_core(beta_seq, state0, key, N_agents, gamma, dt, tau, hard):
+    """JIT-compilable core of the differentiable SIR simulation."""
+    import jax
+    import jax.numpy as jnp
+
+    def step(carry, idx):
+        state, key = carry
+        S = state[:, 0]
+        I = state[:, 1]
+        R = state[:, 2]
+
+        I_total = jnp.sum(I)
+        beta_t = beta_seq[idx]
+
+        p_infect = 1.0 - jnp.exp(-beta_t * I_total / N_agents * dt)
+        p_recover = 1.0 - jnp.exp(-gamma * dt)
+
+        key, k_inf, k_rec = jax.random.split(key, 3)
+        keys_inf = jax.random.split(k_inf, N_agents)
+        keys_rec = jax.random.split(k_rec, N_agents)
+
+        infect = jax.vmap(lambda kk: _gumbel_softmax_bernoulli_jit(kk, p_infect, tau, hard))(
+            keys_inf
+        )
+        recover = jax.vmap(lambda kk: _gumbel_softmax_bernoulli_jit(kk, p_recover, tau, hard))(
+            keys_rec
+        )
+
+        new_I = infect * S
+        new_R = recover * I
+
+        S_next = S - new_I
+        I_next = I + new_I - new_R
+        R_next = R + new_R
+
+        state_next = jnp.stack([S_next, I_next, R_next], axis=-1)
+        totals = jnp.array([jnp.sum(S_next), jnp.sum(I_next), jnp.sum(R_next)])
+        return (state_next, key), totals
+
+    n_steps = beta_seq.shape[0] - 1
+    idxs = jnp.arange(1, n_steps + 1)
+    (stateT, _), totals = jax.lax.scan(step, (state0, key), idxs)
+
+    totals0 = jnp.array(
+        [jnp.sum(state0[:, 0]), jnp.sum(state0[:, 1]), jnp.sum(state0[:, 2])]
+    )
+    totals = jnp.vstack([totals0[None, :], totals])
+
+    return totals
+
+
+def _gumbel_softmax_bernoulli_jit(key, p, tau, hard):
+    """JIT-friendly version without _require_jax calls."""
+    import jax
+    import jax.numpy as jnp
+
+    eps = 1e-6
+    p = jnp.clip(p, eps, 1.0 - eps)
+
+    logits = jnp.stack([jnp.log(p), jnp.log1p(-p)], axis=-1)
+    u = jax.random.uniform(key, logits.shape, minval=eps, maxval=1.0 - eps)
+    g = -jnp.log(-jnp.log(u))
+    y = jax.nn.softmax((logits + g) / tau, axis=-1)
+
+    y_hard = jax.nn.one_hot(jnp.argmax(y, axis=-1), 2)
+    y = jax.lax.cond(hard, lambda: jax.lax.stop_gradient(
+        y_hard - y) + y, lambda: y)
+
+    return y[..., 0]
+
+
 def run_diff_sir(
     *,
     N_agents: int = 200,
@@ -179,47 +250,9 @@ def run_diff_sir(
     key, k_init = jax.random.split(key)
     state0 = _init_onehot_state_sir(N_agents=N_agents, I0=I0, key=k_init)
 
-    def step(carry, idx):
-        state, key = carry
-        S = state[:, 0]
-        I = state[:, 1]
-        R = state[:, 2]
-
-        I_total = jnp.sum(I)
-        beta_t = beta_seq[idx]
-
-        p_infect = 1.0 - jnp.exp(-beta_t * I_total / N_agents * dt)
-        p_recover = 1.0 - jnp.exp(-gamma * dt)
-
-        key, k_inf, k_rec = jax.random.split(key, 3)
-        keys_inf = jax.random.split(k_inf, N_agents)
-        keys_rec = jax.random.split(k_rec, N_agents)
-
-        infect = jax.vmap(lambda kk: _gumbel_softmax_bernoulli(kk, p_infect, tau=config.tau, hard=config.hard))(
-            keys_inf
-        )
-        recover = jax.vmap(lambda kk: _gumbel_softmax_bernoulli(kk, p_recover, tau=config.tau, hard=config.hard))(
-            keys_rec
-        )
-
-        new_I = infect * S
-        new_R = recover * I
-
-        S_next = S - new_I
-        I_next = I + new_I - new_R
-        R_next = R + new_R
-
-        state_next = jnp.stack([S_next, I_next, R_next], axis=-1)
-        totals = jnp.array([jnp.sum(S_next), jnp.sum(I_next), jnp.sum(R_next)])
-        return (state_next, key), totals
-
-    idxs = jnp.arange(1, ts.shape[0])
-    (stateT, _), totals = jax.lax.scan(step, (state0, key), idxs)
-
-    totals0 = jnp.array(
-        [jnp.sum(state0[:, 0]), jnp.sum(state0[:, 1]), jnp.sum(state0[:, 2])]
+    totals = _run_diff_sir_core(
+        beta_seq, state0, key, N_agents, gamma, dt, config.tau, config.hard
     )
-    totals = jnp.vstack([totals0[None, :], totals])
 
     return {
         "t": ts,
