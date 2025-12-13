@@ -451,11 +451,12 @@ JAX devices: [cuda(id=0)]
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
 <span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
 <span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.1</span>
-<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">T</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Smaller for faster demo</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">30</span>
 <span class="n">I0</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="c1"># Generate &quot;observed&quot; data</span>
+<span class="c1"># Using hard=False for smoother gradients (better for HMC)</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">observed</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
     <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
@@ -463,7 +464,7 @@ JAX devices: [cuda(id=0)]
     <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
     <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
     <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
     <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -484,7 +485,10 @@ JAX devices: [cuda(id=0)]
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6caf5a48c3090548750b509da5d9b63932c3a3d0d2b27e134f4374fec465edcc.png" src="../_images/6caf5a48c3090548750b509da5d9b63932c3a3d0d2b27e134f4374fec465edcc.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-13 08:23:52.776402: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
+</pre></div>
+</div>
+<img alt="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" src="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" />
 </div>
 </div>
 </section>
@@ -498,61 +502,75 @@ JAX devices: [cuda(id=0)]
 <p>The posterior is proportional to: <code class="docutils literal notranslate"><span class="pre">posterior</span> <span class="pre">∝</span> <span class="pre">likelihood</span> <span class="pre">×</span> <span class="pre">prior</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model configuration (fixed during inference)</span>
-<span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Fixed for reproducibility</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For efficient MCMC, we need to minimize Python overhead.</span>
+<span class="c1"># Pre-compute everything that doesn&#39;t depend on beta.</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gaussian log-likelihood for the infection curve.&quot;&quot;&quot;</span>
-    <span class="n">pred</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-        <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
-        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
-        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
-        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-        <span class="n">key</span><span class="o">=</span><span class="n">MODEL_KEY</span><span class="p">,</span>
+<span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Pre-compute initial state (this doesn&#39;t change with beta)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">_init_onehot_state_sir</span><span class="p">,</span> <span class="n">_run_diff_sir_core</span>
+
+<span class="n">_key</span><span class="p">,</span> <span class="n">_k_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MODEL_KEY</span><span class="p">)</span>
+<span class="n">_state0</span> <span class="o">=</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_k_init</span><span class="p">)</span>
+
+<span class="c1"># Create a minimal JIT-compiled function that only takes beta</span>
+<span class="c1"># Uses fixed key for deterministic likelihood (needed for MCMC)</span>
+<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fast_sir</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast SIR that only varies beta - everything else pre-computed.&quot;&quot;&quot;</span>
+    <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
+    <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
+        <span class="n">beta_seq</span><span class="p">,</span> <span class="n">_state0</span><span class="p">,</span> <span class="n">_key</span><span class="p">,</span> <span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="kc">False</span>
     <span class="p">)</span>
-    
-    <span class="c1"># Gaussian likelihood with sigma = 10 (observation noise)</span>
-    <span class="c1"># Using larger sigma to smooth the likelihood surface</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">10.0</span>
-    <span class="n">residuals</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">observed_I</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">residuals</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Return I only</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">log_prior</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-prior: beta ~ Normal(0.3, 0.15), constrained to [0, 1].&quot;&quot;&quot;</span>
-    <span class="c1"># Gaussian prior centered at 0.3</span>
-    <span class="n">prior_mean</span> <span class="o">=</span> <span class="mf">0.3</span>
-    <span class="n">prior_std</span> <span class="o">=</span> <span class="mf">0.15</span>
-    <span class="n">log_p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">beta</span> <span class="o">-</span> <span class="n">prior_mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">prior_std</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-    
-    <span class="c1"># Soft constraint to keep beta in reasonable range</span>
-    <span class="c1"># (penalize values outside [0.05, 0.8])</span>
-    <span class="n">penalty</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.05</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="n">penalty</span> <span class="o">+=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="mf">0.8</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">log_p</span> <span class="o">+</span> <span class="n">penalty</span>
+<span class="c1"># Version that also takes a key - for posterior predictive sampling</span>
+<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fast_sir_with_key</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast SIR with variable key for stochastic predictions.&quot;&quot;&quot;</span>
+    <span class="n">key</span><span class="p">,</span> <span class="n">k_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">state0</span> <span class="o">=</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k_init</span><span class="p">)</span>
+    <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
+    <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
+        <span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N_AGENTS</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">log_posterior</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-posterior = log-likelihood + log-prior.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-posterior using the fast pre-compiled model.&quot;&quot;&quot;</span>
+    <span class="n">pred_I</span> <span class="o">=</span> <span class="n">_fast_sir</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+    
+    <span class="c1"># Gaussian likelihood</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(((</span><span class="n">pred_I</span> <span class="o">-</span> <span class="n">observed_I</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    
+    <span class="c1"># Gaussian prior</span>
+    <span class="n">lp</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">beta</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.15</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    
+    <span class="k">return</span> <span class="n">ll</span> <span class="o">+</span> <span class="n">lp</span>
 
 
-<span class="c1"># JIT compile for much faster sampling</span>
+<span class="c1"># JIT the full posterior</span>
 <span class="n">log_posterior_jit</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)</span>
 
-<span class="c1"># Test the log-posterior (this also triggers JIT compilation)</span>
-<span class="n">test_beta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.3: </span><span class="si">{</span><span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Warm up JIT (one-time cost)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compiling...&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.3</span><span class="p">))</span><span class="o">.</span><span class="n">block_until_ready</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.3: </span><span class="si">{</span><span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.3</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.35 (true): </span><span class="si">{</span><span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Log-posterior at β=0.3: -287.58
-Log-posterior at β=0.35 (true): -315.95
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Compiling...
+Done!
+Log-posterior at β=0.3: -10.61
+Log-posterior at β=0.35 (true): -3.77
 </pre></div>
 </div>
 </div>
@@ -564,44 +582,41 @@ Log-posterior at β=0.35 (true): -315.95
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">HAS_BLACKJAX</span><span class="p">:</span>
-    <span class="c1"># Initialize sampler</span>
-    <span class="n">rng_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
-    <span class="n">initial_position</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.30</span><span class="p">)</span>  <span class="c1"># Starting point</span>
-    
-    <span class="c1"># Set up NUTS with window adaptation for warmup</span>
-    <span class="c1"># Note: num_steps is passed to .run(), not the constructor (BlackJAX &gt;= 1.0)</span>
-    <span class="c1"># Using the JIT-compiled log_posterior for much faster sampling</span>
-    <span class="n">warmup</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">window_adaptation</span><span class="p">(</span>
-        <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">,</span>
-        <span class="n">log_posterior_jit</span><span class="p">,</span>
-        <span class="n">initial_step_size</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>  <span class="c1"># Small initial step size for stability</span>
+    <span class="c1"># Use NUTS for efficient sampling</span>
+    <span class="n">nuts</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span>
+        <span class="n">log_posterior_jit</span><span class="p">,</span> 
+        <span class="n">step_size</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">inverse_mass_matrix</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">])</span>
     <span class="p">)</span>
     
-    <span class="c1"># Run warmup</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup...&quot;</span><span class="p">)</span>
-    <span class="n">rng_key</span><span class="p">,</span> <span class="n">warmup_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapted step size: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;step_size&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">initial_position</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.30</span><span class="p">)</span>
+    <span class="n">init_state</span> <span class="o">=</span> <span class="n">nuts</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">initial_position</span><span class="p">)</span>
     
-    <span class="c1"># Set up sampling kernel</span>
-    <span class="n">nuts_kernel</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span><span class="n">log_posterior_jit</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
+    <span class="c1"># JIT compile the step function</span>
+    <span class="n">step_fn</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nuts</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
     
-    <span class="c1"># Sampling loop</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">carry</span>
-        <span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nuts_kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="c1"># Compile (one-time cost)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compiling sampler...&quot;</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">step_fn</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">init_state</span><span class="p">)</span>
+    
+    <span class="c1"># Sampling loop using scan for efficiency</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">step_fn</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">position</span>
     
     <span class="c1"># Run sampling</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running sampling...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running sampling (500 samples)...&quot;</span><span class="p">)</span>
     <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">500</span>
-    <span class="n">rng_key</span><span class="p">,</span> <span class="n">sample_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sample_key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">rng_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
     
-    <span class="n">final_state</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">one_step</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+    <span class="n">final_state</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">one_step</span><span class="p">,</span> <span class="n">init_state</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
     <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
     
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+    <span class="c1"># Discard first 100 as burn-in</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples (after burn-in)&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Posterior mean: </span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Posterior std: </span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;True value: </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -612,7 +627,13 @@ Log-posterior at β=0.35 (true): -315.95
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running warmup (this may take a minute)...
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Compiling sampler...
+Running sampling (500 samples)...
+
+Collected 400 samples (after burn-in)
+Posterior mean: 0.3670
+Posterior std: 0.0193
+True value: 0.35
 </pre></div>
 </div>
 </div>
@@ -669,12 +690,12 @@ Log-posterior at β=0.35 (true): -315.95
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8bdd9d6a22ea17c518cb15b140173c2b5f068dba6d227eb69b740b1c9398c8ae.png" src="../_images/8bdd9d6a22ea17c518cb15b140173c2b5f068dba6d227eb69b740b1c9398c8ae.png" />
+<img alt="../_images/1984db9f3c8aa52dbd068d1f530b9d6a1e87d383d211336b40323417d12d86ca.png" src="../_images/1984db9f3c8aa52dbd068d1f530b9d6a1e87d383d211336b40323417d12d86ca.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Posterior Summary:
-  Mean: 0.3125
-  Std:  0.0094
-  2.5%: 0.2993
-  97.5%: 0.3321
+  Mean: 0.3670
+  Std:  0.0193
+  2.5%: 0.3280
+  97.5%: 0.4053
   True:  0.35
 </pre></div>
 </div>
@@ -687,24 +708,16 @@ Log-posterior at β=0.35 (true): -315.95
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="c1"># Generate predictions from posterior samples</span>
-    <span class="n">n_pred</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Number of posterior samples to use</span>
+    <span class="c1"># Generate predictions from posterior samples using vmap for speed</span>
+    <span class="n">n_pred</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     
-    <span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">sample_indices</span><span class="p">:</span>
-        <span class="n">beta_sample</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">pred</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-            <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
-            <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
-            <span class="n">beta</span><span class="o">=</span><span class="n">beta_sample</span><span class="p">,</span>
-            <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
-            <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="n">key</span><span class="o">=</span><span class="n">MODEL_KEY</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]))</span>
+    <span class="c1"># Get beta samples and generate different keys for each prediction</span>
+    <span class="n">beta_samples</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">sample_indices</span><span class="p">])</span>
+    <span class="n">pred_keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">999</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">)</span>
     
+    <span class="c1"># Vectorize over both beta and key</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">_fast_sir_with_key</span><span class="p">)(</span><span class="n">beta_samples</span><span class="p">,</span> <span class="n">pred_keys</span><span class="p">)</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
     
     <span class="c1"># Plot</span>
@@ -732,7 +745,7 @@ Log-posterior at β=0.35 (true): -315.95
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f7a3b03a455eaefe64afc643aa5f1e47d8a55005854921b58f773a9893719015.png" src="../_images/f7a3b03a455eaefe64afc643aa5f1e47d8a55005854921b58f773a9893719015.png" />
+<img alt="../_images/6f543656776f23e342238701ffa1c22ce4815b7a08c3f4276d980e9a858abb30.png" src="../_images/6f543656776f23e342238701ffa1c22ce4815b7a08c3f4276d980e9a858abb30.png" />
 </div>
 </div>
 </section>
