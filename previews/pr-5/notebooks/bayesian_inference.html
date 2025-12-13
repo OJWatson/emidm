@@ -413,7 +413,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -438,7 +438,54 @@
 <p>We’ll create synthetic epidemic data with known parameters, then try to recover them with uncertainty estimates.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model configuration (fixed during inference)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
+<span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
+<span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">I0</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Generate &quot;observed&quot; data</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">observed</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
+    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
+    <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
+    <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
+    <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">observed_I</span> <span class="o">=</span> <span class="n">observed</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
+
+<span class="c1"># Visualize</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observed</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">],</span> <span class="n">observed</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observed</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">],</span> <span class="n">observed</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observed</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">],</span> <span class="n">observed</span><span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (days)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Population&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Synthetic Epidemic (β = </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-define-the-log-posterior">
+<h2>Step 2: Define the Log-Posterior<a class="headerlink" href="#step-2-define-the-log-posterior" title="Link to this heading">#</a></h2>
+<p>For Bayesian inference, we need to define:</p>
+<ol class="arabic simple">
+<li><p><strong>Likelihood</strong>: How probable is the observed data given parameters?</p></li>
+<li><p><strong>Prior</strong>: What do we believe about parameters before seeing data?</p></li>
+</ol>
+<p>The posterior is proportional to: <code class="docutils literal notranslate"><span class="pre">posterior</span> <span class="pre">∝</span> <span class="pre">likelihood</span> <span class="pre">×</span> <span class="pre">prior</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model configuration (fixed during inference)</span>
 <span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Fixed for reproducibility</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
@@ -487,114 +534,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:2025-12-12 19:04:39,407:jax._src.xla_bridge:794: An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
-</pre></div>
-</div>
-<img alt="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" src="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" />
-</div>
-</div>
-<p>if HAS_BLACKJAX:
-# Initialize sampler
-rng_key = jax.random.PRNGKey(123)
-initial_position = jnp.array(0.30)  # Starting point closer to true value</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># Set up NUTS with window adaptation for warmup
-# Note: num_steps is passed to .run(), not the constructor (BlackJAX &gt;= 1.0)
-warmup = blackjax.window_adaptation(
-    blackjax.nuts,
-    log_posterior,
-    initial_step_size=0.001,  # Small initial step size for stability
-)
-
-# Run warmup
-print(&quot;Running warmup (this may take a minute)...&quot;)
-rng_key, warmup_key = jax.random.split(rng_key)
-(state, params), _ = warmup.run(warmup_key, initial_position, num_steps=500)
-print(f&quot;Adapted step size: {params[&#39;step_size&#39;]:.6f}&quot;)
-
-# Set up sampling kernel
-nuts_kernel = blackjax.nuts(log_posterior, **params).step
-
-# Sampling loop
-def one_step(carry, rng_key):
-    state = carry
-    state, info = nuts_kernel(rng_key, state)
-    return state, state.position
-
-# Run sampling
-print(&quot;Running sampling...&quot;)
-n_samples = 500
-rng_key, sample_key = jax.random.split(rng_key)
-keys = jax.random.split(sample_key, n_samples)
-
-final_state, samples = jax.lax.scan(one_step, state, keys)
-samples = np.array(samples)
-
-print(f&quot;\nCollected {len(samples)} samples&quot;)
-print(f&quot;Posterior mean: {samples.mean():.4f}&quot;)
-print(f&quot;Posterior std: {samples.std():.4f}&quot;)
-print(f&quot;True value: {BETA_TRUE}&quot;)
-</pre></div>
-</div>
-<p>else:
-print(“Skipping MCMC - BlackJAX not installed”)
-samples = None</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model configuration (fixed during inference)</span>
-<span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Fixed for reproducibility</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gaussian log-likelihood for the infection curve.&quot;&quot;&quot;</span>
-    <span class="n">pred</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-        <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
-        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
-        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
-        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-        <span class="n">key</span><span class="o">=</span><span class="n">MODEL_KEY</span><span class="p">,</span>
-    <span class="p">)</span>
-    
-    <span class="c1"># Gaussian likelihood with sigma = 5 (observation noise)</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">5.0</span>
-    <span class="n">residuals</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">observed_I</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">residuals</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">log_prior</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-prior: beta ~ Normal(0.3, 0.15), constrained to [0, 1].&quot;&quot;&quot;</span>
-    <span class="c1"># Gaussian prior centered at 0.3</span>
-    <span class="n">prior_mean</span> <span class="o">=</span> <span class="mf">0.3</span>
-    <span class="n">prior_std</span> <span class="o">=</span> <span class="mf">0.15</span>
-    <span class="n">log_p</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">beta</span> <span class="o">-</span> <span class="n">prior_mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">prior_std</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-    
-    <span class="c1"># Soft constraint to keep beta in reasonable range</span>
-    <span class="c1"># (penalize values outside [0.05, 0.8])</span>
-    <span class="n">penalty</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.05</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="n">penalty</span> <span class="o">+=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">beta</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="mf">0.8</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">log_p</span> <span class="o">+</span> <span class="n">penalty</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">log_posterior</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-posterior = log-likelihood + log-prior.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-
-
-<span class="c1"># Test the log-posterior</span>
-<span class="n">test_beta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.3: </span><span class="si">{</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.35 (true): </span><span class="si">{</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Log-posterior at β=0.3: -57.28
-Log-posterior at β=0.35 (true): -87.96
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="step-3-run-mcmc-sampling">
@@ -602,23 +541,24 @@ Log-posterior at β=0.35 (true): -87.96
 <p>We’ll use BlackJAX’s NUTS (No-U-Turn Sampler) algorithm, which is an adaptive form of Hamiltonian Monte Carlo that automatically tunes the step size and trajectory length.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">HAS_BLACKJAX</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">HAS_BLACKJAX</span><span class="p">:</span>
     <span class="c1"># Initialize sampler</span>
     <span class="n">rng_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
-    <span class="n">initial_position</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>  <span class="c1"># Starting point</span>
+    <span class="n">initial_position</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.30</span><span class="p">)</span>  <span class="c1"># Starting point</span>
     
     <span class="c1"># Set up NUTS with window adaptation for warmup</span>
+    <span class="c1"># Note: num_steps is passed to .run(), not the constructor (BlackJAX &gt;= 1.0)</span>
     <span class="n">warmup</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">window_adaptation</span><span class="p">(</span>
         <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">,</span>
         <span class="n">log_posterior</span><span class="p">,</span>
-        <span class="n">num_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">initial_step_size</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>  <span class="c1"># Small initial step size for stability</span>
     <span class="p">)</span>
     
     <span class="c1"># Run warmup</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup (this may take a minute)...&quot;</span><span class="p">)</span>
     <span class="n">rng_key</span><span class="p">,</span> <span class="n">warmup_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapted step size: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;step_size&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapted step size: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;step_size&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     
     <span class="c1"># Set up sampling kernel</span>
     <span class="n">nuts_kernel</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
@@ -631,7 +571,7 @@ Log-posterior at β=0.35 (true): -87.96
     
     <span class="c1"># Run sampling</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running sampling...&quot;</span><span class="p">)</span>
-    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">500</span>
     <span class="n">rng_key</span><span class="p">,</span> <span class="n">sample_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sample_key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
     
@@ -648,58 +588,6 @@ Log-posterior at β=0.35 (true): -87.96
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running warmup...
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">16</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup...&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="n">rng_key</span><span class="p">,</span> <span class="n">warmup_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">16</span> <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapted step size: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;step_size&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="c1"># Set up sampling kernel</span>
-
-<span class="nn">File ~/GoogleDrive/AcademicWork/Imperial/git/emidm/.venv/lib/python3.10/site-packages/blackjax/adaptation/window_adaptation.py:340,</span> in <span class="ni">window_adaptation.&lt;locals&gt;.run</span><span class="nt">(rng_key, position, num_steps)</span>
-<span class="g g-Whitespace">    </span><span class="mi">338</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">339</span> <span class="n">schedule</span> <span class="o">=</span> <span class="n">build_schedule</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">340</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">scan_fn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">341</span>     <span class="n">one_step</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">342</span>     <span class="n">start_state</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">343</span>     <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_steps</span><span class="p">),</span> <span class="n">keys</span><span class="p">,</span> <span class="n">schedule</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">344</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">346</span> <span class="n">last_chain_state</span><span class="p">,</span> <span class="n">last_warmup_state</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">last_state</span>
-<span class="g g-Whitespace">    </span><span class="mi">348</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">inverse_mass_matrix</span> <span class="o">=</span> <span class="n">adapt_final</span><span class="p">(</span><span class="n">last_warmup_state</span><span class="p">)</span>
-
-    <span class="p">[</span><span class="o">...</span> <span class="n">skipping</span> <span class="n">hidden</span> <span class="mi">10</span> <span class="n">frame</span><span class="p">]</span>
-
-<span class="nn">File ~/GoogleDrive/AcademicWork/Imperial/git/emidm/.venv/lib/python3.10/site-packages/blackjax/adaptation/window_adaptation.py:310,</span> in <span class="ni">window_adaptation.&lt;locals&gt;.one_step</span><span class="nt">(carry, xs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">307</span> <span class="n">_</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">,</span> <span class="n">adaptation_stage</span> <span class="o">=</span> <span class="n">xs</span>
-<span class="g g-Whitespace">    </span><span class="mi">308</span> <span class="n">state</span><span class="p">,</span> <span class="n">adaptation_state</span> <span class="o">=</span> <span class="n">carry</span>
-<span class="ne">--&gt; </span><span class="mi">310</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">mcmc_kernel</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">311</span>     <span class="n">rng_key</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">312</span>     <span class="n">state</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">313</span>     <span class="n">logdensity_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">314</span>     <span class="n">adaptation_state</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">315</span>     <span class="n">adaptation_state</span><span class="o">.</span><span class="n">inverse_mass_matrix</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">316</span>     <span class="o">**</span><span class="n">extra_parameters</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">317</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">318</span> <span class="n">new_adaptation_state</span> <span class="o">=</span> <span class="n">adapt_step</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">319</span>     <span class="n">adaptation_state</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">320</span>     <span class="n">adaptation_stage</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">new_state</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span>     <span class="n">info</span><span class="o">.</span><span class="n">acceptance_rate</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">323</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span> <span class="k">return</span> <span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>     <span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">new_adaptation_state</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>     <span class="n">adaptation_info_fn</span><span class="p">(</span><span class="n">new_state</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">new_adaptation_state</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span> <span class="p">)</span>
-
-<span class="ne">TypeError</span>: build_kernel.&lt;locals&gt;.kernel() got an unexpected keyword argument &#39;num_steps&#39;
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="step-4-analyze-the-posterior">
@@ -707,7 +595,7 @@ Log-posterior at β=0.35 (true): -87.96
 <p>Let’s visualize the posterior distribution and check convergence.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
     
     <span class="c1"># Trace plot</span>
@@ -759,7 +647,7 @@ Log-posterior at β=0.35 (true): -87.96
 <p>We can use samples from the posterior to generate predictions and visualize uncertainty in the model fit.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Generate predictions from posterior samples</span>
     <span class="n">n_pred</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Number of posterior samples to use</span>
     <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -874,6 +762,7 @@ Log-posterior at β=0.35 (true): -87.96
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-bayesian-inference">Why Bayesian Inference?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-generate-synthetic-data">Step 1: Generate Synthetic Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-define-the-log-posterior">Step 2: Define the Log-Posterior</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-run-mcmc-sampling">Step 3: Run MCMC Sampling</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-analyze-the-posterior">Step 4: Analyze the Posterior</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-5-posterior-predictive-check">Step 5: Posterior Predictive Check</a></li>
