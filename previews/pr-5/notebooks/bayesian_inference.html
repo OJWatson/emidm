@@ -421,6 +421,10 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">mse_loss</span>
 
+<span class="c1"># Show which device JAX is using</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JAX backend: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">default_backend</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JAX devices: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 <span class="c1"># Check if blackjax is available</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">blackjax</span>
@@ -472,6 +476,9 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" src="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" />
 </div>
 </div>
 </section>
@@ -534,6 +541,12 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Log-posterior at β=0.3: -14.32
+Log-posterior at β=0.35 (true): -22.03
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-3-run-mcmc-sampling">
@@ -585,6 +598,18 @@
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping MCMC - BlackJAX not installed&quot;</span><span class="p">)</span>
     <span class="n">samples</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running warmup (this may take a minute)...
+Adapted step size: 0.002819
+Running sampling...
+
+Collected 500 samples
+Posterior mean: 0.3125
+Posterior std: 0.0094
+True value: 0.35
 </pre></div>
 </div>
 </div>
@@ -640,6 +665,17 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/8bdd9d6a22ea17c518cb15b140173c2b5f068dba6d227eb69b740b1c9398c8ae.png" src="../_images/8bdd9d6a22ea17c518cb15b140173c2b5f068dba6d227eb69b740b1c9398c8ae.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Posterior Summary:
+  Mean: 0.3125
+  Std:  0.0094
+  2.5%: 0.2993
+  97.5%: 0.3321
+  True:  0.35
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-5-posterior-predictive-check">
@@ -691,6 +727,9 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/f7a3b03a455eaefe64afc643aa5f1e47d8a55005854921b58f773a9893719015.png" src="../_images/f7a3b03a455eaefe64afc643aa5f1e47d8a55005854921b58f773a9893719015.png" />
 </div>
 </div>
 </section>
