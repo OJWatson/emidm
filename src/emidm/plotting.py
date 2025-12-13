@@ -451,3 +451,110 @@ def plot_training_histories(histories: dict) -> tuple[Figure, list[Axes]]:
 
     plt.tight_layout()
     return fig, axes
+
+
+def sir_facet_plot(
+    df: pd.DataFrame,
+    *,
+    compartments: list[str] | None = None,
+    facet_by: str | list[str] | None = None,
+    figsize: tuple[float, float] | None = None,
+):
+    """Create a faceted plot of SIR model outputs using plotnine.
+
+    This function creates a faceted plot showing epidemic trajectories
+    for different parameter combinations, useful for visualizing
+    Latin Hypercube Sampling results or sensitivity analyses.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing SIR model outputs with columns 't', 'S', 'I', 'R',
+        and optionally 'replicate' and parameter columns for faceting.
+    compartments : list[str], optional
+        Compartments to plot. Default is ["S", "I", "R"].
+    facet_by : str or list[str], optional
+        Column(s) to facet by. If None, attempts to auto-detect parameter columns.
+    figsize : tuple[float, float], optional
+        Figure size (width, height) in inches.
+
+    Returns
+    -------
+    plotnine.ggplot
+        A plotnine ggplot object.
+
+    Examples
+    --------
+    >>> from emidm import run_model_with_replicates, run_sir
+    >>> from emidm.plotting import sir_facet_plot
+    >>> from emidm.sampler import generate_lhs_samples
+    >>> samples = generate_lhs_samples({"beta": [0.1, 0.5], "gamma": [0.05, 0.2]}, n_samples=4)
+    >>> results = [run_model_with_replicates(model=run_sir, reps=3, **row.to_dict()).assign(**row.to_dict())
+    ...            for _, row in samples.iterrows()]
+    >>> df = pd.concat(results)
+    >>> plot = sir_facet_plot(df, facet_by=["beta", "gamma"])
+    """
+    try:
+        from plotnine import ggplot, aes, geom_line, facet_wrap, labs, theme_bw
+    except ImportError:
+        raise ImportError(
+            "sir_facet_plot requires plotnine. Install with: pip install plotnine"
+        )
+
+    if compartments is None:
+        compartments = ["S", "I", "R"]
+
+    # Melt the dataframe to long format for plotting
+    id_vars = ["t"]
+    if "replicate" in df.columns:
+        id_vars.append("replicate")
+
+    # Add faceting columns to id_vars
+    if facet_by is None:
+        # Auto-detect parameter columns (exclude standard SIR columns)
+        standard_cols = {"t", "S", "I", "R", "E", "D", "N", "replicate"}
+        facet_by = [c for c in df.columns if c not in standard_cols]
+
+    if isinstance(facet_by, str):
+        facet_by = [facet_by]
+
+    id_vars.extend([c for c in facet_by if c in df.columns])
+
+    # Melt to long format
+    df_long = df.melt(
+        id_vars=id_vars,
+        value_vars=compartments,
+        var_name="compartment",
+        value_name="count",
+    )
+
+    # Create facet formula
+    if len(facet_by) == 1:
+        facet_formula = f"~ {facet_by[0]}"
+    elif len(facet_by) == 2:
+        facet_formula = f"{facet_by[0]} ~ {facet_by[1]}"
+    else:
+        # For more than 2, just wrap by first
+        facet_formula = f"~ {facet_by[0]}"
+
+    # Build plot
+    if "replicate" in df.columns:
+        p = (
+            ggplot(df_long, aes(x="t", y="count",
+                   color="compartment", group="replicate"))
+            + geom_line(alpha=0.5)
+        )
+    else:
+        p = (
+            ggplot(df_long, aes(x="t", y="count", color="compartment"))
+            + geom_line()
+        )
+
+    p = (
+        p
+        + facet_wrap(facet_formula, labeller="label_both")
+        + labs(x="Time", y="Count", color="Compartment")
+        + theme_bw()
+    )
+
+    return p

@@ -42,6 +42,7 @@ from .plotting import (
     plot_optimization_history,
     plot_replicates,
     plot_training_histories,
+    sir_facet_plot,
 )
 
 # Sampling utilities
@@ -90,6 +91,7 @@ __all__ = [
     "plot_optimization_history",
     "plot_replicates",
     "plot_training_histories",
+    "sir_facet_plot",
     # Sampling
     "generate_lhs_samples",
     # Model registry
