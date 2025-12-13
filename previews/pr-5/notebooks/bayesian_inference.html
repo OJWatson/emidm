@@ -435,6 +435,12 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JAX backend: gpu
+JAX devices: [cuda(id=0)]
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-1-generate-synthetic-data">
@@ -478,7 +484,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" src="../_images/8092144172121707f0d0c6379d6811dea7e2df37f4695e9c4682467483fd5250.png" />
+<img alt="../_images/6caf5a48c3090548750b509da5d9b63932c3a3d0d2b27e134f4374fec465edcc.png" src="../_images/6caf5a48c3090548750b509da5d9b63932c3a3d0d2b27e134f4374fec465edcc.png" />
 </div>
 </div>
 </section>
@@ -534,16 +540,19 @@
     <span class="k">return</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
 
 
-<span class="c1"># Test the log-posterior</span>
+<span class="c1"># JIT compile for much faster sampling</span>
+<span class="n">log_posterior_jit</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)</span>
+
+<span class="c1"># Test the log-posterior (this also triggers JIT compilation)</span>
 <span class="n">test_beta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.3: </span><span class="si">{</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.35 (true): </span><span class="si">{</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.3: </span><span class="si">{</span><span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log-posterior at β=0.35 (true): </span><span class="si">{</span><span class="n">log_posterior_jit</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Log-posterior at β=0.3: -14.32
-Log-posterior at β=0.35 (true): -22.03
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Log-posterior at β=0.3: -287.58
+Log-posterior at β=0.35 (true): -315.95
 </pre></div>
 </div>
 </div>
@@ -561,20 +570,21 @@ Log-posterior at β=0.35 (true): -22.03
     
     <span class="c1"># Set up NUTS with window adaptation for warmup</span>
     <span class="c1"># Note: num_steps is passed to .run(), not the constructor (BlackJAX &gt;= 1.0)</span>
+    <span class="c1"># Using the JIT-compiled log_posterior for much faster sampling</span>
     <span class="n">warmup</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">window_adaptation</span><span class="p">(</span>
         <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">,</span>
-        <span class="n">log_posterior</span><span class="p">,</span>
+        <span class="n">log_posterior_jit</span><span class="p">,</span>
         <span class="n">initial_step_size</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>  <span class="c1"># Small initial step size for stability</span>
     <span class="p">)</span>
     
     <span class="c1"># Run warmup</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup (this may take a minute)...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running warmup...&quot;</span><span class="p">)</span>
     <span class="n">rng_key</span><span class="p">,</span> <span class="n">warmup_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">params</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">warmup</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">warmup_key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adapted step size: </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;step_size&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     
     <span class="c1"># Set up sampling kernel</span>
-    <span class="n">nuts_kernel</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
+    <span class="n">nuts_kernel</span> <span class="o">=</span> <span class="n">blackjax</span><span class="o">.</span><span class="n">nuts</span><span class="p">(</span><span class="n">log_posterior_jit</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">step</span>
     
     <span class="c1"># Sampling loop</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">one_step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
@@ -603,13 +613,6 @@ Log-posterior at β=0.35 (true): -22.03
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running warmup (this may take a minute)...
-Adapted step size: 0.002819
-Running sampling...
-
-Collected 500 samples
-Posterior mean: 0.3125
-Posterior std: 0.0094
-True value: 0.35
 </pre></div>
 </div>
 </div>
