@@ -138,6 +138,7 @@ For differentiable models, we provide comprehensive documentation:
 .. toctree::
    :maxdepth: 1
 
+   contributing_models
    jax_fundamentals
    model_structure
    end_to_end_differentiability
