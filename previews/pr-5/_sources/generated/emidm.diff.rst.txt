@@ -10,6 +10,7 @@
    
       run_diff_safir
       run_diff_sir
+      run_diff_sir_replicates
    
    .. rubric:: Classes
 
