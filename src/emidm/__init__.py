@@ -32,7 +32,7 @@ from .diff import (
 from .inference import run_blackjax_nuts
 
 # Optimization
-from .optim import optimize_params, mse_loss, poisson_nll, gaussian_nll, make_sir_loss
+from .optim import optimize_params, mse_loss, poisson_nll, gaussian_nll, binomial_nll, make_sir_loss
 
 # Plotting
 from .plotting import (
@@ -82,6 +82,7 @@ __all__ = [
     "mse_loss",
     "poisson_nll",
     "gaussian_nll",
+    "binomial_nll",
     "make_sir_loss",
     "run_blackjax_nuts",
     # Plotting

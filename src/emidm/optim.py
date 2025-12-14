@@ -95,6 +95,49 @@ def gaussian_nll(predicted, observed, sigma: float = 1.0):
     return jnp.mean(0.5 * ((predicted - observed) / sigma) ** 2)
 
 
+def binomial_nll(predicted, observed, n_trials, eps: float = 1e-8):
+    """Binomial negative log-likelihood loss.
+
+    Useful for proportion/rate data where observations are counts out of
+    a known number of trials (e.g., deaths out of cases).
+
+    Parameters
+    ----------
+    predicted : array-like
+        Predicted probabilities (must be in [0, 1]).
+    observed : array-like
+        Observed counts (successes).
+    n_trials : array-like
+        Number of trials for each observation.
+    eps : float, default 1e-8
+        Small constant to avoid log(0).
+
+    Returns
+    -------
+    float
+        Negative log-likelihood.
+
+    Examples
+    --------
+    >>> # Observed 10 deaths out of 100 cases, model predicts 0.12 probability
+    >>> loss = binomial_nll(predicted=0.12, observed=10, n_trials=100)
+    """
+    _require_jax()
+    import jax.numpy as jnp
+
+    predicted = jnp.asarray(predicted)
+    observed = jnp.asarray(observed)
+    n_trials = jnp.asarray(n_trials)
+
+    # Clip probabilities to avoid log(0)
+    p = jnp.clip(predicted, eps, 1 - eps)
+
+    # Binomial NLL: -[k*log(p) + (n-k)*log(1-p)]
+    # We omit the binomial coefficient as it's constant w.r.t. parameters
+    nll = -(observed * jnp.log(p) + (n_trials - observed) * jnp.log(1 - p))
+    return jnp.mean(nll)
+
+
 def make_sir_loss(
     observed_I,
     *,

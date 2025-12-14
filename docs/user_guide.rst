@@ -34,7 +34,7 @@ The SIR (Susceptible-Infected-Recovered) model is the simplest compartmental mod
    df = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
 
    # Differentiable SIR
-   result = run_diff_sir(N_agents=200, I0=5, beta=0.3, gamma=0.1, T=50)
+   result = run_diff_sir(N=200, I0=5, beta=0.3, gamma=0.1, T=50, seed=0)
 
 SAFIR Model
 ^^^^^^^^^^^
@@ -119,18 +119,18 @@ The **temperature** parameter τ controls the discreteness:
 
 .. code-block:: python
 
-   from emidm import run_diff_sir, DiffConfig
+   from emidm import run_diff_sir
 
    # Low temperature: more discrete
    result_discrete = run_diff_sir(
-       N_agents=100, I0=5, beta=0.3, gamma=0.1, T=50,
-       config=DiffConfig(tau=0.1, hard=True),
+       N=100, I0=5, beta=0.3, gamma=0.1, T=50,
+       tau=0.1, hard=True, seed=0,
    )
 
    # Higher temperature: smoother gradients
    result_smooth = run_diff_sir(
-       N_agents=100, I0=5, beta=0.3, gamma=0.1, T=50,
-       config=DiffConfig(tau=1.0, hard=True),
+       N=100, I0=5, beta=0.3, gamma=0.1, T=50,
+       tau=1.0, hard=True, seed=0,
    )
 
 The ``hard`` parameter controls whether to use the straight-through estimator:
@@ -149,25 +149,21 @@ Basic Calibration
 
 .. code-block:: python
 
-   import jax
    import jax.numpy as jnp
-   from emidm import run_diff_sir, DiffConfig, optimize_params, mse_loss
+   from emidm import run_diff_sir, optimize_params, mse_loss
 
    # Generate synthetic "observed" data
    true_beta = 0.35
-   key = jax.random.PRNGKey(42)
    observed = run_diff_sir(
-       N_agents=200, I0=5, beta=true_beta, gamma=0.1, T=50,
-       config=DiffConfig(tau=0.5, hard=True),
-       key=key,
+       N=200, I0=5, beta=true_beta, gamma=0.1, T=50,
+       tau=0.5, hard=True, seed=42,
    )
 
    # Define loss function
    def loss_fn(beta):
        pred = run_diff_sir(
-           N_agents=200, I0=5, beta=beta, gamma=0.1, T=50,
-           config=DiffConfig(tau=0.5, hard=True),
-           key=jax.random.PRNGKey(0),  # Fixed key for reproducibility
+           N=200, I0=5, beta=beta, gamma=0.1, T=50,
+           tau=0.5, hard=True, seed=0,
        )
        return mse_loss(pred["I"], observed["I"])
 
@@ -194,19 +190,20 @@ Using the Loss Function Helpers
 
 .. code-block:: python
 
-   from emidm import make_sir_loss, run_diff_sir, DiffConfig
+   from emidm import make_sir_loss, run_diff_sir
 
    # Create a loss function automatically
    loss_fn = make_sir_loss(
        observed_I=observed["I"],
        model_fn=run_diff_sir,
        model_kwargs={
-           "N_agents": 200,
+           "N": 200,
            "I0": 5,
            "gamma": 0.1,
            "T": 50,
-           "config": DiffConfig(tau=0.5, hard=True),
-           "key": jax.random.PRNGKey(0),
+           "tau": 0.5,
+           "hard": True,
+           "seed": 0,
        },
        loss_type="mse",  # or "poisson", "gaussian"
    )
@@ -233,7 +230,7 @@ Plotting
    fig, ax = plot_sir(df, title="SIR Epidemic")
 
    # Plot differentiable model output
-   result = run_diff_sir(N_agents=200, I0=5, beta=0.3, gamma=0.1, T=50)
+   result = run_diff_sir(N=200, I0=5, beta=0.3, gamma=0.1, T=50, seed=0)
    fig, ax = plot_sir(result, title="Differentiable SIR")
 
    # Compare observed vs fitted
@@ -254,17 +251,15 @@ Hamiltonian Monte Carlo (HMC) sampling:
 
 .. code-block:: python
 
-   import jax
    import jax.numpy as jnp
-   from emidm import run_diff_sir, DiffConfig, mse_loss, run_blackjax_nuts
+   from emidm import run_diff_sir, mse_loss, run_blackjax_nuts
 
    # Define log-density (negative loss + prior)
    def log_density(beta):
        # Likelihood
        pred = run_diff_sir(
-           N_agents=200, I0=5, beta=beta, gamma=0.1, T=50,
-           config=DiffConfig(tau=0.5, hard=True),
-           key=jax.random.PRNGKey(0),
+           N=200, I0=5, beta=beta, gamma=0.1, T=50,
+           tau=0.5, hard=True, seed=0,
        )
        log_lik = -mse_loss(pred["I"], observed["I"])
 
