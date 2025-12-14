@@ -10,6 +10,8 @@ API Reference
    emidm.diff
    emidm.optim
    emidm.inference
-   emidm.examples.calibration_demo
+   emidm.registry
+   emidm.utils
    emidm.sampler
    emidm.plotting
+   emidm.examples.calibration_demo

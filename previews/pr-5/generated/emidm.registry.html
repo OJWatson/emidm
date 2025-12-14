@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>emidm.sir &#8212; emidm  documentation</title>
+    <title>emidm.registry &#8212; emidm  documentation</title>
   
   
   
@@ -42,11 +42,11 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/emidm.sir';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/emidm.registry';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="emidm.safir" href="emidm.safir.html" />
-    <link rel="prev" title="emidm" href="emidm.html" />
+    <link rel="next" title="emidm.utils" href="emidm.utils.html" />
+    <link rel="prev" title="emidm.inference" href="emidm.inference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -327,12 +327,12 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="emidm.html">emidm</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">emidm.sir</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emidm.sir.html">emidm.sir</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.safir.html">emidm.safir</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.diff.html">emidm.diff</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.optim.html">emidm.optim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.inference.html">emidm.inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="emidm.registry.html">emidm.registry</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">emidm.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.utils.html">emidm.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.sampler.html">emidm.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.plotting.html">emidm.plotting</a></li>
@@ -380,7 +380,7 @@
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">emidm.sir</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">emidm.registry</span></li>
   </ul>
 </nav>
 </div>
@@ -397,25 +397,53 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-emidm.sir">
-<span id="emidm-sir"></span><h1>emidm.sir<a class="headerlink" href="#module-emidm.sir" title="Link to this heading">#</a></h1>
+  <section id="module-emidm.registry">
+<span id="emidm-registry"></span><h1>emidm.registry<a class="headerlink" href="#module-emidm.registry" title="Link to this heading">#</a></h1>
+<p>Model registry for emidm.</p>
+<p>This module provides a registry system for epidemiological models, enabling
+easy discovery, registration, and instantiation of models. This makes it
+straightforward for contributors to add new models to the package.</p>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Register a new model</span>
+<span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;my_seirs&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">&quot;stochastic&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_my_seirs</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="c1"># List available models</span>
+<span class="n">list_models</span><span class="p">()</span>  <span class="c1"># Returns all registered models</span>
+<span class="n">list_models</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;stochastic&quot;</span><span class="p">)</span>  <span class="c1"># Filter by category</span>
+
+<span class="c1"># Get a model function</span>
+<span class="n">model_fn</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;sir&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model_fn</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_model_outputs</span></code>(data[, x, replicate, ...])</p></td>
-<td><p>Plot the outputs of a model run.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code>(name)</p></td>
+<td><p>Get a model function by name.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code>([model, reps, seed])</p></td>
-<td><p>Run a model multiple times and return results as a DataFrame.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model_info</span></code>(name)</p></td>
+<td><p>Get full information about a registered model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir</span></code>(*[, N, I0, R0_init, beta, gamma, ...])</p></td>
-<td><p>Run a stochastic SIR model simulation.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_models</span></code>([category])</p></td>
+<td><p>List all registered models.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir_replicates</span></code>(*[, N, I0, R0_init, ...])</p></td>
-<td><p>Run multiple replicates of the stochastic SIR model.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_summary</span></code>()</p></td>
+<td><p>Get a formatted summary of all registered models.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sir</span></code>(*[, N, I0, R0_init, beta, ...])</p></td>
-<td><p>Simulate a stochastic SIR model with optional time-varying reproduction number.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_model</span></code>(name, *[, category, ...])</p></td>
+<td><p>Decorator to register a model function.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelInfo</span></code>(name, func, category, description, ...)</p></td>
+<td><p>Information about a registered model.</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,20 +461,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="emidm.html"
+       href="emidm.inference.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">emidm</p>
+        <p class="prev-next-title">emidm.inference</p>
       </div>
     </a>
     <a class="right-next"
-       href="emidm.safir.html"
+       href="emidm.utils.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">emidm.safir</p>
+        <p class="prev-next-title">emidm.utils</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -465,7 +493,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/generated/emidm.sir.rst.txt"
+      <li><a href="../_sources/generated/emidm.registry.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

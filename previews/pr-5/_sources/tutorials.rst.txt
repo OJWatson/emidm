@@ -11,6 +11,12 @@ These tutorials demonstrate how to use **emidm** for epidemiological modelling.
 
    notebooks/calibration
    notebooks/bayesian_inference
+   notebooks/safir_inference
+
+The **SAFIR Inference Notebook** demonstrates Bayesian inference for time-varying
+R(t) using the age-structured SAFIR model with UK demographics. It simulates a
+COVID-19-like epidemic matching the UK 2020 pattern and shows how to estimate
+R(t) from death data using gradient-based optimization and MCMC.
 
 Training Surrogates
 -------------------

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>emidm.sir &#8212; emidm  documentation</title>
+    <title>emidm.utils &#8212; emidm  documentation</title>
   
   
   
@@ -42,11 +42,11 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/emidm.sir';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/emidm.utils';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="emidm.safir" href="emidm.safir.html" />
-    <link rel="prev" title="emidm" href="emidm.html" />
+    <link rel="next" title="emidm.sampler" href="emidm.sampler.html" />
+    <link rel="prev" title="emidm.registry" href="emidm.registry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -327,13 +327,13 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="emidm.html">emidm</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">emidm.sir</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emidm.sir.html">emidm.sir</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.safir.html">emidm.safir</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.diff.html">emidm.diff</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.optim.html">emidm.optim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.inference.html">emidm.inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.registry.html">emidm.registry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="emidm.utils.html">emidm.utils</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">emidm.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.sampler.html">emidm.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.plotting.html">emidm.plotting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.examples.calibration_demo.html">emidm.examples.calibration_demo</a></li>
@@ -380,7 +380,7 @@
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">emidm.sir</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">emidm.utils</span></li>
   </ul>
 </nav>
 </div>
@@ -397,25 +397,19 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-emidm.sir">
-<span id="emidm-sir"></span><h1>emidm.sir<a class="headerlink" href="#module-emidm.sir" title="Link to this heading">#</a></h1>
+  <section id="module-emidm.utils">
+<span id="emidm-utils"></span><h1>emidm.utils<a class="headerlink" href="#module-emidm.utils" title="Link to this heading">#</a></h1>
+<p>Utility functions for emidm.</p>
+<p>This module provides utility functions for converting between data formats
+and other common operations used across the package.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_model_outputs</span></code>(data[, x, replicate, ...])</p></td>
-<td><p>Plot the outputs of a model run.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_to_dataframe</span></code>(data[, include_replicate])</p></td>
+<td><p>Alias for to_dataframe for backwards compatibility.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code>([model, reps, seed])</p></td>
-<td><p>Run a model multiple times and return results as a DataFrame.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir</span></code>(*[, N, I0, R0_init, beta, gamma, ...])</p></td>
-<td><p>Run a stochastic SIR model simulation.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir_replicates</span></code>(*[, N, I0, R0_init, ...])</p></td>
-<td><p>Run multiple replicates of the stochastic SIR model.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sir</span></code>(*[, N, I0, R0_init, beta, ...])</p></td>
-<td><p>Simulate a stochastic SIR model with optional time-varying reproduction number.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>(data[, include_replicate])</p></td>
+<td><p>Convert model output dictionary to a pandas DataFrame.</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,20 +427,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="emidm.html"
+       href="emidm.registry.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">emidm</p>
+        <p class="prev-next-title">emidm.registry</p>
       </div>
     </a>
     <a class="right-next"
-       href="emidm.safir.html"
+       href="emidm.sampler.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">emidm.safir</p>
+        <p class="prev-next-title">emidm.sampler</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -465,7 +459,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/generated/emidm.sir.rst.txt"
+      <li><a href="../_sources/generated/emidm.utils.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

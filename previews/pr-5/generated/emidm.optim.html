@@ -332,9 +332,11 @@
 <li class="toctree-l1"><a class="reference internal" href="emidm.diff.html">emidm.diff</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">emidm.optim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.inference.html">emidm.inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="emidm.examples.calibration_demo.html">emidm.examples.calibration_demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emidm.registry.html">emidm.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emidm.utils.html">emidm.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.sampler.html">emidm.sampler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emidm.plotting.html">emidm.plotting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emidm.examples.calibration_demo.html">emidm.examples.calibration_demo</a></li>
 </ul>
 </div>
 </nav></div>
@@ -403,19 +405,22 @@ epidemiological model parameters using JAX and Optax.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_nll</span></code>(predicted, observed[, sigma])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">binomial_nll</span></code>(predicted, observed, n_trials)</p></td>
+<td><p>Binomial negative log-likelihood loss.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_nll</span></code>(predicted, observed[, sigma])</p></td>
 <td><p>Gaussian negative log-likelihood loss.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_sir_loss</span></code>(observed_I, *, model_fn[, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_sir_loss</span></code>(observed_I, *, model_fn[, ...])</p></td>
 <td><p>Create a loss function for SIR model calibration.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mse_loss</span></code>(predicted, observed)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mse_loss</span></code>(predicted, observed)</p></td>
 <td><p>Mean squared error loss function.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_params</span></code>(*, loss_fn, init_params[, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_params</span></code>(*, loss_fn, init_params[, ...])</p></td>
 <td><p>Gradient-based parameter optimization using Optax (Adam).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson_nll</span></code>(predicted, observed[, eps])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">poisson_nll</span></code>(predicted, observed[, eps])</p></td>
 <td><p>Poisson negative log-likelihood loss.</p></td>
 </tr>
 </tbody>
