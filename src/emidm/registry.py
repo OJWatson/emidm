@@ -4,7 +4,7 @@ This module provides a registry system for epidemiological models, enabling
 easy discovery, registration, and instantiation of models. This makes it
 straightforward for contributors to add new models to the package.
 
-Example usage:
+Example usage::
 
     # Register a new model
     @register_model("my_seirs", category="stochastic")
