@@ -399,17 +399,29 @@
                   
   <section id="module-emidm.safir">
 <span id="emidm-safir"></span><h1>emidm.safir<a class="headerlink" href="#module-emidm.safir" title="Link to this heading">#</a></h1>
+<p>Stochastic age-structured SAFIR/SEIR model implementation.</p>
+<p>This module provides a class-based SAFIR model following the ABM pattern:
+- SAFIRModel: Model class with init_state(), step(), run() methods
+- Convenience functions: run_safir(), run_safir_replicates(), simulate_safir()</p>
+<p>The SAFIR model implements an age-structured SEIR model with hospitalization and death:
+Compartments: S -&gt; E1 -&gt; E2 -&gt; (Iasy | Imild | Icase) -&gt; R or D</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_safir</span></code>(*, population, contact_matrix[, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_safir_simulation</span></code>(*, population, ...[, ...])</p></td>
 <td><p>Run an age-structured SAFIR/SEIR model simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_safir_replicates</span></code>(*, population, ...[, ...])</p></td>
-<td><p>Run multiple replicates of the SAFIR/SEIR model.</p></td>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAFIRModel</span></code>(*, population, contact_matrix[, ...])</p></td>
+<td><p>Stochastic age-structured SAFIR/SEIR model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_safir</span></code>(*, population, contact_matrix)</p></td>
-<td><p>Simulate an age-structured SAFIR/SEIR model.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAFIRState</span></code>(S, E1, E2, Iasy, Imild, Icase, R, D)</p></td>
+<td><p>State of the SAFIR model at a single time point.</p></td>
 </tr>
 </tbody>
 </table>

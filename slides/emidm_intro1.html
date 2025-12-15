@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-html/tabby.min.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="emidm_intro1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="emidm_intro1_files/libs/quarto-html/tabby.min.js"></script>
+<script src="emidm_intro1_files/libs/quarto-html/popper.min.js"></script>
+<script src="emidm_intro1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="emidm_intro1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="emidm_intro1_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="emidm_intro1_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.26">
 
   <meta name="dcterms.date" content="2025-04-03">
-  <title>emidm – Introduction to Deep Learning Frameworks with Python and PyTorch</title>
+  <title>Introduction to Deep Learning Frameworks with Python and PyTorch</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="emidm_intro1_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="emidm_intro1_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -95,11 +95,11 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-bec4dcf5f031edb8acdca0dec9d4c7b7.css">
-  <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="emidm_intro1_files/libs/revealjs/dist/theme/quarto-bec4dcf5f031edb8acdca0dec9d4c7b7.css">
+  <link href="emidm_intro1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="emidm_intro1_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="emidm_intro1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="emidm_intro1_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -432,18 +432,18 @@
 <section id="pytorch-in-action-basic-operations" class="slide level2 smaller">
 <h2>PyTorch in Action: Basic Operations</h2>
 <p>Let’s see a simple example creating a tensor, doing a computation, and using autograd to get gradients:</p>
-<div id="ffc739c4" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> torch</span>
-<span id="cb1-2"><a></a></span>
-<span id="cb1-3"><a></a><span class="co"># Create a tensor with gradient tracking</span></span>
-<span id="cb1-4"><a></a>x <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>], requires_grad<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-5"><a></a><span class="co"># Perform operations on the tensor</span></span>
-<span id="cb1-6"><a></a>y <span class="op">=</span> x <span class="op">*</span> <span class="dv">2</span>  <span class="co"># y = [2.0, 4.0, 6.0]</span></span>
-<span id="cb1-7"><a></a>y_sum <span class="op">=</span> y.<span class="bu">sum</span>()  <span class="co"># y_sum = 12.0 (scalar tensor)</span></span>
-<span id="cb1-8"><a></a><span class="co"># Compute gradients (dy_sum/dx)</span></span>
-<span id="cb1-9"><a></a>y_sum.backward()  <span class="co"># backpropagate through the computation</span></span>
-<span id="cb1-10"><a></a><span class="bu">print</span>(x.grad)  <span class="co"># Gradient of y_sum w.r.t x</span></span>
-<span id="cb1-11"><a></a><span class="co"># Expected output: tensor([2., 2., 2.])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6b5f0f54" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href=""></a></span>
+<span id="cb1-3"><a href=""></a><span class="co"># Create a tensor with gradient tracking</span></span>
+<span id="cb1-4"><a href=""></a>x <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>], requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-5"><a href=""></a><span class="co"># Perform operations on the tensor</span></span>
+<span id="cb1-6"><a href=""></a>y <span class="op">=</span> x <span class="op">*</span> <span class="dv">2</span>  <span class="co"># y = [2.0, 4.0, 6.0]</span></span>
+<span id="cb1-7"><a href=""></a>y_sum <span class="op">=</span> y.<span class="bu">sum</span>()  <span class="co"># y_sum = 12.0 (scalar tensor)</span></span>
+<span id="cb1-8"><a href=""></a><span class="co"># Compute gradients (dy_sum/dx)</span></span>
+<span id="cb1-9"><a href=""></a>y_sum.backward()  <span class="co"># backpropagate through the computation</span></span>
+<span id="cb1-10"><a href=""></a><span class="bu">print</span>(x.grad)  <span class="co"># Gradient of y_sum w.r.t x</span></span>
+<span id="cb1-11"><a href=""></a><span class="co"># Expected output: tensor([2., 2., 2.])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li>In this example, <code>y = 2*x</code>, and <code>y_sum = 2*x1 + 2*x2 + 2*x3</code>. The gradient ∂(y_sum)/∂x = <code>[2, 2, 2]</code>, which PyTorch computes for us.</li>
@@ -499,9 +499,9 @@
 <ul>
 <li>We’ll use the classic <strong>SIR model</strong> (Susceptible-Infectious-Recovered) as an example of building a surrogate. In a stochastic SIR simulation, each run with given parameters produces a trajectory of S, I, R over time.</li>
 </ul>
-<div id="c9158176" class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
-<span id="cb2-2"><a></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9029d118" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="im">from</span> emidm.sir <span class="im">import</span> run_sir, run_model_with_replicates, plot_model_outputs</span>
+<span id="cb2-2"><a href=""></a>plot_model_outputs(run_model_with_replicates(run_sir, reps<span class="op">=</span><span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="building-the-surrogate" class="slide level2 smaller">
@@ -574,7 +574,6 @@
 <li><strong>Note:</strong> This is an advanced technique and an active research area. It combines deep learning’s generative power with the need in epidemiology to quantify uncertainty.</li>
 </ul>
 
-
 </section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
@@ -585,19 +584,19 @@
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="../site_libs/revealjs/dist/reveal.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="../site_libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="../site_libs/revealjs/plugin/search/search.js"></script>
-  <script src="../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../site_libs/revealjs/plugin/math/math.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="emidm_intro1_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>

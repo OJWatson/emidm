@@ -28,13 +28,19 @@ The SIR (Susceptible-Infected-Recovered) model is the simplest compartmental mod
 
 .. code-block:: python
 
-   from emidm import simulate_sir, run_diff_sir
+   import jax
+   from emidm import run_sir_simulation, run_diff_sir_simulation, DiffConfig
 
    # Stochastic SIR
-   df = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
+   result = run_sir_simulation(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
 
    # Differentiable SIR
-   result = run_diff_sir(N=200, I0=5, beta=0.3, gamma=0.1, T=50, seed=0)
+   key = jax.random.PRNGKey(0)
+   result = run_diff_sir_simulation(
+       N=200, I0=5, beta=0.3, gamma=0.1, T=50,
+       config=DiffConfig(tau=0.5, hard=True),
+       key=key,
+   )
 
 SAFIR Model
 ^^^^^^^^^^^
@@ -49,7 +55,7 @@ The SAFIR model is an age-structured SEIR model with hospitalization and death:
 .. code-block:: python
 
    import numpy as np
-   from emidm import simulate_safir, run_diff_safir
+   from emidm import run_safir_simulation, run_diff_safir_simulation, DiffConfig
 
    population = np.array([1000, 2000, 1500, 1000])  # 4 age groups
    contact_matrix = np.array([
@@ -60,19 +66,21 @@ The SAFIR model is an age-structured SEIR model with hospitalization and death:
    ])
 
    # Stochastic SAFIR
-   df = simulate_safir(
+   result = run_safir_simulation(
        population=population,
        contact_matrix=contact_matrix,
        R0=2.5,
-       time_horizon=200,
+       T=200,
    )
 
    # Differentiable SAFIR
-   result = run_diff_safir(
+   result = run_diff_safir_simulation(
        population=population,
        contact_matrix=contact_matrix,
        R0=2.5,
-       time_horizon=100,
+       T=100,
+       seed=0,
+       config=DiffConfig(tau=0.5),
    )
 
 Time-Varying Reproduction Number
@@ -119,18 +127,24 @@ The **temperature** parameter τ controls the discreteness:
 
 .. code-block:: python
 
-   from emidm import run_diff_sir
+   import jax
+   from emidm import run_diff_sir_simulation, DiffConfig
+
+   key = jax.random.PRNGKey(0)
 
    # Low temperature: more discrete
-   result_discrete = run_diff_sir(
+   result_discrete = run_diff_sir_simulation(
        N=100, I0=5, beta=0.3, gamma=0.1, T=50,
-       tau=0.1, hard=True, seed=0,
+       config=DiffConfig(tau=0.1, hard=True),
+       key=key,
    )
 
    # Higher temperature: smoother gradients
-   result_smooth = run_diff_sir(
+   key = jax.random.PRNGKey(0)
+   result_smooth = run_diff_sir_simulation(
        N=100, I0=5, beta=0.3, gamma=0.1, T=50,
-       tau=1.0, hard=True, seed=0,
+       config=DiffConfig(tau=1.0, hard=True),
+       key=key,
    )
 
 The ``hard`` parameter controls whether to use the straight-through estimator:
@@ -149,21 +163,28 @@ Basic Calibration
 
 .. code-block:: python
 
+   import jax
    import jax.numpy as jnp
-   from emidm import run_diff_sir, optimize_params, mse_loss
+   from emidm import run_diff_sir_simulation, DiffConfig
+   from emidm.optim import optimize_params, mse_loss
 
    # Generate synthetic "observed" data
    true_beta = 0.35
-   observed = run_diff_sir(
+   key = jax.random.PRNGKey(42)
+   observed = run_diff_sir_simulation(
        N=200, I0=5, beta=true_beta, gamma=0.1, T=50,
-       tau=0.5, hard=True, seed=42,
+       config=DiffConfig(tau=0.5, hard=True),
+       key=key,
    )
 
-   # Define loss function
+   # Define loss function (use fixed key for deterministic evaluation)
+   opt_key = jax.random.PRNGKey(0)
+
    def loss_fn(beta):
-       pred = run_diff_sir(
+       pred = run_diff_sir_simulation(
            N=200, I0=5, beta=beta, gamma=0.1, T=50,
-           tau=0.5, hard=True, seed=0,
+           config=DiffConfig(tau=0.5, hard=True),
+           key=opt_key,
        )
        return mse_loss(pred["I"], observed["I"])
 
@@ -190,20 +211,22 @@ Using the Loss Function Helpers
 
 .. code-block:: python
 
-   from emidm import make_sir_loss, run_diff_sir
+   import jax
+   from emidm import run_diff_sir_simulation, DiffConfig
+   from emidm.optim import make_sir_loss
 
    # Create a loss function automatically
+   key = jax.random.PRNGKey(0)
    loss_fn = make_sir_loss(
        observed_I=observed["I"],
-       model_fn=run_diff_sir,
+       model_fn=run_diff_sir_simulation,
        model_kwargs={
            "N": 200,
            "I0": 5,
            "gamma": 0.1,
            "T": 50,
-           "tau": 0.5,
-           "hard": True,
-           "seed": 0,
+           "config": DiffConfig(tau=0.5, hard=True),
+           "key": key,
        },
        loss_type="mse",  # or "poisson", "gaussian"
    )
@@ -215,33 +238,32 @@ Plotting
 
 .. code-block:: python
 
+   import jax
    from emidm import (
-       simulate_sir,
-       run_diff_sir,
-       plot_sir,
-       plot_safir,
-       plot_model_comparison,
-       plot_optimization_history,
-       plot_replicates,
+       run_sir_simulation,
+       run_diff_sir_simulation,
+       to_dataframe,
+       DiffConfig,
    )
+   from emidm.plotting import plot_replicates
 
-   # Plot SIR trajectories (works with both dict and DataFrame)
-   df = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
-   fig, ax = plot_sir(df, title="SIR Epidemic")
+   # Plot SIR trajectories
+   result = run_sir_simulation(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
+   df = to_dataframe(result)
+   df.plot("t", ["S", "I", "R"])
 
    # Plot differentiable model output
-   result = run_diff_sir(N=200, I0=5, beta=0.3, gamma=0.1, T=50, seed=0)
-   fig, ax = plot_sir(result, title="Differentiable SIR")
-
-   # Compare observed vs fitted
-   fig, ax = plot_model_comparison(observed, fitted, compartment="I")
-
-   # Plot optimization history
-   fig, axes = plot_optimization_history(history, true_params=0.35)
+   key = jax.random.PRNGKey(0)
+   result = run_diff_sir_simulation(
+       N=200, I0=5, beta=0.3, gamma=0.1, T=50,
+       config=DiffConfig(tau=0.5, hard=True),
+       key=key,
+   )
 
    # Plot multiple replicates with confidence intervals
-   df_reps = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100, n_replicates=50)
-   fig, ax = plot_replicates(df_reps, compartment="I", show_ci=True)
+   result_reps = run_sir_simulation(N=10000, I0=10, beta=0.3, gamma=0.1, T=100, reps=50)
+   df_reps = to_dataframe(result_reps)
+   fig, ax = plot_replicates(df_reps, compartment="I")
 
 Bayesian Inference
 ------------------
@@ -251,15 +273,21 @@ Hamiltonian Monte Carlo (HMC) sampling:
 
 .. code-block:: python
 
+   import jax
    import jax.numpy as jnp
-   from emidm import run_diff_sir, mse_loss, run_blackjax_nuts
+   from emidm import run_diff_sir_simulation, DiffConfig
+   from emidm.optim import mse_loss
+
+   # Fixed key for deterministic likelihood evaluation
+   likelihood_key = jax.random.PRNGKey(0)
 
    # Define log-density (negative loss + prior)
    def log_density(beta):
        # Likelihood
-       pred = run_diff_sir(
+       pred = run_diff_sir_simulation(
            N=200, I0=5, beta=beta, gamma=0.1, T=50,
-           tau=0.5, hard=True, seed=0,
+           config=DiffConfig(tau=0.5, hard=True),
+           key=likelihood_key,
        )
        log_lik = -mse_loss(pred["I"], observed["I"])
 
@@ -268,17 +296,10 @@ Hamiltonian Monte Carlo (HMC) sampling:
 
        return log_lik + log_prior
 
-   # Run NUTS sampler
-   samples = run_blackjax_nuts(
-       logdensity_fn=log_density,
-       initial_position=jnp.array(0.25),
-       rng_seed=42,
-       num_warmup=500,
-       num_samples=1000,
-   )
-
-   print(f"Posterior mean: {samples.mean():.3f}")
-   print(f"Posterior std: {samples.std():.3f}")
+   # Use BlackJAX for MCMC sampling (see bayesian_inference tutorial)
+   # import blackjax
+   # nuts = blackjax.nuts(log_density, step_size=0.01, ...)
+   # ... run sampling loop ...
 
 References
 ----------

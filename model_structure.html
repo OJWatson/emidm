@@ -398,8 +398,8 @@
 <h2>Overview: The Two-Layer Architecture<a class="headerlink" href="#overview-the-two-layer-architecture" title="Link to this heading">#</a></h2>
 <p>Every differentiable model in <code class="docutils literal notranslate"><span class="pre">emidm</span></code> follows a two-layer pattern:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────┐
-│  User-Facing Function (run_diff_sir)                        │
-│  - Handles seed → key conversion                            │
+│  User-Facing Function (run_diff_sir_simulation)             │
+│  - Accepts JAX PRNGKey for vmap/jit compatibility           │
 │  - Sets up initial state                                    │
 │  - Calls JIT-compiled core                                  │
 │  - Returns user-friendly dict                               │
@@ -427,7 +427,7 @@
 <section id="layer-1-user-facing-function">
 <h2>Layer 1: User-Facing Function<a class="headerlink" href="#layer-1-user-facing-function" title="Link to this heading">#</a></h2>
 <p>The user-facing function handles all the “messy” parts that don’t need to be JIT-compiled:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_diff_sir</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_diff_sir_simulation</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">N</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
     <span class="n">I0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
@@ -435,17 +435,14 @@
     <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">T</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">tau</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">hard</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>  <span class="c1"># JAX PRNGKey - required for vmap/jit compatibility</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">DiffConfig</span> <span class="o">=</span> <span class="n">DiffConfig</span><span class="p">(),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a differentiable SIR model simulation.&quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
     
-    <span class="c1"># 1. Convert seed to JAX random key</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-    
+    <span class="c1"># 1. Key is passed directly (enables vmap/jit)</span>
     <span class="c1"># 2. Set up initial state</span>
     <span class="n">S0</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">I0</span><span class="p">)</span>  <span class="c1"># One-hot encoding</span>
     <span class="n">I0_arr</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">I0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
@@ -470,8 +467,8 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">seed</span> <span class="pre">→</span> <span class="pre">key</span></code> conversion</p></td>
-<td><p>Keeps API simple (users pass int, not JAX key)</p></td>
+<tr class="row-even"><td><p>Key validation</p></td>
+<td><p>Ensures valid JAX PRNGKey is provided</p></td>
 </tr>
 <tr class="row-odd"><td><p>Initial state setup</p></td>
 <td><p>May involve complex logic not needed in hot loop</p></td>
@@ -791,7 +788,7 @@
 <tbody>
 <tr class="row-even"><td><p>Two-layer architecture</p></td>
 <td><p>Separate user API from JIT core</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">run_diff_sir</span></code> → <code class="docutils literal notranslate"><span class="pre">_run_diff_sir_core</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">run_diff_sir_simulation</span></code> → <code class="docutils literal notranslate"><span class="pre">_run_diff_sir_core</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Static arguments</p></td>
 <td><p>Enable JIT with dynamic shapes</p></td>

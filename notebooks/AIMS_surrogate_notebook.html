@@ -488,7 +488,7 @@
 <p>First we will install <code class="docutils literal notranslate"><span class="pre">emidm</span></code> from Github:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">OJWatson</span><span class="o">/</span><span class="n">emidm</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install git+https://github.com/OJWatson/emidm.git
 </pre></div>
 </div>
 </div>
@@ -496,9 +496,9 @@
 <p>Next we will import any required modules once here. If this works then the rest of the notebook should work 🤞:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports from our own package</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_sir</span><span class="p">,</span> <span class="n">run_model_with_replicates</span><span class="p">,</span> <span class="n">plot_model_outputs</span><span class="p">,</span> <span class="n">to_dataframe</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">sir_facet_plot</span><span class="p">,</span> <span class="n">plot_training_histories</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports from our own package</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_sir_simulation</span><span class="p">,</span> <span class="n">to_dataframe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">sir_facet_plot</span><span class="p">,</span> <span class="n">plot_training_histories</span><span class="p">,</span> <span class="n">plot_replicates</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.sampler</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_lhs_samples</span>
 
 <span class="c1"># imports of other common packages</span>
@@ -536,15 +536,21 @@
 <p>In 1978, there was a very fast outbreak of influenza A (H1N1) in 1978 at a British boarding school, with the epidemic being tracked by the numbers of students in bed (infectious individuals).</p>
 <p>In the boarding school, 512 students total were confined to bed within 14 days after the outbreak started on the 22nd of January to the 4th of February. It is reported that one infected boy started the epidemic, which spread rapidly in the relatively closed community of the boarding school.</p>
 <p>The outbreak was published in the British Medical Journal in 1978 (including hand drawn outbreak curves), and the data is freely available in the R package outbreaks, maintained as part of the <a class="reference external" href="https://www.repidemicsconsortium.org/">R Epidemics Consortium</a>, but we will fetch it from an easier source.</p>
-<p><img alt="Outbreak Article" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/outbreak_article.png" /></p>
+<p><img alt="Outbreak Article" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/outbreak_article.png" /></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fetch the 1987 flu outbreak data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fetch the 1987 flu outbreak data</span>
 <span class="n">flu_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/elizavetasemenova/prob-epi/refs/heads/main/data/influenza_england_1978_school.csv&quot;</span><span class="p">)</span>
 <span class="n">flu_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="n">flu_raw</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="n">flu_raw</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="p">,</span><span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="n">flu_raw</span><span class="p">[</span><span class="s2">&quot;in_bed&quot;</span><span class="p">],</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="n">flu_raw</span><span class="p">[</span><span class="s1">&#39;convalescent&#39;</span><span class="p">]})</span>
 <span class="n">flu_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span><span class="s2">&quot;R&quot;</span><span class="p">],</span> <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Days After First Cases&quot;</span><span class="p">,</span> <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Number of Infectious Students&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel=&#39;Days After First Cases&#39;, ylabel=&#39;Number of Infectious Students&#39;&gt;
+</pre></div>
+</div>
+<img alt="../_images/5f0d9cec43ceacb6b152c74d92b4c57816a03deeb8dc6f5000b281bf1b1807b1.png" src="../_images/5f0d9cec43ceacb6b152c74d92b4c57816a03deeb8dc6f5000b281bf1b1807b1.png" />
 </div>
 </div>
 </section>
@@ -556,7 +562,7 @@
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 1: Size of our population {&quot;vertical-output&quot;:true}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 1: Size of our population {&quot;vertical-output&quot;:true}</span>
 <span class="c1"># Display the associated webpage in a new window</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/c6b3a34b-21f1-423b-9d7f-23fc44ce5f15&#39;</span>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">IFrame</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">700</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">)</span>
@@ -589,21 +595,22 @@
 <p>We can use <code class="docutils literal notranslate"><span class="pre">emidm</span></code> to simulate the SIR model dynamics using default parameters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demonstrate running one model</span>
-<span class="n">single</span> <span class="o">=</span> <span class="n">run_sir</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demonstrate running one model</span>
+<span class="n">single</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">()</span>
 
-<span class="c1"># Show the output</span>
-<span class="n">single</span>
+<span class="c1"># Show the output - convert to dataframe for display</span>
+<span class="n">to_dataframe</span><span class="p">(</span><span class="n">single</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>The output is a <code class="docutils literal notranslate"><span class="pre">pandas</span> <span class="pre">DataFrame</span></code> containing the number of susceptible (S), infected (I), and recovered (R) individuals over time.</p>
+<p>The output is a dictionary containing numpy arrays for the number of susceptible (S), infected (I), and recovered (R) individuals over time. We can convert it to a DataFrame for display.</p>
 <p>To visualize the results:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show a single plot line</span>
-<span class="n">single</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show a single plot line</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">single</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -611,9 +618,10 @@
 <p>We can adjust parameters such as the transmission rate (<code class="docutils literal notranslate"><span class="pre">beta</span></code>), the initial number of infections (<code class="docutils literal notranslate"><span class="pre">I0</span></code>) and total population size (<code class="docutils literal notranslate"><span class="pre">N</span></code>) to observe different dynamics:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can also vary the parameters</span>
-<span class="n">alt</span> <span class="o">=</span> <span class="n">run_sir</span><span class="p">(</span><span class="n">beta</span> <span class="o">=</span> <span class="mf">1.6</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
-<span class="n">alt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can also vary the parameters</span>
+<span class="n">alt</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">beta</span> <span class="o">=</span> <span class="mf">1.6</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">df_alt</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span>
+<span class="n">df_alt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -624,56 +632,50 @@
 <p>To account for stochasticity, we can run multiple realizations of the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can run multiple realisations</span>
-<span class="n">reps</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="n">run_sir</span><span class="p">,</span> <span class="n">reps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
-<span class="n">reps</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can run multiple realisations using the reps parameter</span>
+<span class="n">reps_result</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">reps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># convert to dataframe for display</span>
+<span class="n">reps_df</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">reps_result</span><span class="p">)</span>
+<span class="n">reps_df</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can run multiple realisations</span>
-<span class="n">reps</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="n">run_sir</span><span class="p">,</span> <span class="n">reps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can run multiple realisations and plot them</span>
+<span class="n">reps_result</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">reps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">reps_df</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">reps_result</span><span class="p">)</span>
+
+<span class="c1"># and plot these using plot_replicates</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_replicates</span><span class="p">(</span><span class="n">reps_df</span><span class="p">,</span> <span class="n">compartment</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we can also pass through any of the arguments to <code class="docutils literal notranslate"><span class="pre">run_sir_simulation</span></code> to control the simulation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can also pass args to run_sir_simulation</span>
+<span class="n">reps_result</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">reps_df</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">reps_result</span><span class="p">)</span>
 
 <span class="c1"># and plot these</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">plot_model_outputs</span><span class="p">(</span><span class="n">reps</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>And we can also pass through any of the arguments to <code class="docutils literal notranslate"><span class="pre">run_sir</span></code> to our <code class="docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code> function.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we can also by args to run_sir through kwargs</span>
-<span class="n">reps</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">run_sir</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">)</span>
-
-<span class="c1"># and plot these</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">plot_model_outputs</span><span class="p">(</span><span class="n">reps</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">])</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_replicates</span><span class="p">(</span><span class="n">reps_df</span><span class="p">,</span> <span class="n">compartment</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 2: Parameters in SIR Model {&quot;vertical-output&quot;:false}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 2: Parameters in SIR Model {&quot;vertical-output&quot;:false}</span>
 <span class="c1"># Display the associated webpage in a new window</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/f1d6e04f-76dc-43ac-9b46-a027d0194b11&#39;</span>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">IFrame</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">700</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html">
-        <iframe
-            width="700"
-            height="400"
-            src="https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/f1d6e04f-76dc-43ac-9b46-a027d0194b11"
-            frameborder="0"
-            allowfullscreen
-            
-        ></iframe>
-        </div></div>
 </div>
 </section>
 <section id="understanding-r0">
@@ -697,13 +699,14 @@
 <p><strong>Let’s investigate the dynamics of an epidemic when R<sub>0</sub> is equal to 1.</strong></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title R0 Exploration  {&quot;vertical-output&quot;:false}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title R0 Exploration  {&quot;vertical-output&quot;:false}</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">clear_output</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.sir</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_sir</span><span class="p">,</span> <span class="n">run_model_with_replicates</span><span class="p">,</span> <span class="n">plot_model_outputs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_sir_simulation</span><span class="p">,</span> <span class="n">to_dataframe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_replicates</span>
 
 <span class="c1"># Define widgets for user input</span>
 <span class="n">beta_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Beta:&#39;</span><span class="p">)</span>
@@ -719,11 +722,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">update_plot</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">reps</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">I0</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
         <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">reps_data</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">run_sir</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="n">I0</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">)</span>
+        <span class="n">reps_df</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
         <span class="n">r0</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">/</span> <span class="n">gamma</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">plot_model_outputs</span><span class="p">(</span><span class="n">reps_data</span><span class="p">,</span> <span class="n">show</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SIR Model Dynamics (R0 = </span><span class="si">{</span><span class="n">r0</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)))</span>  <span class="c1"># Format R0 to 2 decimal places</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_replicates</span><span class="p">(</span><span class="n">reps_df</span><span class="p">,</span> <span class="n">compartment</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SIR Model Dynamics (R0 = </span><span class="si">{</span><span class="n">r0</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="c1"># Interactive function to update the plot</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">on_value_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
@@ -766,25 +770,107 @@
 <p>To systematically explore the parameter space, we use Latin Hypercube Sampling (LHS), which we have again provided helper functions from <code class="docutils literal notranslate"><span class="pre">emidm</span></code> for you to use.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we specify an upper and lower for each parameter we want to sample</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># we specify an upper and lower for each parameter we want to sample</span>
 <span class="n">param_ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="s2">&quot;I0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">]}</span>
 <span class="n">df_samples</span> <span class="o">=</span> <span class="n">generate_lhs_samples</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">df_samples</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>beta</th>
+      <th>gamma</th>
+      <th>I0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.374201</td>
+      <td>0.148920</td>
+      <td>230.617738</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.143421</td>
+      <td>0.269606</td>
+      <td>168.684939</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.274629</td>
+      <td>0.222609</td>
+      <td>49.341255</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.351654</td>
+      <td>0.178589</td>
+      <td>337.727141</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.245204</td>
+      <td>0.277146</td>
+      <td>475.415146</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.325759</td>
+      <td>0.062373</td>
+      <td>163.795021</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.205746</td>
+      <td>0.199120</td>
+      <td>402.523802</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.188182</td>
+      <td>0.078592</td>
+      <td>62.370284</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.107387</td>
+      <td>0.127927</td>
+      <td>307.789580</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>This generates a set of parameter combinations, which we can then pass to our <code class="docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code> function. We have just used 9 samples here initially just to show you the outputs and understand it. Later we will generate more samples to build a robust training dataset.</p>
 <p>However, before that we need to turn our <code class="docutils literal notranslate"><span class="pre">I0</span></code> column into integers.</p>
-<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/add_code.png" alt="Add Code 1" width="200"/>
+<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/add_code.png" alt="Add Code 1" width="200"/>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ADD YOUR CODE HERE</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ADD YOUR CODE HERE</span>
 <span class="n">df_samples</span><span class="p">[</span><span class="s2">&quot;I0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="c1"># insert code here</span>
 
 <span class="c1"># Run the model for each row of samples:</span>
 <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">to_dataframe</span><span class="p">(</span><span class="n">run_sir_simulation</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_samples</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
 <span class="p">]</span>
 
@@ -794,6 +880,14 @@
 <span class="c1"># Make a facet plot to see the different simulations</span>
 <span class="n">plot_facet</span> <span class="o">=</span> <span class="n">sir_facet_plot</span><span class="p">(</span><span class="n">df_all_results</span><span class="p">)</span>
 <span class="n">plot_facet</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">24</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+    <span class="n">df_samples</span><span class="p">[</span><span class="s2">&quot;I0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="c1"># insert code here</span>
+                       <span class="o">^</span>
+<span class="ne">SyntaxError</span>: invalid syntax
 </pre></div>
 </div>
 </div>
@@ -809,7 +903,7 @@
 <img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/add_code.png" alt="Add Code 1" width="200"/>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># now to generate a lhs sample based on R0 and gamma</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now to generate a lhs sample based on R0 and gamma</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">beta_gamma_from_r0_gamma</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">param_ranges</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">df_samples</span> <span class="o">=</span> <span class="n">generate_lhs_samples</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">df_samples</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">df_samples</span><span class="p">[</span><span class="s2">&quot;R0&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_samples</span><span class="p">[</span><span class="s2">&quot;gamma&quot;</span><span class="p">])</span>
@@ -840,7 +934,7 @@
 </div></blockquote>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set random seed for reproducibility</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set random seed for reproducibility</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 
@@ -855,21 +949,21 @@
 <span class="c1"># generate train samples and data</span>
 <span class="n">train_samples</span> <span class="o">=</span> <span class="n">beta_gamma_from_r0_gamma</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">param_ranges</span> <span class="o">=</span> <span class="n">param_ranges</span><span class="p">)</span>
 <span class="n">train_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
-    <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">to_dataframe</span><span class="p">(</span><span class="n">run_sir_simulation</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">))</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_samples</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_samples</span><span class="p">))</span>
 <span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># generate valid samples</span>
 <span class="n">valid_samples</span> <span class="o">=</span> <span class="n">beta_gamma_from_r0_gamma</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_valid</span><span class="p">,</span> <span class="n">param_ranges</span> <span class="o">=</span> <span class="n">param_ranges</span><span class="p">)</span>
 <span class="n">valid_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
-    <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">to_dataframe</span><span class="p">(</span><span class="n">run_sir_simulation</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">))</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">valid_samples</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_samples</span><span class="p">))</span>
 <span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># generate test samples</span>
 <span class="n">test_samples</span> <span class="o">=</span> <span class="n">beta_gamma_from_r0_gamma</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_test</span><span class="p">,</span> <span class="n">param_ranges</span> <span class="o">=</span> <span class="n">param_ranges</span><span class="p">)</span>
 <span class="n">test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
-    <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+    <span class="n">to_dataframe</span><span class="p">(</span><span class="n">run_sir_simulation</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">))</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_samples</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_samples</span><span class="p">))</span>
 <span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
@@ -885,7 +979,7 @@
 <blockquote>
 <div><p>Hint: To answer the questions you may need to write new cells with code to generate plots to answer some of the questions. To save these plots from Colab, Right Click &gt; Save Image As</p>
 </div></blockquote>
-<p><img alt="Assessment 1" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/assessment_1.png" /></p>
+<p><img alt="Assessment 1" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/assessment_1.png" /></p>
 </section>
 <section id="training-our-surrogate">
 <h2>3. Training our surrogate<a class="headerlink" href="#training-our-surrogate" title="Link to this heading">#</a></h2>
@@ -897,8 +991,8 @@
 <p>We have not created this dataset class yet in <code class="docutils literal notranslate"><span class="pre">emidm</span></code>, so that you can see you how it works more easily, which will help you in writing your own surrogate model later.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SIRTimeSeriesDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">],</span> <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SIRTimeSeriesDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">],</span> <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">],</span> <span class="n">N</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
 
@@ -910,7 +1004,7 @@
         <span class="c1"># Extract timepoints (assuming they&#39;re the same for all parameter sets)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timepoints</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timepoints</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span>  <span class="c1"># Population size passed as parameter</span>
 
         <span class="c1"># Create samples</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
@@ -956,30 +1050,19 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 3: Output Normalisation {&quot;vertical-output&quot;:false}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Slido Poll 3: Output Normalisation {&quot;vertical-output&quot;:false}</span>
 <span class="c1"># Display the associated webpage in a new window</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1&#39;</span>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">IFrame</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">700</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html">
-        <iframe
-            width="700"
-            height="400"
-            src="https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1"
-            frameborder="0"
-            allowfullscreen
-            
-        ></iframe>
-        </div></div>
 </div>
 <p>Having made our <code class="docutils literal notranslate"><span class="pre">SIRTimeSeriesDataset</span></code> class, we can use this to create a <code class="docutils literal notranslate"><span class="pre">SIRTimeSeriesDataset</span></code> object for each of our different data sets (train, validation, test).</p>
 <p>After this we then create <code class="docutils literal notranslate"><span class="pre">DataLoaders</span></code>. This is a PyTorch class used to efficiently iterate through the datasets during training. It handles tasks like batching, shuffling (for the training set), and potentially loading data in parallel.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create datasets</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create datasets</span>
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">SIRTimeSeriesDataset</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
 <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">SIRTimeSeriesDataset</span><span class="p">(</span><span class="n">valid_data</span><span class="p">)</span>
 <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">SIRTimeSeriesDataset</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
@@ -1036,7 +1119,7 @@
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define constants</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define constants</span>
 <span class="n">input_size</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># beta and gamma and I0</span>
 <span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">64</span>
 <span class="n">output_size</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># S and I</span>
@@ -1066,7 +1149,7 @@
 </ul>
 </details><div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Feedforward Neural Network</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Feedforward Neural Network</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">FFNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">time_steps</span><span class="p">,</span> <span class="n">output_channels</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FFNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -1124,7 +1207,7 @@
 </details>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># GRU Model</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># GRU Model</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GRUModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GRUModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -1191,10 +1274,10 @@
 </details>
 <hr class="docutils" />
 <p>Below you will need to complete the <code class="docutils literal notranslate"><span class="pre">LSTMModel</span></code> class</p>
-<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/add_code.png" alt="Add Code 1" width="200"/>
+<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/add_code.png" alt="Add Code 1" width="200"/>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># LSTM Model</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># LSTM Model</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LSTMModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LSTMModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -1239,7 +1322,7 @@
 <p>If a GPU is found (<code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code>), it sets the device to ‘cuda’ (indicating GPU usage); otherwise, it defaults to ‘cpu’ for CPU-based calculations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize models</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize models</span>
 <span class="n">ffnn_model</span> <span class="o">=</span> <span class="n">FFNN</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">time_length</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
 <span class="n">gru_model</span> <span class="o">=</span> <span class="n">GRUModel</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
 <span class="n">lstm_model</span> <span class="o">=</span> <span class="n">LSTMModel</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
@@ -1308,7 +1391,7 @@
 </ol>
 </details><div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="c1"># Initialize criterion, optimizer and scheduler</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
@@ -1421,7 +1504,6 @@
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;model_state_dict&#39;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">history</span>
-
 </pre></div>
 </div>
 </div>
@@ -1429,7 +1511,7 @@
 <p>We can now actually train our models!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set training parameters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set training parameters</span>
 <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">1e-3</span>
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">patience</span> <span class="o">=</span> <span class="mi">10</span>
@@ -1465,7 +1547,7 @@
 <p>However, for these simple models, we will see that the models train well and reaching best performance quickly.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">histories</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">histories</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;FFNN&quot;</span><span class="p">:</span> <span class="n">ffnn_history</span><span class="p">,</span>
     <span class="s2">&quot;GRU&quot;</span><span class="p">:</span> <span class="n">gru_history</span><span class="p">,</span>
     <span class="s2">&quot;LSTM&quot;</span><span class="p">:</span> <span class="n">lstm_history</span>
@@ -1484,7 +1566,7 @@
 <p>To do so, we have created a simple function <code class="docutils literal notranslate"><span class="pre">predict_random_samples</span></code> which predicts the time series of <code class="docutils literal notranslate"><span class="pre">S</span></code> and <code class="docutils literal notranslate"><span class="pre">I</span></code> for random samples of beta and gamma combinations from a provided <code class="docutils literal notranslate"><span class="pre">SIRTimeSeriesDataset</span></code>. The function makes predictions for whichever models you pass, and from the predictions creates a data frame with the predictions as well as the equivalent ground-truth from the actual SIR model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict_random_samples</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">model_names</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;I0&#39;</span><span class="p">],</span> <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict_random_samples</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">model_names</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;I0&#39;</span><span class="p">],</span> <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predicts the time series of S and I for random samples of beta and gamma combinations,</span>
 <span class="sd">    compares to ground truth, and returns a DataFrame with predictions and ground truth.</span>
@@ -1546,7 +1628,6 @@
     <span class="n">df_combine</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">filtered_test_data</span><span class="p">,</span> <span class="n">df_predictions</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">df_combine</span>
-
 </pre></div>
 </div>
 </div>
@@ -1554,7 +1635,7 @@
 <p>When we created our datasets, we kept one dataset back to be our test dataset, which will use here by selecting 5 random combinations of $\beta$, $\gamma$ and <code class="docutils literal notranslate"><span class="pre">I0</span></code> and creating the predictions of each model as well as the true SIR model runs.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_predictions</span> <span class="o">=</span> <span class="n">predict_random_samples</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_predictions</span> <span class="o">=</span> <span class="n">predict_random_samples</span><span class="p">(</span>
     <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">ffnn_model</span><span class="p">,</span> <span class="n">gru_model</span><span class="p">,</span> <span class="n">lstm_model</span><span class="p">],</span>
     <span class="n">dataset</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="p">,</span>
     <span class="n">model_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FFNN&quot;</span><span class="p">,</span> <span class="s2">&quot;GRU&quot;</span><span class="p">,</span> <span class="s2">&quot;LSTM&quot;</span><span class="p">],</span>
@@ -1567,7 +1648,7 @@
 <p>We can then wrangle this into long data and return to our beloved ggplot style for plotting the model predictions and the replicates of the stochastic SIR model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reshape dataframe into tidy long-format</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reshape dataframe into tidy long-format</span>
 <span class="n">df_long_preds</span> <span class="o">=</span> <span class="n">df_predictions</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span>
     <span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">,</span><span class="s2">&quot;replicate&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">],</span>  <span class="c1"># Include model in id_vars</span>
     <span class="n">value_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">],</span>
@@ -1623,7 +1704,7 @@
 <blockquote>
 <div><p>Hint: To answer the questions you may need to write new cells with code to generate plots to answer some of the questions. To save these plots from Colab, Right Click &gt; Save Image As</p>
 </div></blockquote>
-<p><img alt="Assessment 2" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/assessment_2.png" /></p>
+<p><img alt="Assessment 2" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/assessment_2.png" /></p>
 </section>
 <section id="run-the-model">
 <h2>5. Run the model<a class="headerlink" href="#run-the-model" title="Link to this heading">#</a></h2>
@@ -1632,7 +1713,7 @@
 <p>Have a go and try different parameter combinations, can you guess what will happen if you feed in a beta and gamma value that sits outside of the trained range?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Interactive Surrogate Testing</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Interactive Surrogate Testing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">clear_output</span>
 
@@ -1720,8 +1801,9 @@
 
             <span class="c1"># Run actual SIR model with these parameters</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running SIR model with beta=</span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">, gamma=</span><span class="si">{</span><span class="n">gamma</span><span class="si">}</span><span class="s2">, I0=</span><span class="si">{</span><span class="n">I0</span><span class="si">}</span><span class="s2">, replicates=</span><span class="si">{</span><span class="n">reps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">)</span>
-
+            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">)</span>
+            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">sir_results</span><span class="p">)</span>
+            
             <span class="c1"># Normalize inputs for surrogate models</span>
             <span class="n">features_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">I0</span><span class="p">])</span>
             <span class="n">features_normalized</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">feature_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">features_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -1809,7 +1891,7 @@ These standardized metrics (scaled from 0-1) allow for fair comparisons between 
 <p><strong>Don’t worry too much about this code, and focus on looking at the outputs and thinking about whether the results surprise you</strong></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Higher Resolution Standardized Error Metrics Heatmap</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title Higher Resolution Standardized Error Metrics Heatmap</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -1900,7 +1982,8 @@ These standardized metrics (scaled from 0-1) allow for fair comparisons between 
             <span class="n">is_outside_training</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">&gt;</span> <span class="n">beta</span><span class="p">)</span>
 
             <span class="c1"># Run the actual SIR model with multiple replicates</span>
-            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">run_model_with_replicates</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="n">I0</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">n_replicates</span><span class="p">)</span>
+            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">run_sir_simulation</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="n">I0</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">n_replicates</span><span class="p">)</span>
+            <span class="n">sir_results</span> <span class="o">=</span> <span class="n">to_dataframe</span><span class="p">(</span><span class="n">sir_results</span><span class="p">)</span> 
 
             <span class="c1"># Calculate mean of SIR replicates as ground truth</span>
             <span class="n">sir_mean</span> <span class="o">=</span> <span class="n">sir_results</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()[[</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -2066,7 +2149,7 @@ These standardized metrics (scaled from 0-1) allow for fair comparisons between 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the high-resolution analysis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the high-resolution analysis</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This analysis visualizes model performance across the parameter space with higher grid resolution.&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;For all metrics, higher values (greener) indicate better performance.&quot;</span><span class="p">)</span>
 
@@ -2104,7 +2187,7 @@ These standardized metrics (scaled from 0-1) allow for fair comparisons between 
 <blockquote>
 <div><p>Hint: To answer the questions you may need to write new cells with code to generate plots to answer some of the questions. To save these plots from Colab, Right Click &gt; Save Image As</p>
 </div></blockquote>
-<p><img alt="Assessment 3" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/assessment_3.png" /></p>
+<p><img alt="Assessment 3" src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/assessment_3.png" /></p>
 </section>
 <section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
@@ -2126,24 +2209,13 @@ We trained these models using the Adam optimizer and a learning rate scheduler, 
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title 1-minute Paper Feedback {&quot;vertical-output&quot;:false}</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># @title 1-minute Paper Feedback {&quot;vertical-output&quot;:false}</span>
 <span class="c1"># Display the associated webpage in a new window</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://app.sli.do/event/5CjdyPAdbqa72Pf55UQRZz/embed/polls/4654a249-1336-4d69-bff9-fbbbd6790e6c&#39;</span>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">IFrame</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">700</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html">
-        <iframe
-            width="700"
-            height="400"
-            src="https://app.sli.do/event/5CjdyPAdbqa72Pf55UQRZz/embed/polls/4654a249-1336-4d69-bff9-fbbbd6790e6c"
-            frameborder="0"
-            allowfullscreen
-            
-        ></iframe>
-        </div></div>
 </div>
 </section>
 <section id="longer-feedback">

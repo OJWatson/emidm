@@ -399,23 +399,27 @@
                   
   <section id="module-emidm.sir">
 <span id="emidm-sir"></span><h1>emidm.sir<a class="headerlink" href="#module-emidm.sir" title="Link to this heading">#</a></h1>
+<p>Stochastic SIR model implementation.</p>
+<p>This module provides a class-based SIR model following the ABM pattern:
+- SIRModel: Model class with init_state(), step(), run() methods
+- Convenience functions: run_sir(), run_sir_replicates(), simulate_sir()</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_model_outputs</span></code>(data[, x, replicate, ...])</p></td>
-<td><p>Plot the outputs of a model run.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code>([model, reps, seed])</p></td>
-<td><p>Run a model multiple times and return results as a DataFrame.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir</span></code>(*[, N, I0, R0_init, beta, gamma, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir_simulation</span></code>(*[, N, I0, R_init, beta, ...])</p></td>
 <td><p>Run a stochastic SIR model simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sir_replicates</span></code>(*[, N, I0, R0_init, ...])</p></td>
-<td><p>Run multiple replicates of the stochastic SIR model.</p></td>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIRModel</span></code>(*[, N, I0, R_init, beta, gamma, ...])</p></td>
+<td><p>Stochastic SIR (Susceptible-Infected-Recovered) model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_sir</span></code>(*[, N, I0, R0_init, beta, ...])</p></td>
-<td><p>Simulate a stochastic SIR model with optional time-varying reproduction number.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SIRState</span></code>(S, I, R)</p></td>
+<td><p>State of the SIR model at a single time point.</p></td>
 </tr>
 </tbody>
 </table>

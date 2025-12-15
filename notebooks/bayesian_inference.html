@@ -423,7 +423,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir_simulation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">mse_loss</span>
 
 <span class="c1"># Show which device JAX is using</span>
@@ -463,14 +463,14 @@ JAX devices: [cuda(id=0)]
 <span class="c1"># Generate &quot;observed&quot; data</span>
 <span class="c1"># Using hard=False for smoother gradients (better for HMC)</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">observed</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
+<span class="n">observed</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
     <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
     <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
     <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
     <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
     <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">observed_I</span> <span class="o">=</span> <span class="n">observed</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
@@ -490,9 +490,6 @@ JAX devices: [cuda(id=0)]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-15 06:40:16.510265: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
-</pre></div>
-</div>
 <img alt="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" src="../_images/0873f8024779d5a4d0ef4c1f32b892296518fa7dc4c74bb1122c8b8314a44054.png" />
 </div>
 </div>
@@ -507,37 +504,39 @@ JAX devices: [cuda(id=0)]
 <p>The posterior is proportional to: <code class="docutils literal notranslate"><span class="pre">posterior</span> <span class="pre">∝</span> <span class="pre">likelihood</span> <span class="pre">×</span> <span class="pre">prior</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For efficient MCMC, we need to minimize Python overhead.</span>
-<span class="c1"># Pre-compute everything that doesn&#39;t depend on beta.</span>
-<span class="n">MODEL_KEY</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For efficient MCMC, we use the public API with run_diff_sir_simulation</span>
+<span class="c1"># The model is JIT-compiled internally for efficiency</span>
 
-<span class="c1"># Pre-compute initial state (this doesn&#39;t change with beta)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">_init_onehot_state_sir</span><span class="p">,</span> <span class="n">_run_diff_sir_core</span>
-<span class="n">_key</span><span class="p">,</span> <span class="n">_k_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">MODEL_KEY</span><span class="p">)</span>
-<span class="n">_state0</span> <span class="o">=</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_k_init</span><span class="p">)</span>
+<span class="c1"># Fixed key for deterministic likelihood evaluation</span>
+<span class="n">likelihood_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="c1"># Create a minimal JIT-compiled function that only takes beta</span>
-<span class="c1"># Uses fixed key for deterministic likelihood (needed for MCMC)</span>
 <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_fast_sir</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast SIR that only varies beta - everything else pre-computed.&quot;&quot;&quot;</span>
-    <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
-    <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
-        <span class="n">beta_seq</span><span class="p">,</span> <span class="n">_state0</span><span class="p">,</span> <span class="n">_key</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast SIR that only varies beta.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
+        <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
+        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
+        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">key</span><span class="o">=</span><span class="n">likelihood_key</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Return I only</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
 
 <span class="c1"># Version that also takes a key - for posterior predictive sampling</span>
-<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_fast_sir_with_key</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast SIR with variable key for stochastic predictions.&quot;&quot;&quot;</span>
-    <span class="n">key</span><span class="p">,</span> <span class="n">k_init</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">state0</span> <span class="o">=</span> <span class="n">_init_onehot_state_sir</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k_init</span><span class="p">)</span>
-    <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
-    <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
-        <span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
+        <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
+        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
+        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">log_posterior</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Log-posterior using the fast pre-compiled model.&quot;&quot;&quot;</span>
@@ -702,7 +701,7 @@ True value: 0.35
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     
-    <span class="c1"># Generate predictions from posterior samples using vmap for speed</span>
+    <span class="c1"># Generate predictions from posterior samples</span>
     <span class="n">n_pred</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     
@@ -710,7 +709,7 @@ True value: 0.35
     <span class="n">beta_samples</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">sample_indices</span><span class="p">])</span>
     <span class="n">pred_keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">999</span><span class="p">),</span> <span class="n">n_pred</span><span class="p">)</span>
     
-    <span class="c1"># Vectorize over both beta and key</span>
+    <span class="c1"># Vectorize over both beta and key using vmap</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">_fast_sir_with_key</span><span class="p">)(</span><span class="n">beta_samples</span><span class="p">,</span> <span class="n">pred_keys</span><span class="p">)</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
     
@@ -734,9 +733,6 @@ True value: 0.35
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/6b6cfc12b7bec190edb79647d294bfc330f1d48af14700b40baceff5312c2e44.png" src="../_images/6b6cfc12b7bec190edb79647d294bfc330f1d48af14700b40baceff5312c2e44.png" />
 </div>
 </div>
 </section>

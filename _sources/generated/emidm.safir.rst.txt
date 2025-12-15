@@ -8,7 +8,12 @@
 
    .. autosummary::
    
-      run_safir
-      run_safir_replicates
-      simulate_safir
+      run_safir_simulation
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SAFIRModel
+      SAFIRState
    
