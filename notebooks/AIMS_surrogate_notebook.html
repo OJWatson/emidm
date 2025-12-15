@@ -546,12 +546,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel=&#39;Days After First Cases&#39;, ylabel=&#39;Number of Infectious Students&#39;&gt;
-</pre></div>
-</div>
-<img alt="../_images/5f0d9cec43ceacb6b152c74d92b4c57816a03deeb8dc6f5000b281bf1b1807b1.png" src="../_images/5f0d9cec43ceacb6b152c74d92b4c57816a03deeb8dc6f5000b281bf1b1807b1.png" />
-</div>
 </div>
 </section>
 <section id="training-a-surrogate-to-respond-to-the-1978-flu-outbreak">
@@ -777,88 +771,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>beta</th>
-      <th>gamma</th>
-      <th>I0</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.374201</td>
-      <td>0.148920</td>
-      <td>230.617738</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.143421</td>
-      <td>0.269606</td>
-      <td>168.684939</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.274629</td>
-      <td>0.222609</td>
-      <td>49.341255</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.351654</td>
-      <td>0.178589</td>
-      <td>337.727141</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.245204</td>
-      <td>0.277146</td>
-      <td>475.415146</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>0.325759</td>
-      <td>0.062373</td>
-      <td>163.795021</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>0.205746</td>
-      <td>0.199120</td>
-      <td>402.523802</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>0.188182</td>
-      <td>0.078592</td>
-      <td>62.370284</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>0.107387</td>
-      <td>0.127927</td>
-      <td>307.789580</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
 </div>
 <p>This generates a set of parameter combinations, which we can then pass to our <code class="docutils literal notranslate"><span class="pre">run_model_with_replicates</span></code> function. We have just used 9 samples here initially just to show you the outputs and understand it. Later we will generate more samples to build a robust training dataset.</p>
 <p>However, before that we need to turn our <code class="docutils literal notranslate"><span class="pre">I0</span></code> column into integers.</p>
@@ -883,14 +795,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">24</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-    <span class="n">df_samples</span><span class="p">[</span><span class="s2">&quot;I0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="c1"># insert code here</span>
-                       <span class="o">^</span>
-<span class="ne">SyntaxError</span>: invalid syntax
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="generating-training-and-test-data">
@@ -900,7 +804,7 @@
 <blockquote>
 <div><p><strong>Hint</strong>: Think about what ranges to specify to generate training data tailored for our problem of fitting a model to the 1978 epidemic.</p>
 </div></blockquote>
-<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/examples/imgs/add_code.png" alt="Add Code 1" width="200"/>
+<img src="https://raw.githubusercontent.com/OJWatson/emidm/refs/heads/main/docs/notebooks/imgs/add_code.png" alt="Add Code 1" width="200"/>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># now to generate a lhs sample based on R0 and gamma</span>
@@ -1057,6 +961,17 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="700"
+            height="400"
+            src="https://app.sli.do/event/1HnwbEVFT7HATeDCdCHtHL/embed/polls/45869e34-e663-4cb3-b336-41b86f7741e1"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
 </div>
 <p>Having made our <code class="docutils literal notranslate"><span class="pre">SIRTimeSeriesDataset</span></code> class, we can use this to create a <code class="docutils literal notranslate"><span class="pre">SIRTimeSeriesDataset</span></code> object for each of our different data sets (train, validation, test).</p>
 <p>After this we then create <code class="docutils literal notranslate"><span class="pre">DataLoaders</span></code>. This is a PyTorch class used to efficiently iterate through the datasets during training. It handles tasks like batching, shuffling (for the training set), and potentially loading data in parallel.</p>

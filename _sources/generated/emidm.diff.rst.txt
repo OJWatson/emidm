@@ -9,6 +9,7 @@
    .. autosummary::
    
       make_diff_safir_model
+      make_diff_sir_model
       run_diff_safir_simulation
       run_diff_sir_simulation
    

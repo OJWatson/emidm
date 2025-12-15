@@ -417,8 +417,9 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir_simulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir_simulation</span><span class="p">,</span> <span class="n">make_diff_sir_model</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_sir</span>
 
 <span class="c1"># Show which device JAX is using</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JAX backend: </span><span class="si">{</span><span class="n">jax</span><span class="o">.</span><span class="n">default_backend</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -466,17 +467,20 @@ JAX devices: [cuda(id=0)]
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated epidemic with β = </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Peak infections: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">}</span><span class="s2"> at day </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;I&#39;</span><span class="p">]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plot_sir</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-15 11:25:45.442003: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated epidemic with β = 0.35
 Peak infections: 290 at day 35
 </pre></div>
 </div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 1000x500 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;Time&#39;, ylabel=&#39;Population&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/8000027a96a65c0b302cc12e38d0c7b29a271f099e9916ead956bb7e3ebbda73.png" src="../_images/8000027a96a65c0b302cc12e38d0c7b29a271f099e9916ead956bb7e3ebbda73.png" />
 </div>
 </div>
 </section>
@@ -484,6 +488,7 @@ Peak infections: 290 at day 35
 <h2>Step 2: Define the Loss Function<a class="headerlink" href="#step-2-define-the-loss-function" title="Link to this heading">#</a></h2>
 <p>To fit the model, we need a loss function that measures how well a given β reproduces the observed infection curve. We’ll use <strong>mean squared error</strong> between the predicted and observed number of infected individuals.</p>
 <p>For robust optimization, we average the loss over multiple stochastic replicates. This reduces gradient noise and leads to better convergence. We use <code class="docutils literal notranslate"><span class="pre">hard=False</span></code> during optimization so gradients can flow through the soft Gumbel-Softmax approximation.</p>
+<p><strong>Key optimization</strong>: We use <code class="docutils literal notranslate"><span class="pre">make_diff_sir_model</span></code> to create a pre-compiled model that only takes <code class="docutils literal notranslate"><span class="pre">beta</span></code> as input. This pre-computes all static values (population structure, initial state, etc.) once, making repeated calls during optimization much faster than calling <code class="docutils literal notranslate"><span class="pre">run_diff_sir_simulation</span></code> directly.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The observed infection curve we want to fit</span>
@@ -494,24 +499,24 @@ Peak infections: 290 at day 35
 
 <span class="n">N_OPT_REPS</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># Number of replicates for optimization</span>
 
-<span class="c1"># Fixed key for deterministic loss evaluation</span>
+<span class="c1"># Create a pre-compiled model using the factory pattern</span>
+<span class="c1"># This pre-computes all static values once, making repeated calls much faster</span>
 <span class="n">opt_key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">sir_model</span> <span class="o">=</span> <span class="n">make_diff_sir_model</span><span class="p">(</span>
+    <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+    <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
+    <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
+    <span class="n">reps</span><span class="o">=</span><span class="n">N_OPT_REPS</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="n">opt_key</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>  <span class="c1"># hard=False for gradient flow</span>
+<span class="p">)</span>
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute MSE averaged over multiple replicates for robust optimization.&quot;&quot;&quot;</span>
-    <span class="c1"># Run multiple replicates using the reps parameter</span>
-    <span class="c1"># Use hard=False so gradients can flow through the soft Gumbel-Softmax</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
-        <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
-        <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
-        <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
-        <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">reps</span><span class="o">=</span><span class="n">N_OPT_REPS</span><span class="p">,</span>
-        <span class="n">key</span><span class="o">=</span><span class="n">opt_key</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-    <span class="p">)</span>
+    <span class="c1"># Use the pre-compiled model - only beta varies</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">sir_model</span><span class="p">({</span><span class="s1">&#39;beta&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">})</span>
     
     <span class="c1"># Average MSE across replicates</span>
     <span class="n">all_I</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">]</span>  <span class="c1"># Shape: (N_OPT_REPS, T+1)</span>
