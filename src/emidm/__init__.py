@@ -25,10 +25,8 @@ from .safir import (
 from .diff import (
     DiffConfig,
     make_diff_safir_model,
-    run_diff_safir,
-    run_diff_safir_replicates,
-    run_diff_sir,
-    run_diff_sir_replicates,
+    run_diff_safir_simulation,
+    run_diff_sir_simulation,
 )
 
 # Inference
@@ -75,10 +73,8 @@ __all__ = [
     # Differentiable models
     "DiffConfig",
     "make_diff_safir_model",
-    "run_diff_sir",
-    "run_diff_sir_replicates",
-    "run_diff_safir",
-    "run_diff_safir_replicates",
+    "run_diff_sir_simulation",
+    "run_diff_safir_simulation",
     # Optimization & inference
     "optimize_params",
     "mse_loss",

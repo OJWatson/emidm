@@ -1,4 +1,4 @@
-from emidm.diff import DiffConfig, run_diff_sir
+from emidm.diff import DiffConfig, run_diff_sir_simulation
 from emidm.optim import optimize_params
 
 
@@ -14,7 +14,7 @@ def _require_jax():
 
 def make_synthetic_data(*, beta_true=0.35, gamma=0.2, T=30, N=200, seed=0):
     _require_jax()
-    out = run_diff_sir(
+    out = run_diff_sir_simulation(
         N=N,
         I0=5,
         beta=beta_true,
@@ -31,7 +31,7 @@ def fit_beta_to_data(observed_I, *, gamma=0.2, T=30, N=200):
     import jax.numpy as jnp
 
     def loss_fn(beta):
-        pred = run_diff_sir(
+        pred = run_diff_sir_simulation(
             N=N,
             I0=5,
             beta=beta,

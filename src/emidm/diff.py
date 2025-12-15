@@ -172,7 +172,7 @@ def _gumbel_softmax_bernoulli_jit(key, p, tau, hard):
     return y[..., 0]
 
 
-def run_diff_sir(
+def run_diff_sir_simulation(
     *,
     N: int = 200,
     I0: int = 5,
@@ -182,6 +182,7 @@ def run_diff_sir(
     dt: int = 1,
     R_t=None,
     seed: int = 0,
+    reps: int = 1,
     config: DiffConfig = DiffConfig(),
 ):
     """Run a differentiable SIR simulation using straight-through Gumbel-Softmax.
@@ -189,6 +190,8 @@ def run_diff_sir(
     This model uses the Gumbel-Softmax reparameterization trick to make discrete
     stochastic transitions differentiable, enabling gradient-based optimization
     of model parameters.
+
+    When reps > 1, uses JAX's vmap for efficient parallel execution across replicates.
 
     Parameters
     ----------
@@ -209,6 +212,8 @@ def run_diff_sir(
         Beta is computed as R_t * gamma at each time step.
     seed : int, default 0
         Random seed for reproducibility.
+    reps : int, default 1
+        Number of replicates to run. When reps > 1, uses vmap for parallel execution.
     config : DiffConfig, default DiffConfig()
         Configuration for Gumbel-Softmax (tau, hard).
 
@@ -216,12 +221,15 @@ def run_diff_sir(
     -------
     dict
         Dictionary with keys 't', 'S', 'I', 'R' as JAX arrays.
+        - If reps == 1: shapes are (T+1,) for each compartment
+        - If reps > 1: shapes are (reps, T+1) for each compartment
 
     Examples
     --------
-    >>> from emidm import run_diff_sir, DiffConfig
+    >>> from emidm import run_diff_sir_simulation, DiffConfig
     >>>
-    >>> result = run_diff_sir(
+    >>> # Single run
+    >>> result = run_diff_sir_simulation(
     ...     N=100,
     ...     I0=5,
     ...     beta=0.3,
@@ -231,93 +239,10 @@ def run_diff_sir(
     ...     seed=42,
     ... )
     >>> print(result["I"].max())  # Peak infections
-    """
-    _require_jax()
-    import jax
-    import jax.numpy as jnp
-
-    key = jax.random.PRNGKey(int(seed))
-
-    N = int(N)
-    T = int(T)
-    dt = int(dt)
-
-    ts = jnp.arange(0, T + 1, dt)
-    beta_seq = _prepare_beta_t_sequence(beta=beta, gamma=gamma, R_t=R_t, ts=ts)
-
-    key, k_init = jax.random.split(key)
-    state0 = _init_onehot_state_sir(N=N, I0=I0, key=k_init)
-
-    totals = _run_diff_sir_core(
-        beta_seq, state0, key, N, gamma, dt, config.tau, config.hard
-    )
-
-    return {
-        "t": ts,
-        "S": totals[:, 0],
-        "I": totals[:, 1],
-        "R": totals[:, 2],
-    }
-
-
-def run_diff_sir_replicates(
-    *,
-    N: int = 200,
-    I0: int = 5,
-    beta: float = 0.2,
-    gamma: float = 0.1,
-    T: int = 50,
-    dt: int = 1,
-    R_t=None,
-    seed: int = 0,
-    reps: int = 10,
-    config: DiffConfig = DiffConfig(),
-):
-    """Run multiple replicates of the differentiable SIR model efficiently using vmap.
-
-    This is much faster than running `run_diff_sir` in a loop because it uses
-    JAX's vmap to parallelize across replicates.
-
-    Parameters
-    ----------
-    N : int, default 200
-        Total population size (number of agents).
-    I0 : int, default 5
-        Initial number of infected individuals.
-    beta : float, default 0.2
-        Transmission rate (used if R_t is None).
-    gamma : float, default 0.1
-        Recovery rate.
-    T : int, default 50
-        Total simulation time.
-    dt : int, default 1
-        Time step size.
-    R_t : array-like, optional
-        Time-varying reproduction number.
-    seed : int, default 0
-        Random seed for reproducibility.
-    reps : int, default 10
-        Number of replicates to run.
-    config : DiffConfig, default DiffConfig()
-        Configuration for Gumbel-Softmax (tau, hard).
-
-    Returns
-    -------
-    dict
-        Dictionary with keys:
-        - 't': time points (shape: (T+1,))
-        - 'S', 'I', 'R': compartment totals (shape: (reps, T+1))
-
-    Examples
-    --------
-    >>> from emidm import run_diff_sir_replicates, DiffConfig
-    >>> results = run_diff_sir_replicates(
-    ...     N=1000,
-    ...     I0=5,
-    ...     beta=0.3,
-    ...     gamma=0.1,
-    ...     T=50,
-    ...     reps=10,
+    >>>
+    >>> # Multiple replicates
+    >>> results = run_diff_sir_simulation(
+    ...     N=100, I0=5, beta=0.3, gamma=0.1, T=50, reps=10,
     ...     config=DiffConfig(tau=0.5, hard=True),
     ... )
     >>> print(results["I"].shape)  # (10, 51)
@@ -334,31 +259,49 @@ def run_diff_sir_replicates(
     ts = jnp.arange(0, T + 1, dt)
     beta_seq = _prepare_beta_t_sequence(beta=beta, gamma=gamma, R_t=R_t, ts=ts)
 
-    # Generate keys for each replicate
-    base_key = jax.random.PRNGKey(int(seed))
-    keys = jax.random.split(base_key, reps * 2)  # reps for init, reps for run
-    init_keys = keys[:reps]
-    run_keys = keys[reps:]
+    if reps == 1:
+        # Single replicate - original behavior
+        key = jax.random.PRNGKey(int(seed))
+        key, k_init = jax.random.split(key)
+        state0 = _init_onehot_state_sir(N=N, I0=I0, key=k_init)
 
-    # Initialize states for all replicates using vmap
-    states0 = jax.vmap(
-        lambda k: _init_onehot_state_sir(N=N, I0=I0, key=k)
-    )(init_keys)
-
-    # Run all replicates in parallel using vmap
-    def run_one(state0, key):
-        return _run_diff_sir_core(
+        totals = _run_diff_sir_core(
             beta_seq, state0, key, N, gamma, dt, config.tau, config.hard
         )
 
-    all_totals = jax.vmap(run_one)(states0, run_keys)
+        return {
+            "t": ts,
+            "S": totals[:, 0],
+            "I": totals[:, 1],
+            "R": totals[:, 2],
+        }
+    else:
+        # Multiple replicates - use vmap for parallel execution
+        base_key = jax.random.PRNGKey(int(seed))
+        # reps for init, reps for run
+        keys = jax.random.split(base_key, reps * 2)
+        init_keys = keys[:reps]
+        run_keys = keys[reps:]
 
-    return {
-        "t": ts,
-        "S": all_totals[:, :, 0],
-        "I": all_totals[:, :, 1],
-        "R": all_totals[:, :, 2],
-    }
+        # Initialize states for all replicates using vmap
+        states0 = jax.vmap(
+            lambda k: _init_onehot_state_sir(N=N, I0=I0, key=k)
+        )(init_keys)
+
+        # Run all replicates in parallel using vmap
+        def run_one(state0, key):
+            return _run_diff_sir_core(
+                beta_seq, state0, key, N, gamma, dt, config.tau, config.hard
+            )
+
+        all_totals = jax.vmap(run_one)(states0, run_keys)
+
+        return {
+            "t": ts,
+            "S": all_totals[:, :, 0],
+            "I": all_totals[:, :, 1],
+            "R": all_totals[:, :, 2],
+        }
 
 
 def _gumbel_softmax_categorical_jit(key, probs, tau, hard):
@@ -494,7 +437,7 @@ def _run_diff_safir_core(
     return daily_series
 
 
-def run_diff_safir(
+def run_diff_safir_simulation(
     *,
     population,
     contact_matrix,
@@ -503,6 +446,7 @@ def run_diff_safir(
     T: int = 200,
     dt: float = 0.1,
     seed: int = 0,
+    reps: int = 1,
     config: DiffConfig = DiffConfig(),
     I0: int = 10,
     prob_hosp=None,
@@ -521,6 +465,8 @@ def run_diff_safir(
 
     Compartments: S -> E1 -> E2 -> (Iasy | Imild | Icase) -> R or D
 
+    When reps > 1, runs multiple replicates sequentially (SAFIR is too complex for vmap).
+
     Parameters
     ----------
     population : array-like
@@ -538,6 +484,8 @@ def run_diff_safir(
         Sub-daily time step (must evenly divide 1 day).
     seed : int, default 0
         Random seed for reproducibility.
+    reps : int, default 1
+        Number of replicates to run. Replicates are run sequentially.
     config : DiffConfig, default DiffConfig()
         Configuration for Gumbel-Softmax (tau, hard).
     I0 : int, default 10
@@ -563,21 +511,32 @@ def run_diff_safir(
     -------
     dict
         Dictionary with keys 't', 'S', 'E', 'I', 'R', 'D' as JAX arrays.
-        Daily totals (length = T + 1).
+        - If reps == 1: shapes are (T+1,) for each compartment
+        - If reps > 1: shapes are (reps, T+1) for each compartment
 
     Examples
     --------
     >>> import numpy as np
-    >>> from emidm import run_diff_safir
+    >>> from emidm import run_diff_safir_simulation
     >>>
     >>> population = np.array([1000, 2000, 1500])  # 3 age groups
     >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
-    >>> result = run_diff_safir(
+    >>> result = run_diff_safir_simulation(
     ...     population=population,
     ...     contact_matrix=contact_matrix,
     ...     R0=2.5,
     ...     T=100,
     ... )
+    >>>
+    >>> # Multiple replicates
+    >>> results = run_diff_safir_simulation(
+    ...     population=population,
+    ...     contact_matrix=contact_matrix,
+    ...     R0=2.5,
+    ...     T=100,
+    ...     reps=10,
+    ... )
+    >>> results["I"].shape  # (10, 101)
     """
     _require_jax()
     import jax
@@ -703,14 +662,64 @@ def run_diff_safir(
     )
 
     t = jnp.arange(days + 1)
-    return {
-        "t": t,
-        "S": daily_series[:, 0],
-        "E": daily_series[:, 1],
-        "I": daily_series[:, 2],
-        "R": daily_series[:, 3],
-        "D": daily_series[:, 4],
-    }
+
+    if reps == 1:
+        return {
+            "t": t,
+            "S": daily_series[:, 0],
+            "E": daily_series[:, 1],
+            "I": daily_series[:, 2],
+            "R": daily_series[:, 3],
+            "D": daily_series[:, 4],
+        }
+    else:
+        # Multiple replicates - run sequentially (SAFIR is too complex for vmap)
+        # We already ran the first replicate above, now run the rest
+        all_results = [daily_series]
+        for rep in range(1, reps):
+            rep_seed = seed + rep
+            rep_key = jax.random.PRNGKey(int(rep_seed))
+            rep_state0 = jax.nn.one_hot(
+                jnp.zeros((N,), dtype=jnp.int32), num_states).astype(jnp.float32)
+            rep_key, rep_k_seed = jax.random.split(rep_key)
+            rep_seed_idx = jax.random.choice(
+                rep_k_seed, N, shape=(I0_eff,), replace=False)
+            rep_state0 = rep_state0.at[rep_seed_idx, 0].set(
+                0.0).at[rep_seed_idx, 1].set(1.0)
+
+            rep_daily_series = _run_diff_safir_core(
+                beta_t_daily=beta_t_daily,
+                state0=rep_state0,
+                key=rep_key,
+                population=population,
+                contact_matrix=contact_matrix,
+                age_index=age_index,
+                prob_die_by_agent=prob_die_by_agent,
+                P_Icase=P_Icase,
+                P_Iasym=P_Iasym,
+                P_Imild=P_Imild,
+                p_E=p_E,
+                p_Iasym=p_Iasym,
+                p_Imild=p_Imild,
+                p_Icase=p_Icase,
+                dt=dt_float,
+                tau=config.tau,
+                hard=config.hard,
+                steps_per_day=steps_per_day,
+                n_age=n_age,
+                N=N,
+            )
+            all_results.append(rep_daily_series)
+
+        stacked = jnp.stack(all_results)
+        return {
+            "t": t,
+            "S": stacked[:, :, 0],
+            "E": stacked[:, :, 1],
+            "I": stacked[:, :, 2],
+            "R": stacked[:, :, 3],
+            "D": stacked[:, :, 4],
+        }
 
 
 def make_diff_safir_model(
@@ -934,135 +943,3 @@ def make_diff_safir_model(
         }
 
     return _model
-
-
-def run_diff_safir_replicates(
-    *,
-    population,
-    contact_matrix,
-    R0: float = 2.0,
-    R_t=None,
-    T: int = 200,
-    dt: float = 0.1,
-    seed: int = 0,
-    reps: int = 10,
-    config: DiffConfig = DiffConfig(),
-    I0: int = 10,
-    prob_hosp=None,
-    prob_asymp: float = 0.3,
-    prob_non_sev_death=None,
-    prob_sev_death=None,
-    frac_ICU: float = 0.3,
-    dur_E: float = 4.6,
-    dur_IMild: float = 2.1,
-    dur_ICase: float = 4.5,
-):
-    """Run multiple replicates of the differentiable SAFIR/SEIR model.
-
-    This function runs multiple independent replicates of the age-structured
-    differentiable SAFIR model. Unlike run_diff_sir_replicates, this cannot
-    use vmap due to the complexity of the SAFIR model, so replicates are
-    run sequentially but still benefit from JIT compilation.
-
-    Parameters
-    ----------
-    population : array-like
-        Population size per age group.
-    contact_matrix : array-like
-        Contact matrix (n_age x n_age).
-    R0 : float, default 2.0
-        Basic reproduction number (used if R_t is None).
-    R_t : array-like, optional
-        Time-varying reproduction number. If provided, must have length T + 1.
-    T : int, default 200
-        Number of days to simulate.
-    dt : float, default 0.1
-        Sub-daily time step (must evenly divide 1 day).
-    seed : int, default 0
-        Random seed for reproducibility.
-    reps : int, default 10
-        Number of replicates to run.
-    config : DiffConfig, default DiffConfig()
-        Configuration for Gumbel-Softmax (tau, hard).
-    I0 : int, default 10
-        Initial number of infected individuals.
-    prob_hosp : array-like, optional
-        Age-specific probability of hospitalization.
-    prob_asymp : float, default 0.3
-        Probability of asymptomatic infection.
-    prob_non_sev_death : array-like, optional
-        Age-specific death probability for non-severe cases.
-    prob_sev_death : array-like, optional
-        Age-specific death probability for severe (ICU) cases.
-    frac_ICU : float, default 0.3
-        Fraction of hospitalized cases requiring ICU.
-    dur_E : float, default 4.6
-        Mean duration of exposed period (days).
-    dur_IMild : float, default 2.1
-        Mean duration of mild/asymptomatic infectious period.
-    dur_ICase : float, default 4.5
-        Mean duration from symptom onset to hospitalization.
-
-    Returns
-    -------
-    dict
-        Dictionary with keys:
-        - 't': time points (shape: (T+1,))
-        - 'S', 'E', 'I', 'R', 'D': compartment totals (shape: (reps, T+1))
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from emidm import run_diff_safir_replicates
-    >>> population = np.array([1000, 2000, 1500])
-    >>> contact_matrix = np.array([[3, 1, 0.5], [1, 2, 1], [0.5, 1, 1.5]])
-    >>> result = run_diff_safir_replicates(
-    ...     population=population,
-    ...     contact_matrix=contact_matrix,
-    ...     R0=2.5,
-    ...     T=100,
-    ...     reps=10,
-    ... )
-    >>> result["I"].shape  # (10, 101)
-    """
-    _require_jax()
-    import jax.numpy as jnp
-
-    reps = int(reps)
-    time_horizon = int(T)
-
-    # Run replicates sequentially (SAFIR is too complex for simple vmap)
-    results = []
-    for rep in range(reps):
-        rep_seed = seed + rep
-        result = run_diff_safir(
-            population=population,
-            contact_matrix=contact_matrix,
-            R0=R0,
-            R_t=R_t,
-            T=T,
-            dt=dt,
-            seed=rep_seed,
-            config=config,
-            I0=I0,
-            prob_hosp=prob_hosp,
-            prob_asymp=prob_asymp,
-            prob_non_sev_death=prob_non_sev_death,
-            prob_sev_death=prob_sev_death,
-            frac_ICU=frac_ICU,
-            dur_E=dur_E,
-            dur_IMild=dur_IMild,
-            dur_ICase=dur_ICase,
-        )
-        results.append(result)
-
-    # Stack results
-    t = results[0]["t"]
-    return {
-        "t": t,
-        "S": jnp.stack([r["S"] for r in results]),
-        "E": jnp.stack([r["E"] for r in results]),
-        "I": jnp.stack([r["I"] for r in results]),
-        "R": jnp.stack([r["R"] for r in results]),
-        "D": jnp.stack([r["D"] for r in results]),
-    }
