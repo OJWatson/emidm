@@ -83,15 +83,11 @@ def _run_diff_sir_core(beta_seq, state0, key, N, gamma, dt, tau, hard):
         p_recover = 1.0 - jnp.exp(-gamma * dt)
 
         key, k_inf, k_rec = jax.random.split(key, 3)
-        keys_inf = jax.random.split(k_inf, N)
-        keys_rec = jax.random.split(k_rec, N)
 
-        infect = jax.vmap(lambda kk: _gumbel_softmax_bernoulli_jit(kk, p_infect, tau, hard))(
-            keys_inf
-        )
-        recover = jax.vmap(lambda kk: _gumbel_softmax_bernoulli_jit(kk, p_recover, tau, hard))(
-            keys_rec
-        )
+        infect = _gumbel_softmax_bernoulli_jit(
+            k_inf, p_infect, tau, hard, sample_shape=(N,))
+        recover = _gumbel_softmax_bernoulli_jit(
+            k_rec, p_recover, tau, hard, sample_shape=(N,))
 
         new_I = infect * S
         new_R = recover * I
@@ -116,13 +112,18 @@ def _run_diff_sir_core(beta_seq, state0, key, N, gamma, dt, tau, hard):
     return totals
 
 
-def _gumbel_softmax_bernoulli_jit(key, p, tau, hard):
+def _gumbel_softmax_bernoulli_jit(key, p, tau, hard, sample_shape=None):
     """JIT-friendly version without _require_jax calls."""
     import jax
     import jax.numpy as jnp
 
     eps = 1e-6
-    p = jnp.clip(p, eps, 1.0 - eps)
+    p = jnp.clip(jnp.asarray(p, dtype=jnp.float32), eps, 1.0 - eps)
+    if sample_shape is None:
+        target_shape = p.shape
+    else:
+        target_shape = tuple(sample_shape)
+        p = jnp.broadcast_to(p, target_shape)
 
     logits = jnp.stack([jnp.log(p), jnp.log1p(-p)], axis=-1)
     u = jax.random.uniform(key, logits.shape, minval=eps, maxval=1.0 - eps)
