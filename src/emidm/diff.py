@@ -38,45 +38,9 @@ def _require_jax():
         ) from e
 
 
-def _gumbel_softmax_bernoulli(key, p, *, tau: float, hard: bool):
-    _require_jax()
-    import jax
-    import jax.numpy as jnp
-
-    eps = 1e-6
-    p = jnp.clip(p, eps, 1.0 - eps)
-
-    logits = jnp.stack([jnp.log(p), jnp.log1p(-p)], axis=-1)
-    u = jax.random.uniform(key, logits.shape, minval=eps, maxval=1.0 - eps)
-    g = -jnp.log(-jnp.log(u))
-    y = jax.nn.softmax((logits + g) / tau, axis=-1)
-
-    if hard:
-        y_hard = jax.nn.one_hot(jnp.argmax(y, axis=-1), 2)
-        y = jax.lax.stop_gradient(y_hard - y) + y
-
-    return y[..., 0]
-
-
-def _gumbel_softmax_categorical(key, probs, *, tau: float, hard: bool):
-    _require_jax()
-    import jax
-    import jax.numpy as jnp
-
-    eps = 1e-12
-    probs = jnp.clip(probs, eps, 1.0)
-    probs = probs / jnp.sum(probs, axis=-1, keepdims=True)
-
-    logits = jnp.log(probs)
-    u = jax.random.uniform(key, logits.shape, minval=eps, maxval=1.0 - eps)
-    g = -jnp.log(-jnp.log(u))
-    y = jax.nn.softmax((logits + g) / tau, axis=-1)
-
-    if hard:
-        y_hard = jax.nn.one_hot(jnp.argmax(y, axis=-1), y.shape[-1])
-        y = jax.lax.stop_gradient(y_hard - y) + y
-
-    return y
+# Note: _gumbel_softmax_bernoulli_jit and _gumbel_softmax_categorical_jit
+# are the JIT-compatible versions used in the core simulation functions.
+# They avoid _require_jax() calls and use jax.lax.cond instead of Python if.
 
 
 def _init_onehot_state_sir(*, N: int, I0: int, key=None):
@@ -304,6 +268,184 @@ def run_diff_sir_simulation(
             "I": all_totals[:, :, 1],
             "R": all_totals[:, :, 2],
         }
+
+
+def make_diff_sir_model(
+    *,
+    N: int = 200,
+    I0: int = 5,
+    T: int = 50,
+    dt: int = 1,
+    key,
+    reps: int = 1,
+    config: DiffConfig = DiffConfig(),
+    beta: float = 0.2,
+    gamma: float = 0.1,
+):
+    """Create a pre-compiled SIR model function for gradient-based inference.
+
+    This factory function pre-computes all static values (population structure,
+    initial state, etc.) and returns a JIT-compiled function that takes an
+    optional params dict to override default parameter values.
+
+    Parameters
+    ----------
+    N : int, default 200
+        Total population size (number of agents). Static - affects array shapes.
+    I0 : int, default 5
+        Initial number of infected individuals. Static - affects initial state.
+    T : int, default 50
+        Total simulation time. Static - affects output array length.
+    dt : int, default 1
+        Time step size. Static - affects number of steps.
+    key : jax.random.PRNGKey
+        JAX random key for stochastic simulation. Required.
+    reps : int, default 1
+        Number of replicates to run. Static - affects array shapes.
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard). Static.
+    beta : float, default 0.2
+        Default transmission rate. Can be overridden at call time.
+    gamma : float, default 0.1
+        Default recovery rate. Can be overridden at call time.
+
+    Returns
+    -------
+    callable
+        A JIT-compiled function `model(params=None)` where `params` is an
+        optional dict that can override: 'beta', 'gamma', 'R_t'.
+        Returns dict with keys 't', 'S', 'I', 'R'.
+
+    Examples
+    --------
+    >>> import jax
+    >>> import jax.numpy as jnp
+    >>> from emidm import make_diff_sir_model
+    >>>
+    >>> # Create model once - pre-computes static values
+    >>> key = jax.random.PRNGKey(0)
+    >>> model = make_diff_sir_model(N=1000, I0=10, T=50, key=key)
+    >>>
+    >>> # Use defaults
+    >>> result = model()
+    >>>
+    >>> # Override beta for inference
+    >>> result = model({'beta': 0.35})
+    >>>
+    >>> # Override multiple params
+    >>> result = model({'beta': 0.35, 'gamma': 0.12})
+    >>>
+    >>> # Use R_t instead of beta
+    >>> R_t = jnp.ones(51) * 2.5
+    >>> result = model({'R_t': R_t, 'gamma': 0.1})
+    >>>
+    >>> # Use in loss function for inference
+    >>> observed_I = jnp.array([...])
+    >>> @jax.jit
+    ... def loss(beta):
+    ...     pred = model({'beta': beta})
+    ...     return jnp.mean((pred['I'] - observed_I)**2)
+    >>> grad_fn = jax.grad(loss)
+    """
+    _require_jax()
+    import jax
+    import jax.numpy as jnp
+
+    # Convert to static Python values
+    N = int(N)
+    T = int(T)
+    dt = int(dt)
+    reps = int(reps)
+
+    # Pre-compute time array (static)
+    ts = jnp.arange(0, T + 1, dt)
+    n_steps = ts.shape[0]
+
+    # Pre-compute initial state (static)
+    if reps == 1:
+        key, k_init = jax.random.split(key)
+        state0 = _init_onehot_state_sir(N=N, I0=I0, key=k_init)
+    else:
+        keys = jax.random.split(key, reps * 2)
+        init_keys = keys[:reps]
+        run_keys = keys[reps:]
+        states0 = jax.vmap(
+            lambda k: _init_onehot_state_sir(N=N, I0=I0, key=k)
+        )(init_keys)
+
+    # Capture defaults in closure
+    default_beta = float(beta)
+    default_gamma = float(gamma)
+    tau = config.tau
+    hard = config.hard
+
+    if reps == 1:
+        @jax.jit
+        def _model(params=None):
+            # Merge params with defaults
+            p_beta = default_beta
+            p_gamma = default_gamma
+            p_R_t = None
+
+            if params is not None:
+                p_beta = params.get('beta', p_beta)
+                p_gamma = params.get('gamma', p_gamma)
+                p_R_t = params.get('R_t', None)
+
+            # Compute beta sequence
+            if p_R_t is not None:
+                R_t_arr = jnp.asarray(p_R_t, dtype=jnp.float32)
+                beta_seq = R_t_arr * jnp.asarray(p_gamma, dtype=jnp.float32)
+            else:
+                beta_seq = jnp.ones(n_steps, dtype=jnp.float32) * \
+                    jnp.asarray(p_beta, dtype=jnp.float32)
+
+            totals = _run_diff_sir_core(
+                beta_seq, state0, key, N, p_gamma, dt, tau, hard
+            )
+
+            return {
+                "t": ts,
+                "S": totals[:, 0],
+                "I": totals[:, 1],
+                "R": totals[:, 2],
+            }
+    else:
+        @jax.jit
+        def _model(params=None):
+            # Merge params with defaults
+            p_beta = default_beta
+            p_gamma = default_gamma
+            p_R_t = None
+
+            if params is not None:
+                p_beta = params.get('beta', p_beta)
+                p_gamma = params.get('gamma', p_gamma)
+                p_R_t = params.get('R_t', None)
+
+            # Compute beta sequence
+            if p_R_t is not None:
+                R_t_arr = jnp.asarray(p_R_t, dtype=jnp.float32)
+                beta_seq = R_t_arr * jnp.asarray(p_gamma, dtype=jnp.float32)
+            else:
+                beta_seq = jnp.ones(n_steps, dtype=jnp.float32) * \
+                    jnp.asarray(p_beta, dtype=jnp.float32)
+
+            def run_one(state0, run_key):
+                return _run_diff_sir_core(
+                    beta_seq, state0, run_key, N, p_gamma, dt, tau, hard
+                )
+
+            all_totals = jax.vmap(run_one)(states0, run_keys)
+
+            return {
+                "t": ts,
+                "S": all_totals[:, :, 0],
+                "I": all_totals[:, :, 1],
+                "R": all_totals[:, :, 2],
+            }
+
+    return _model
 
 
 def _gumbel_softmax_categorical_jit(key, probs, tau, hard):
@@ -788,29 +930,36 @@ def make_diff_safir_model(
     Returns
     -------
     callable
-        A function `model(R_t) -> dict` that takes a time-varying R_t array
-        and returns the simulation results. This function is JIT-compiled
-        and fully differentiable.
+        A JIT-compiled function `model(params=None)` where `params` is an
+        optional dict that can override: 'R_t', 'R0', 'prob_asymp', 'frac_ICU'.
+        Returns dict with keys 't', 'S', 'E', 'I', 'R', 'D'.
 
     Examples
     --------
     >>> import jax.numpy as jnp
     >>> from emidm import make_diff_safir_model
-    >>> 
+    >>>
     >>> # Create the model once
     >>> model = make_diff_safir_model(
     ...     population=jnp.array([1000, 2000, 1500]),
     ...     contact_matrix=jnp.eye(3) * 2,
     ...     T=50,
     ... )
-    >>> 
-    >>> # Use it for inference (fast, differentiable)
+    >>>
+    >>> # Use defaults
+    >>> result = model()
+    >>>
+    >>> # Override R_t for inference (most common case)
     >>> R_t = jnp.ones(51) * 2.0
-    >>> result = model(R_t)
-    >>> 
+    >>> result = model({'R_t': R_t})
+    >>>
+    >>> # Override multiple params
+    >>> result = model({'R_t': R_t, 'prob_asymp': 0.4})
+    >>>
     >>> # Compute gradients
-    >>> def loss(R_t):
-    ...     return model(R_t)['D'][-1]
+    >>> @jax.jit
+    ... def loss(R_t):
+    ...     return model({'R_t': R_t})['D'][-1]
     >>> grad_fn = jax.grad(loss)
     >>> grads = grad_fn(R_t)
     """
@@ -903,13 +1052,52 @@ def make_diff_safir_model(
     P_Imild = (1.0 - P_Icase) * (1.0 - jnp.clip(prob_asymp_val, 0.0, 1.0))
     prob_die_by_agent = prob_die[age_index]
 
-    # Create the model function that only takes R_t
+    # Capture defaults in closure for inferrable params
+    default_R0 = R0_float
+    default_prob_asymp = float(prob_asymp)
+    default_frac_ICU = float(frac_ICU)
+
+    # Create the model function that takes optional params dict
     # JIT-compile for fast repeated calls during inference
     @jax.jit
-    def _model(R_t):
-        R_t_arr = jnp.asarray(R_t, dtype=jnp.float32)
-        beta_t_daily = jnp.asarray(
-            beta_base, dtype=jnp.float32) * R_t_arr / jnp.asarray(R0_float, dtype=jnp.float32)
+    def _model(params=None):
+        # Get param values (from dict or defaults)
+        p_R_t = None
+        p_R0 = default_R0
+        p_prob_asymp = default_prob_asymp
+        p_frac_ICU = default_frac_ICU
+
+        if params is not None:
+            p_R_t = params.get('R_t', None)
+            p_R0 = params.get('R0', p_R0)
+            p_prob_asymp = params.get('prob_asymp', p_prob_asymp)
+            p_frac_ICU = params.get('frac_ICU', p_frac_ICU)
+
+        # Compute beta_t_daily based on R_t or R0
+        if p_R_t is not None:
+            R_t_arr = jnp.asarray(p_R_t, dtype=jnp.float32)
+            beta_t_daily = jnp.asarray(
+                beta_base, dtype=jnp.float32) * R_t_arr / jnp.asarray(default_R0, dtype=jnp.float32)
+        else:
+            # Use constant R0 (possibly overridden)
+            beta_t_daily = jnp.full(
+                days + 1,
+                beta_base * p_R0 / default_R0,
+                dtype=jnp.float32
+            )
+
+        # Recompute prob_asymp-dependent values if changed
+        p_prob_asymp_val = jnp.asarray(p_prob_asymp, dtype=jnp.float32)
+        p_P_Iasym = (1.0 - P_Icase) * jnp.clip(p_prob_asymp_val, 0.0, 1.0)
+        p_P_Imild = (1.0 - P_Icase) * \
+            (1.0 - jnp.clip(p_prob_asymp_val, 0.0, 1.0))
+
+        # Recompute frac_ICU-dependent values if changed
+        p_frac_ICU_val = jnp.asarray(p_frac_ICU, dtype=jnp.float32)
+        p_prob_die = p_frac_ICU_val * prob_sev_death_arr + \
+            (1.0 - p_frac_ICU_val) * prob_non_sev_death_arr
+        p_prob_die = jnp.clip(p_prob_die, 0.0, 1.0)
+        p_prob_die_by_agent = p_prob_die[age_index]
 
         daily_series = _run_diff_safir_core(
             beta_t_daily=beta_t_daily,
@@ -918,10 +1106,10 @@ def make_diff_safir_model(
             population=population,
             contact_matrix=contact_matrix,
             age_index=age_index,
-            prob_die_by_agent=prob_die_by_agent,
+            prob_die_by_agent=p_prob_die_by_agent,
             P_Icase=P_Icase,
-            P_Iasym=P_Iasym,
-            P_Imild=P_Imild,
+            P_Iasym=p_P_Iasym,
+            P_Imild=p_P_Imild,
             p_E=p_E,
             p_Iasym=p_Iasym,
             p_Imild=p_Imild,
