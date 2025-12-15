@@ -25,6 +25,7 @@ from .safir import (
 from .diff import (
     DiffConfig,
     make_diff_safir_model,
+    make_diff_sir_model,
     run_diff_safir_simulation,
     run_diff_sir_simulation,
 )
@@ -73,6 +74,7 @@ __all__ = [
     # Differentiable models
     "DiffConfig",
     "make_diff_safir_model",
+    "make_diff_sir_model",
     "run_diff_sir_simulation",
     "run_diff_safir_simulation",
     # Optimization & inference

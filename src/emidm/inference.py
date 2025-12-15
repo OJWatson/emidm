@@ -66,11 +66,12 @@ def run_blackjax_nuts(
         ) from e
 
     rng_key = jax.random.PRNGKey(rng_seed)
+    key_warmup, key_sample = jax.random.split(rng_key)
 
     warmup = blackjax.window_adaptation(blackjax.nuts, logdensity_fn)
 
     (state, params), _ = warmup.run(
-        rng_key, initial_position, num_steps=num_warmup)
+        key_warmup, initial_position, num_steps=num_warmup)
 
     nuts = blackjax.nuts(logdensity_fn, **params)
 
@@ -78,6 +79,11 @@ def run_blackjax_nuts(
         state, info = nuts.step(rng_key, state)
         return state, state.position
 
-    keys = jax.random.split(rng_key, num_samples)
-    _, positions = jax.lax.scan(one_step, state, keys)
-    return positions
+    sample_keys = jax.random.split(key_sample, num_samples)
+
+    @jax.jit
+    def _draw(initial_state, keys):
+        _, positions = jax.lax.scan(one_step, initial_state, keys)
+        return positions
+
+    return _draw(state, sample_keys)
