@@ -8,8 +8,12 @@
 
    .. autosummary::
    
-      plot_model_outputs
-      run_model_with_replicates
-      run_sir
-      simulate_sir
+      run_sir_simulation
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SIRModel
+      SIRState
    

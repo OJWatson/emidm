@@ -14,6 +14,8 @@ def _require_jax():
 
 def make_synthetic_data(*, beta_true=0.35, gamma=0.2, T=30, N=200, seed=0):
     _require_jax()
+    import jax
+    key = jax.random.PRNGKey(seed)
     out = run_diff_sir_simulation(
         N=N,
         I0=5,
@@ -21,14 +23,17 @@ def make_synthetic_data(*, beta_true=0.35, gamma=0.2, T=30, N=200, seed=0):
         gamma=gamma,
         T=T,
         config=DiffConfig(tau=0.8, hard=True),
-        seed=seed,
+        key=key,
     )
     return out
 
 
 def fit_beta_to_data(observed_I, *, gamma=0.2, T=30, N=200):
     _require_jax()
+    import jax
     import jax.numpy as jnp
+
+    key = jax.random.PRNGKey(0)
 
     def loss_fn(beta):
         pred = run_diff_sir_simulation(
@@ -38,7 +43,7 @@ def fit_beta_to_data(observed_I, *, gamma=0.2, T=30, N=200):
             gamma=gamma,
             T=T,
             config=DiffConfig(tau=0.8, hard=True),
-            seed=0,
+            key=key,
         )
         return jnp.mean((pred["I"] - observed_I) ** 2)
 

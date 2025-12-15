@@ -181,7 +181,7 @@ def run_diff_sir_simulation(
     T: int = 50,
     dt: int = 1,
     R_t=None,
-    seed: int = 0,
+    key,
     reps: int = 1,
     config: DiffConfig = DiffConfig(),
 ):
@@ -210,8 +210,8 @@ def run_diff_sir_simulation(
     R_t : array-like, optional
         Time-varying reproduction number. If provided, must have length T/dt + 1.
         Beta is computed as R_t * gamma at each time step.
-    seed : int, default 0
-        Random seed for reproducibility.
+    key : jax.random.PRNGKey
+        JAX random key for stochastic simulation. Required.
     reps : int, default 1
         Number of replicates to run. When reps > 1, uses vmap for parallel execution.
     config : DiffConfig, default DiffConfig()
@@ -228,7 +228,9 @@ def run_diff_sir_simulation(
     --------
     >>> from emidm import run_diff_sir_simulation, DiffConfig
     >>>
+    >>> import jax
     >>> # Single run
+    >>> key = jax.random.PRNGKey(42)
     >>> result = run_diff_sir_simulation(
     ...     N=100,
     ...     I0=5,
@@ -236,14 +238,16 @@ def run_diff_sir_simulation(
     ...     gamma=0.1,
     ...     T=50,
     ...     config=DiffConfig(tau=0.5, hard=True),
-    ...     seed=42,
+    ...     key=key,
     ... )
     >>> print(result["I"].max())  # Peak infections
     >>>
     >>> # Multiple replicates
+    >>> key = jax.random.PRNGKey(0)
     >>> results = run_diff_sir_simulation(
     ...     N=100, I0=5, beta=0.3, gamma=0.1, T=50, reps=10,
     ...     config=DiffConfig(tau=0.5, hard=True),
+    ...     key=key,
     ... )
     >>> print(results["I"].shape)  # (10, 51)
     """
@@ -261,7 +265,6 @@ def run_diff_sir_simulation(
 
     if reps == 1:
         # Single replicate - original behavior
-        key = jax.random.PRNGKey(int(seed))
         key, k_init = jax.random.split(key)
         state0 = _init_onehot_state_sir(N=N, I0=I0, key=k_init)
 
@@ -277,9 +280,8 @@ def run_diff_sir_simulation(
         }
     else:
         # Multiple replicates - use vmap for parallel execution
-        base_key = jax.random.PRNGKey(int(seed))
         # reps for init, reps for run
-        keys = jax.random.split(base_key, reps * 2)
+        keys = jax.random.split(key, reps * 2)
         init_keys = keys[:reps]
         run_keys = keys[reps:]
 
@@ -289,9 +291,9 @@ def run_diff_sir_simulation(
         )(init_keys)
 
         # Run all replicates in parallel using vmap
-        def run_one(state0, key):
+        def run_one(state0, run_key):
             return _run_diff_sir_core(
-                beta_seq, state0, key, N, gamma, dt, config.tau, config.hard
+                beta_seq, state0, run_key, N, gamma, dt, config.tau, config.hard
             )
 
         all_totals = jax.vmap(run_one)(states0, run_keys)

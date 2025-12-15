@@ -14,4 +14,5 @@
       plot_safir
       plot_sir
       plot_training_histories
+      sir_facet_plot
    
