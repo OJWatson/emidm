@@ -417,7 +417,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir_simulation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_params</span>
 
 <span class="c1"># Show which device JAX is using</span>
@@ -454,7 +454,7 @@ JAX devices: [cuda(id=0)]
 
 <span class="c1"># Generate synthetic data</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
     <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
     <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
     <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
@@ -491,16 +491,15 @@ Peak infections: 290 at day 35
 
 <span class="c1"># For robust optimization, we average the loss over multiple replicates</span>
 <span class="c1"># This reduces gradient noise and leads to better convergence</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_diff_sir_replicates</span>
 
 <span class="n">N_OPT_REPS</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># Number of replicates for optimization</span>
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute MSE averaged over multiple replicates for robust optimization.&quot;&quot;&quot;</span>
-    <span class="c1"># Run multiple replicates using the public API</span>
+    <span class="c1"># Run multiple replicates using the reps parameter</span>
     <span class="c1"># Use hard=False so gradients can flow through the soft Gumbel-Softmax</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">run_diff_sir_replicates</span><span class="p">(</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
         <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
         <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
         <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
@@ -613,21 +612,18 @@ Loss at β = 0.35 (true): 2451.31
 <p>We use <code class="docutils literal notranslate"><span class="pre">hard=True</span></code> for these simulations to get realistic discrete trajectories, and run multiple replicates to show the stochastic variability. The <code class="docutils literal notranslate"><span class="pre">run_diff_sir_replicates</span></code> function uses <code class="docutils literal notranslate"><span class="pre">vmap</span></code> for fast parallel execution.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the fast replicate utility</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_diff_sir_replicates</span>
-
-<span class="c1"># Number of replicates for visualization</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of replicates for visualization</span>
 <span class="n">N_VIZ_REPS</span> <span class="o">=</span> <span class="mi">10</span>
 
 <span class="c1"># Generate predictions with fitted and initial parameters using replicates</span>
 <span class="c1"># This uses vmap for fast parallel execution</span>
-<span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir_replicates</span><span class="p">(</span>
+<span class="n">pred_fitted</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
     <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_hat</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">reps</span><span class="o">=</span><span class="n">N_VIZ_REPS</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">pred_initial</span> <span class="o">=</span> <span class="n">run_diff_sir_replicates</span><span class="p">(</span>
+<span class="n">pred_initial</span> <span class="o">=</span> <span class="n">run_diff_sir_simulation</span><span class="p">(</span>
     <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_init</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">reps</span><span class="o">=</span><span class="n">N_VIZ_REPS</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>

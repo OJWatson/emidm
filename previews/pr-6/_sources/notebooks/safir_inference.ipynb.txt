@@ -41,7 +41,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": null,
    "metadata": {},
    "outputs": [
     {
@@ -63,7 +63,7 @@
     "import jax.numpy as jnp\n",
     "\n",
     "# emidm imports\n",
-    "from emidm import run_diff_safir, make_diff_safir_model\n",
+    "from emidm import run_diff_safir_simulation, make_diff_safir_model\n",
     "from emidm.optim import optimize_params\n",
     "\n",
     "# Set random seed for reproducibility\n",
@@ -306,7 +306,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": null,
    "metadata": {},
    "outputs": [
     {
@@ -333,9 +333,11 @@
    ],
    "source": [
     "# Run the SAFIR model with time-varying R(t)\n",
+    "from emidm.diff import DiffConfig\n",
+    "\n",
     "print(\"Running SAFIR simulation...\")\n",
     "\n",
-    "result = run_diff_safir(\n",
+    "result = run_diff_safir_simulation(\n",
     "    population=population,\n",
     "    contact_matrix=contact_matrix,\n",
     "    R0=2.5,          # Base R0 for beta calibration\n",
@@ -343,9 +345,8 @@
     "    T=T,\n",
     "    dt=0.25,         # Sub-daily timestep\n",
     "    seed=42,\n",
-    "    tau=0.1,\n",
-    "    hard=True,\n",
-    "    n_seed=20,      # Initial infections\n",
+    "    config=DiffConfig(tau=0.1, hard=True),\n",
+    "    I0=20,      # Initial infections\n",
     ")\n",
     "\n",
     "print(f\"Simulation complete. Total deaths: {result['D'][-1]:.0f}\")"
@@ -737,7 +738,7 @@
     "# Compare predicted vs observed deaths with MAP estimate\n",
     "map_R_expanded = expand_R_intervals(map_R, T, interval_days)\n",
     "\n",
-    "map_result = run_diff_safir(\n",
+    "map_result = run_diff_safir_simulation(\n",
     "    population=population,\n",
     "    contact_matrix=contact_matrix,\n",
     "    R0=2.5,\n",
@@ -971,13 +972,13 @@
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": ".venv",
    "language": "python",
    "name": "python3"
   },
   "language_info": {
    "name": "python",
-   "version": "3.10"
+   "version": "3.10.12"
   }
  },
  "nbformat": 4,

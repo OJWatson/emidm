@@ -429,7 +429,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 
 <span class="c1"># emidm imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">emidm</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_diff_safir</span><span class="p">,</span> <span class="n">make_diff_safir_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_diff_safir_simulation</span><span class="p">,</span> <span class="n">make_diff_safir_model</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_params</span>
 
 <span class="c1"># Set random seed for reproducibility</span>
@@ -644,9 +644,11 @@ Contact matrix:
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the SAFIR model with time-varying R(t)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running SAFIR simulation...&quot;</span><span class="p">)</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">run_diff_safir</span><span class="p">(</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">run_diff_safir_simulation</span><span class="p">(</span>
     <span class="n">population</span><span class="o">=</span><span class="n">population</span><span class="p">,</span>
     <span class="n">contact_matrix</span><span class="o">=</span><span class="n">contact_matrix</span><span class="p">,</span>
     <span class="n">R0</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>          <span class="c1"># Base R0 for beta calibration</span>
@@ -654,9 +656,8 @@ Contact matrix:
     <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">dt</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>         <span class="c1"># Sub-daily timestep</span>
     <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
-    <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">n_seed</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>      <span class="c1"># Initial infections</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">I0</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>      <span class="c1"># Initial infections</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation complete. Total deaths: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -984,7 +985,7 @@ MAP R(t) estimates:
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare predicted vs observed deaths with MAP estimate</span>
 <span class="n">map_R_expanded</span> <span class="o">=</span> <span class="n">expand_R_intervals</span><span class="p">(</span><span class="n">map_R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">interval_days</span><span class="p">)</span>
 
-<span class="n">map_result</span> <span class="o">=</span> <span class="n">run_diff_safir</span><span class="p">(</span>
+<span class="n">map_result</span> <span class="o">=</span> <span class="n">run_diff_safir_simulation</span><span class="p">(</span>
     <span class="n">population</span><span class="o">=</span><span class="n">population</span><span class="p">,</span>
     <span class="n">contact_matrix</span><span class="o">=</span><span class="n">contact_matrix</span><span class="p">,</span>
     <span class="n">R0</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
