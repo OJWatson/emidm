@@ -1,0 +1,22 @@
+﻿emidm.diff
+==========
+
+.. automodule:: emidm.diff
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      make_diff_safir_model
+      run_diff_safir
+      run_diff_safir_replicates
+      run_diff_sir
+      run_diff_sir_replicates
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DiffConfig
+   

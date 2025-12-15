@@ -1,0 +1,891 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>End-to-End Differentiability in Epidemiological Models &#8212; emidm  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'end_to_end_differentiability';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing JAX Models for emidm" href="writing_jax_models.html" />
+    <link rel="prev" title="Model Structure in emidm" href="model_structure.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">emidm  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="development.html">
+    Development Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="slides.html">
+    Slides
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OJWatson/emidm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="development.html">
+    Development Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="slides.html">
+    Slides
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OJWatson/emidm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="contributing_models.html">Contributing New Models to emidm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jax_fundamentals.html">JAX Fundamentals for Epidemiological Modelling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_structure.html">Model Structure in emidm</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">End-to-End Differentiability in Epidemiological Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_jax_models.html">Writing JAX Models for emidm</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="development.html" class="nav-link">Development Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">End-to-End Differentiability in Epidemiological Models</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="end-to-end-differentiability-in-epidemiological-models">
+<h1>End-to-End Differentiability in Epidemiological Models<a class="headerlink" href="#end-to-end-differentiability-in-epidemiological-models" title="Link to this heading">#</a></h1>
+<p>This document explains the core challenge of making stochastic, discrete epidemiological models differentiable, and how <code class="docutils literal notranslate"><span class="pre">emidm</span></code> solves it using the Gumbel-Softmax trick.</p>
+<section id="the-problem-discrete-operations-break-gradients">
+<h2>The Problem: Discrete Operations Break Gradients<a class="headerlink" href="#the-problem-discrete-operations-break-gradients" title="Link to this heading">#</a></h2>
+<p>Epidemiological models involve <strong>discrete</strong> operations that have zero or undefined gradients:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stochastic SIR: sample number of new infections</span>
+<span class="n">new_infections</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">p_infect</span><span class="p">)</span>  <span class="c1"># Discrete!</span>
+
+<span class="c1"># The gradient of binomial sampling is undefined</span>
+<span class="c1"># ∂(new_infections)/∂(p_infect) = ???</span>
+</pre></div>
+</div>
+<p>This is problematic because:</p>
+<ol class="arabic simple">
+<li><p><strong>Sampling is non-differentiable</strong>: You can’t backpropagate through <code class="docutils literal notranslate"><span class="pre">random.binomial</span></code></p></li>
+<li><p><strong>Argmax is non-differentiable</strong>: <code class="docutils literal notranslate"><span class="pre">argmax</span></code> has zero gradient almost everywhere</p></li>
+<li><p><strong>Integer operations</strong>: Counts are integers, gradients need continuous values</p></li>
+</ol>
+</section>
+<section id="the-solution-gumbel-softmax-concrete-distribution">
+<h2>The Solution: Gumbel-Softmax (Concrete Distribution)<a class="headerlink" href="#the-solution-gumbel-softmax-concrete-distribution" title="Link to this heading">#</a></h2>
+<p>The <strong>Gumbel-Softmax</strong> trick (also called the Concrete distribution) provides a differentiable approximation to categorical sampling.</p>
+<section id="how-categorical-sampling-works">
+<h3>How Categorical Sampling Works<a class="headerlink" href="#how-categorical-sampling-works" title="Link to this heading">#</a></h3>
+<p>To sample from a categorical distribution with probabilities <code class="docutils literal notranslate"><span class="pre">[p₀,</span> <span class="pre">p₁,</span> <span class="pre">...,</span> <span class="pre">pₙ]</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standard approach: sample category index</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">)</span>  <span class="c1"># Returns integer 0, 1, ..., n-1</span>
+</pre></div>
+</div>
+<p>This returns a <strong>hard</strong> one-hot vector (all zeros except one 1), but the sampling operation has no gradient.</p>
+</section>
+<section id="the-gumbel-max-trick">
+<h3>The Gumbel-Max Trick<a class="headerlink" href="#the-gumbel-max-trick" title="Link to this heading">#</a></h3>
+<p>The Gumbel-Max trick reformulates categorical sampling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equivalent to categorical sampling:</span>
+<span class="n">gumbel_noise</span> <span class="o">=</span> <span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>  <span class="c1"># Gumbel(0, 1) samples</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>  <span class="c1"># Convert probs to log-odds</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">argmax</span><span class="p">(</span><span class="n">logits</span> <span class="o">+</span> <span class="n">gumbel_noise</span><span class="p">)</span>  <span class="c1"># Sample!</span>
+</pre></div>
+</div>
+<p>This is mathematically equivalent to categorical sampling, but still has the non-differentiable <code class="docutils literal notranslate"><span class="pre">argmax</span></code>.</p>
+</section>
+<section id="the-gumbel-softmax-trick">
+<h3>The Gumbel-Softmax Trick<a class="headerlink" href="#the-gumbel-softmax-trick" title="Link to this heading">#</a></h3>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">argmax</span></code> with <code class="docutils literal notranslate"><span class="pre">softmax</span></code> (which IS differentiable):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">gumbel_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differentiable approximation to categorical sampling.&quot;&quot;&quot;</span>
+    <span class="c1"># Sample Gumbel noise</span>
+    <span class="n">gumbel_noise</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="p">))</span>
+    
+    <span class="c1"># Add noise to logits</span>
+    <span class="n">noisy_logits</span> <span class="o">=</span> <span class="p">(</span><span class="n">logits</span> <span class="o">+</span> <span class="n">gumbel_noise</span><span class="p">)</span> <span class="o">/</span> <span class="n">tau</span>
+    
+    <span class="c1"># Softmax instead of argmax</span>
+    <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">noisy_logits</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <strong>temperature</strong> <code class="docutils literal notranslate"><span class="pre">τ</span></code> (tau) controls the approximation:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">τ</span> <span class="pre">→</span> <span class="pre">0</span></code>: Output approaches one-hot (like argmax), but gradient vanishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">τ</span> <span class="pre">→</span> <span class="pre">∞</span></code>: Output approaches uniform distribution</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">τ</span> <span class="pre">≈</span> <span class="pre">0.1-1.0</span></code>: Good balance between discreteness and gradient flow</p></li>
+</ul>
+</section>
+<section id="visualization">
+<h3>Visualization<a class="headerlink" href="#visualization" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Temperature Effect on Gumbel-Softmax Output:
+
+τ = 0.01 (nearly discrete):  [0.00, 0.00, 0.99, 0.01, 0.00]  ← Almost one-hot
+τ = 0.1  (typical):          [0.02, 0.05, 0.78, 0.12, 0.03]  ← Peaked but soft
+τ = 1.0  (soft):             [0.10, 0.15, 0.35, 0.25, 0.15]  ← Spread out
+τ = 10.0 (very soft):        [0.18, 0.20, 0.22, 0.21, 0.19]  ← Nearly uniform
+</pre></div>
+</div>
+</section>
+</section>
+<section id="the-straight-through-estimator">
+<h2>The Straight-Through Estimator<a class="headerlink" href="#the-straight-through-estimator" title="Link to this heading">#</a></h2>
+<p>For the forward pass, we often want <strong>discrete</strong> outputs (actual counts), but for the backward pass, we need <strong>continuous</strong> gradients.</p>
+<p>The <strong>straight-through estimator</strong> achieves this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">straight_through_gumbel_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hard samples in forward pass, soft gradients in backward pass.&quot;&quot;&quot;</span>
+    <span class="c1"># Soft sample (differentiable)</span>
+    <span class="n">soft</span> <span class="o">=</span> <span class="n">gumbel_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+    
+    <span class="c1"># Hard sample (one-hot)</span>
+    <span class="n">hard</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">soft</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">soft</span><span class="p">))</span>
+    
+    <span class="c1"># Trick: use hard for forward, soft gradient for backward</span>
+    <span class="c1"># jax.lax.stop_gradient(hard - soft) has zero gradient</span>
+    <span class="k">return</span> <span class="n">soft</span> <span class="o">+</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">hard</span> <span class="o">-</span> <span class="n">soft</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This works because:</p>
+<ul class="simple">
+<li><p><strong>Forward pass</strong>: Returns <code class="docutils literal notranslate"><span class="pre">hard</span></code> (the one-hot vector)</p></li>
+<li><p><strong>Backward pass</strong>: Gradient flows through <code class="docutils literal notranslate"><span class="pre">soft</span></code> (ignoring the stopped gradient term)</p></li>
+</ul>
+<section id="in-emidm">
+<h3>In emidm<a class="headerlink" href="#in-emidm" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_gumbel_softmax_sample</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample from Gumbel-Softmax distribution.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        logits: Log-probabilities (unnormalized)</span>
+<span class="sd">        key: JAX random key</span>
+<span class="sd">        tau: Temperature parameter</span>
+<span class="sd">        hard: If True, use straight-through estimator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Sample Gumbel noise</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">gumbel</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
+    
+    <span class="c1"># Soft sample</span>
+    <span class="n">soft</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">((</span><span class="n">logits</span> <span class="o">+</span> <span class="n">gumbel</span><span class="p">)</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">hard</span><span class="p">:</span>
+        <span class="c1"># Straight-through: hard forward, soft backward</span>
+        <span class="n">hard_sample</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">soft</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">soft</span> <span class="o">+</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">hard_sample</span> <span class="o">-</span> <span class="n">soft</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">soft</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="applying-to-epidemiological-transitions">
+<h2>Applying to Epidemiological Transitions<a class="headerlink" href="#applying-to-epidemiological-transitions" title="Link to this heading">#</a></h2>
+<section id="the-challenge">
+<h3>The Challenge<a class="headerlink" href="#the-challenge" title="Link to this heading">#</a></h3>
+<p>In an SIR model, we need to sample:</p>
+<ol class="arabic simple">
+<li><p>How many susceptibles get infected (binomial)</p></li>
+<li><p>How many infected recover (binomial)</p></li>
+</ol>
+<p>These are <strong>binomial</strong> distributions, not categorical. How do we apply Gumbel-Softmax?</p>
+</section>
+<section id="the-solution-one-hot-state-representation">
+<h3>The Solution: One-Hot State Representation<a class="headerlink" href="#the-solution-one-hot-state-representation" title="Link to this heading">#</a></h3>
+<p>We represent counts as <strong>one-hot probability distributions</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instead of: S = 990 (integer)</span>
+<span class="c1"># We use: S = [0, 0, ..., 0, 1, 0, ..., 0]  (one-hot, 1 at position 990)</span>
+<span class="c1">#              ↑ position 0    ↑ position 990</span>
+</pre></div>
+</div>
+<p>Now, transitions become <strong>categorical</strong> operations on these distributions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">transition_S_to_I</span><span class="p">(</span><span class="n">S_onehot</span><span class="p">,</span> <span class="n">p_infect</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transition some susceptibles to infected.</span>
+<span class="sd">    </span>
+<span class="sd">    S_onehot: One-hot distribution over possible S counts</span>
+<span class="sd">    p_infect: Probability of infection per susceptible</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S_onehot</span><span class="p">)</span>
+    
+    <span class="c1"># Current S count (expected value or argmax)</span>
+    <span class="n">S_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">S_onehot</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+    
+    <span class="c1"># For each possible current S value, compute distribution over new infections</span>
+    <span class="c1"># This creates a transition matrix</span>
+    
+    <span class="c1"># Simplified: sample new S directly</span>
+    <span class="c1"># Compute logits for each possible new S value</span>
+    <span class="c1"># ... (complex transition logic)</span>
+    
+    <span class="c1"># Sample new S using Gumbel-Softmax</span>
+    <span class="n">new_S_onehot</span> <span class="o">=</span> <span class="n">_gumbel_softmax_sample</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">new_S_onehot</span>
+</pre></div>
+</div>
+</section>
+<section id="transition-matrices">
+<h3>Transition Matrices<a class="headerlink" href="#transition-matrices" title="Link to this heading">#</a></h3>
+<p>For efficiency, we can precompute <strong>transition matrices</strong> that encode all possible transitions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">build_infection_matrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">p_infect</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build matrix M where M[i,j] = P(new_S = j | old_S = i).&quot;&quot;&quot;</span>
+    <span class="c1"># For each starting S value i, compute distribution over ending S values j</span>
+    <span class="c1"># This involves binomial probabilities</span>
+    
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="c1"># If S = i, new infections ~ Binomial(i, p_infect)</span>
+        <span class="c1"># So new_S ~ i - Binomial(i, p_infect)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># k = number of new infections</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">binom_pmf</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">p_infect</span><span class="p">)</span>
+            <span class="n">new_S</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">k</span>
+            <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">new_S</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">matrix</span>
+</pre></div>
+</div>
+<p>Then apply the transition:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Transition: multiply state by transition matrix</span>
+<span class="n">new_S_probs</span> <span class="o">=</span> <span class="n">S_onehot</span> <span class="o">@</span> <span class="n">transition_matrix</span>  <span class="c1"># Matrix multiplication!</span>
+
+<span class="c1"># Sample from the resulting distribution</span>
+<span class="n">new_S_onehot</span> <span class="o">=</span> <span class="n">_gumbel_softmax_sample</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">new_S_probs</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">),</span> <span class="n">key</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="complete-example-differentiable-sir-step">
+<h2>Complete Example: Differentiable SIR Step<a class="headerlink" href="#complete-example-differentiable-sir-step" title="Link to this heading">#</a></h2>
+<p>Here’s how a single time step works in <code class="docutils literal notranslate"><span class="pre">emidm</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">sir_step</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One differentiable SIR time step.&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">R</span><span class="p">),</span> <span class="n">key</span> <span class="o">=</span> <span class="n">carry</span>
+    <span class="n">key</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    
+    <span class="c1"># Get current counts (as soft expectations)</span>
+    <span class="n">S_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">S</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+    <span class="n">I_count</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">I</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+    
+    <span class="c1"># Compute transition probabilities</span>
+    <span class="n">p_infect</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="n">I_count</span> <span class="o">/</span> <span class="n">N</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="n">p_recover</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
+    
+    <span class="c1"># Build transition distributions</span>
+    <span class="c1"># (Simplified - actual implementation uses efficient matrix ops)</span>
+    
+    <span class="c1"># Sample new infections using Gumbel-Softmax</span>
+    <span class="n">infection_logits</span> <span class="o">=</span> <span class="n">compute_infection_logits</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">p_infect</span><span class="p">)</span>
+    <span class="n">new_infections_onehot</span> <span class="o">=</span> <span class="n">_gumbel_softmax_sample</span><span class="p">(</span><span class="n">infection_logits</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">)</span>
+    
+    <span class="c1"># Sample recoveries using Gumbel-Softmax  </span>
+    <span class="n">recovery_logits</span> <span class="o">=</span> <span class="n">compute_recovery_logits</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">p_recover</span><span class="p">)</span>
+    <span class="n">new_recoveries_onehot</span> <span class="o">=</span> <span class="n">_gumbel_softmax_sample</span><span class="p">(</span><span class="n">recovery_logits</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">hard</span><span class="p">)</span>
+    
+    <span class="c1"># Update compartments</span>
+    <span class="n">new_S</span> <span class="o">=</span> <span class="n">update_S</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">new_infections_onehot</span><span class="p">)</span>
+    <span class="n">new_I</span> <span class="o">=</span> <span class="n">update_I</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">new_infections_onehot</span><span class="p">,</span> <span class="n">new_recoveries_onehot</span><span class="p">)</span>
+    <span class="n">new_R</span> <span class="o">=</span> <span class="n">update_R</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">new_recoveries_onehot</span><span class="p">)</span>
+    
+    <span class="c1"># Output counts for trajectory</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">S_count</span><span class="p">,</span> <span class="n">I_count</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="n">S_count</span> <span class="o">-</span> <span class="n">I_count</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">((</span><span class="n">new_S</span><span class="p">,</span> <span class="n">new_I</span><span class="p">,</span> <span class="n">new_R</span><span class="p">),</span> <span class="n">key</span><span class="p">),</span> <span class="n">output</span>
+</pre></div>
+</div>
+</section>
+<section id="gradient-flow-visualization">
+<h2>Gradient Flow Visualization<a class="headerlink" href="#gradient-flow-visualization" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Forward Pass (with hard=True):
+┌─────────┐    ┌──────────────┐    ┌─────────┐    ┌──────┐
+│  beta   │───▶│ p_infect     │───▶│ logits  │───▶│ hard │───▶ Loss
+│  gamma  │    │ computation  │    │         │    │sample│
+└─────────┘    └──────────────┘    └─────────┘    └──────┘
+                                         │
+                                   (discrete output)
+
+Backward Pass:
+┌─────────┐    ┌──────────────┐    ┌─────────┐    ┌──────┐
+│ ∂L/∂β   │◀───│   gradient   │◀───│ ∂L/∂log │◀───│ soft │◀─── ∂L/∂out
+│ ∂L/∂γ   │    │   flows!     │    │         │    │ grad │
+└─────────┘    └──────────────┘    └─────────┘    └──────┘
+                                         │
+                                   (continuous gradient)
+</pre></div>
+</div>
+</section>
+<section id="training-vs-inference">
+<h2>Training vs Inference<a class="headerlink" href="#training-vs-inference" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">hard</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">tau</span></code></p></th>
+<th class="head"><p>Use Case</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Training</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>0.1-1.0</p></td>
+<td><p>Gradient-based optimization</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inference</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>0.1</p></td>
+<td><p>Discrete samples for prediction</p></td>
+</tr>
+<tr class="row-even"><td><p>Annealing</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code> → <code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+<td><p>1.0 → 0.1</p></td>
+<td><p>Curriculum learning</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="temperature-annealing">
+<h3>Temperature Annealing<a class="headerlink" href="#temperature-annealing" title="Link to this heading">#</a></h3>
+<p>During training, you might anneal temperature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start soft, gradually become more discrete</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_epochs</span><span class="p">):</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">epoch</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># Anneal from 1.0 to 0.1</span>
+    
+    <span class="n">loss</span><span class="p">,</span> <span class="n">grads</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">loss_fn</span><span class="p">)(</span><span class="n">params</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">grads</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="key-takeaways">
+<h2>Key Takeaways<a class="headerlink" href="#key-takeaways" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Gumbel-Softmax</strong> provides differentiable categorical sampling</p></li>
+<li><p><strong>Temperature</strong> controls the softness of the approximation</p></li>
+<li><p><strong>Straight-through estimator</strong> gives discrete forward, continuous backward</p></li>
+<li><p><strong>One-hot encoding</strong> converts count-based models to categorical form</p></li>
+<li><p><strong>Transition matrices</strong> efficiently encode binomial transitions</p></li>
+</ol>
+</section>
+<section id="mathematical-details">
+<h2>Mathematical Details<a class="headerlink" href="#mathematical-details" title="Link to this heading">#</a></h2>
+<section id="gumbel-distribution">
+<h3>Gumbel Distribution<a class="headerlink" href="#gumbel-distribution" title="Link to this heading">#</a></h3>
+<p>The Gumbel(0, 1) distribution has CDF: <code class="docutils literal notranslate"><span class="pre">F(x)</span> <span class="pre">=</span> <span class="pre">exp(-exp(-x))</span></code></p>
+<p>To sample: <code class="docutils literal notranslate"><span class="pre">g</span> <span class="pre">=</span> <span class="pre">-log(-log(u))</span></code> where <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">~</span> <span class="pre">Uniform(0,</span> <span class="pre">1)</span></code></p>
+</section>
+<section id="why-gumbel-max-works">
+<h3>Why Gumbel-Max Works<a class="headerlink" href="#why-gumbel-max-works" title="Link to this heading">#</a></h3>
+<p>For logits <code class="docutils literal notranslate"><span class="pre">z₁,</span> <span class="pre">...,</span> <span class="pre">zₙ</span></code> and Gumbel noise <code class="docutils literal notranslate"><span class="pre">g₁,</span> <span class="pre">...,</span> <span class="pre">gₙ</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P</span><span class="p">(</span><span class="n">argmax</span><span class="p">(</span><span class="n">zᵢ</span> <span class="o">+</span> <span class="n">gᵢ</span><span class="p">)</span> <span class="o">=</span> <span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">zₖ</span><span class="p">)</span> <span class="o">/</span> <span class="n">Σⱼ</span> <span class="n">exp</span><span class="p">(</span><span class="n">zⱼ</span><span class="p">)</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="n">ₖ</span>
+</pre></div>
+</div>
+<p>This is the <strong>Gumbel-Max theorem</strong> - adding Gumbel noise and taking argmax is equivalent to sampling from the softmax distribution.</p>
+</section>
+<section id="gradient-of-softmax">
+<h3>Gradient of Softmax<a class="headerlink" href="#gradient-of-softmax" title="Link to this heading">#</a></h3>
+<p>The softmax function has well-defined gradients:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>∂softmax(z)ᵢ/∂zⱼ = softmax(z)ᵢ * (δᵢⱼ - softmax(z)ⱼ)
+</pre></div>
+</div>
+<p>This allows gradients to flow through the Gumbel-Softmax operation.</p>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Jang, E., Gu, S., &amp; Poole, B. (2017). Categorical Reparameterization with Gumbel-Softmax. ICLR.</p></li>
+<li><p>Maddison, C. J., Mnih, A., &amp; Teh, Y. W. (2017). The Concrete Distribution. ICLR.</p></li>
+<li><p>Bengio, Y., Léonard, N., &amp; Courville, A. (2013). Estimating or Propagating Gradients Through Stochastic Neurons. arXiv.</p></li>
+</ul>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_jax_models.html"><span class="std std-doc">Writing JAX Models</span></a> - Practical guide to implementing new models</p></li>
+<li><p><a class="reference internal" href="jax_fundamentals.html"><span class="std std-doc">JAX Fundamentals</span></a> - Core JAX concepts</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="model_structure.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Model Structure in emidm</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="writing_jax_models.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Writing JAX Models for emidm</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-discrete-operations-break-gradients">The Problem: Discrete Operations Break Gradients</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-gumbel-softmax-concrete-distribution">The Solution: Gumbel-Softmax (Concrete Distribution)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-categorical-sampling-works">How Categorical Sampling Works</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gumbel-max-trick">The Gumbel-Max Trick</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gumbel-softmax-trick">The Gumbel-Softmax Trick</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-straight-through-estimator">The Straight-Through Estimator</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#in-emidm">In emidm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-to-epidemiological-transitions">Applying to Epidemiological Transitions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge">The Challenge</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-one-hot-state-representation">The Solution: One-Hot State Representation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transition-matrices">Transition Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complete-example-differentiable-sir-step">Complete Example: Differentiable SIR Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-flow-visualization">Gradient Flow Visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-vs-inference">Training vs Inference</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-annealing">Temperature Annealing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-takeaways">Key Takeaways</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-details">Mathematical Details</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gumbel-distribution">Gumbel Distribution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-gumbel-max-works">Why Gumbel-Max Works</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-of-softmax">Gradient of Softmax</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/end_to_end_differentiability.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
