@@ -216,9 +216,8 @@
    "outputs": [],
    "source": [
     "# Imports from our own package\n",
-    "from emidm.sir import run_sir_simulation\n",
+    "from emidm import run_sir_simulation, to_dataframe\n",
     "from emidm.sampler import generate_lhs_samples\n",
-    "from emidm import to_dataframe\n",
     "\n",
     "# imports of other common packages\n",
     "import pandas as pd\n",
@@ -1057,7 +1056,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
+   "execution_count": null,
    "metadata": {
     "execution": {
      "iopub.execute_input": "2025-12-13T11:07:11.607967Z",
@@ -1070,7 +1069,7 @@
    "outputs": [],
    "source": [
     "class SIRTimeSeriesDataset(Dataset):\n",
-    "    def __init__(self, dataframe, features=['beta', 'gamma'], targets=['S', 'I']):\n",
+    "    def __init__(self, dataframe, features=['beta', 'gamma'], targets=['S', 'I'], N=1000):\n",
     "        self.features = features\n",
     "        self.targets = targets\n",
     "\n",
@@ -1082,7 +1081,7 @@
     "        # Extract timepoints (assuming they're the same for all parameter sets)\n",
     "        self.timepoints = dataframe['t'].unique()\n",
     "        self.time_length = len(self.timepoints)\n",
-    "        self.N = dataframe['N'].iloc[0]\n",
+    "        self.N = N  # Population size passed as parameter\n",
     "\n",
     "        # Create samples\n",
     "        self.samples = []\n",
