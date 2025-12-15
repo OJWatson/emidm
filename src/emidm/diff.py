@@ -503,9 +503,8 @@ def run_diff_safir(
     T: int = 200,
     dt: float = 0.1,
     seed: int = 0,
-    tau: float = 0.1,
-    hard: bool = True,
-    n_seed: int = 10,
+    config: DiffConfig = DiffConfig(),
+    I0: int = 10,
     prob_hosp=None,
     prob_asymp: float = 0.3,
     prob_non_sev_death=None,
@@ -539,12 +538,10 @@ def run_diff_safir(
         Sub-daily time step (must evenly divide 1 day).
     seed : int, default 0
         Random seed for reproducibility.
-    tau : float, default 0.1
-        Gumbel-Softmax temperature parameter.
-    hard : bool, default True
-        Whether to use straight-through gradient estimator.
-    n_seed : int, default 10
-        Number of initial infections to seed.
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard).
+    I0 : int, default 10
+        Initial number of infected individuals.
     prob_hosp : array-like, optional
         Age-specific probability of hospitalization given infection.
     prob_asymp : float, default 0.3
@@ -663,9 +660,9 @@ def run_diff_safir(
     num_states = 8
     state0 = jax.nn.one_hot(
         jnp.zeros((N,), dtype=jnp.int32), num_states).astype(jnp.float32)
-    n_seed_eff = min(int(n_seed), N)
+    I0_eff = min(int(I0), N)
     key, k_seed = jax.random.split(key)
-    seed_idx = jax.random.choice(k_seed, N, shape=(n_seed_eff,), replace=False)
+    seed_idx = jax.random.choice(k_seed, N, shape=(I0_eff,), replace=False)
     state0 = state0.at[seed_idx, 0].set(
         0.0).at[seed_idx, 1].set(1.0)  # S=0, E1=1
 
@@ -698,8 +695,8 @@ def run_diff_safir(
         p_Imild=p_Imild,
         p_Icase=p_Icase,
         dt=dt_float,
-        tau=tau,
-        hard=hard,
+        tau=config.tau,
+        hard=config.hard,
         steps_per_day=steps_per_day,
         n_age=n_age,
         N=N,
@@ -724,9 +721,8 @@ def make_diff_safir_model(
     T: int = 200,
     dt: float = 0.1,
     seed: int = 0,
-    tau: float = 0.1,
-    hard: bool = True,
-    n_seed: int = 10,
+    config: DiffConfig = DiffConfig(),
+    I0: int = 10,
     prob_hosp=None,
     prob_asymp: float = 0.3,
     prob_non_sev_death=None,
@@ -757,12 +753,10 @@ def make_diff_safir_model(
         Sub-daily time step (must evenly divide 1 day).
     seed : int, default 0
         Random seed for reproducibility.
-    tau : float, default 0.1
-        Gumbel-Softmax temperature parameter.
-    hard : bool, default True
-        Whether to use straight-through gradient estimator.
-    n_seed : int, default 10
-        Number of initial infections to seed.
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard).
+    I0 : int, default 10
+        Initial number of infected individuals.
     prob_hosp : array-like, optional
         Age-specific probability of hospitalization.
     prob_asymp : float, default 0.3
@@ -881,9 +875,9 @@ def make_diff_safir_model(
     num_states = 8
     state0 = jax.nn.one_hot(
         jnp.zeros((N,), dtype=jnp.int32), num_states).astype(jnp.float32)
-    n_seed_eff = min(int(n_seed), N)
+    I0_eff = min(int(I0), N)
     key, k_seed = jax.random.split(key)
-    seed_idx = jax.random.choice(k_seed, N, shape=(n_seed_eff,), replace=False)
+    seed_idx = jax.random.choice(k_seed, N, shape=(I0_eff,), replace=False)
     state0 = state0.at[seed_idx, 0].set(0.0).at[seed_idx, 1].set(1.0)
 
     # Precompute transition probabilities
@@ -922,8 +916,8 @@ def make_diff_safir_model(
             p_Imild=p_Imild,
             p_Icase=p_Icase,
             dt=dt_float,
-            tau=tau,
-            hard=hard,
+            tau=config.tau,
+            hard=config.hard,
             steps_per_day=steps_per_day,
             n_age=n_age,
             N=N,
@@ -952,9 +946,8 @@ def run_diff_safir_replicates(
     dt: float = 0.1,
     seed: int = 0,
     reps: int = 10,
-    tau: float = 0.1,
-    hard: bool = True,
-    n_seed: int = 10,
+    config: DiffConfig = DiffConfig(),
+    I0: int = 10,
     prob_hosp=None,
     prob_asymp: float = 0.3,
     prob_non_sev_death=None,
@@ -989,12 +982,10 @@ def run_diff_safir_replicates(
         Random seed for reproducibility.
     reps : int, default 10
         Number of replicates to run.
-    tau : float, default 0.1
-        Gumbel-Softmax temperature parameter.
-    hard : bool, default True
-        Whether to use straight-through gradient estimator.
-    n_seed : int, default 10
-        Number of initial infections to seed.
+    config : DiffConfig, default DiffConfig()
+        Configuration for Gumbel-Softmax (tau, hard).
+    I0 : int, default 10
+        Initial number of infected individuals.
     prob_hosp : array-like, optional
         Age-specific probability of hospitalization.
     prob_asymp : float, default 0.3
@@ -1052,9 +1043,8 @@ def run_diff_safir_replicates(
             T=T,
             dt=dt,
             seed=rep_seed,
-            tau=tau,
-            hard=hard,
-            n_seed=n_seed,
+            config=config,
+            I0=I0,
             prob_hosp=prob_hosp,
             prob_asymp=prob_asymp,
             prob_non_sev_death=prob_non_sev_death,

@@ -9,19 +9,22 @@ from .utils import to_dataframe
 
 # SIR models
 from .sir import (
-    run_sir,
-    run_sir_replicates,
-    simulate_sir,
-    run_model_with_replicates,
-    plot_model_outputs,
+    SIRModel,
+    SIRState,
+    run_sir_simulation,
 )
 
 # SAFIR models
-from .safir import run_safir, run_safir_replicates, simulate_safir
+from .safir import (
+    SAFIRModel,
+    SAFIRState,
+    run_safir_simulation,
+)
 
 # Differentiable models
 from .diff import (
     DiffConfig,
+    make_diff_safir_model,
     run_diff_safir,
     run_diff_safir_replicates,
     run_diff_sir,
@@ -62,17 +65,16 @@ __all__ = [
     # Utilities
     "to_dataframe",
     # SIR models
-    "run_sir",
-    "run_sir_replicates",
-    "simulate_sir",
-    "run_model_with_replicates",
-    "plot_model_outputs",
+    "SIRModel",
+    "SIRState",
+    "run_sir_simulation",
     # SAFIR models
-    "run_safir",
-    "run_safir_replicates",
-    "simulate_safir",
+    "SAFIRModel",
+    "SAFIRState",
+    "run_safir_simulation",
     # Differentiable models
     "DiffConfig",
+    "make_diff_safir_model",
     "run_diff_sir",
     "run_diff_sir_replicates",
     "run_diff_safir",

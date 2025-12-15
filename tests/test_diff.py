@@ -26,8 +26,8 @@ def test_run_diff_safir_shapes_and_conservation():
         T=10,
         dt=0.5,
         seed=0,
-        n_seed=4,
-        tau=0.7,
+        I0=4,
+        config=DiffConfig(tau=0.7),
     )
     totals = out["S"] + out["E"] + out["I"] + out["R"] + out["D"]
     assert jax.numpy.all(totals == sum(map(int, population)))
@@ -148,8 +148,8 @@ def test_time_varying_rt_diff_safir():
         T=T,
         dt=0.5,
         seed=42,
-        n_seed=5,
-        tau=0.5,
+        I0=5,
+        config=DiffConfig(tau=0.5),
     )
 
     assert out["t"].shape[0] == T + 1
@@ -172,7 +172,7 @@ def test_run_diff_safir_replicates_shape():
         dt=0.5,
         seed=0,
         reps=3,
-        tau=0.5,
+        config=DiffConfig(tau=0.5),
     )
 
     assert out["t"].shape == (11,)

@@ -6,10 +6,10 @@ import pytest
 
 def test_plot_sir_with_dict():
     """Test plot_sir accepts dict input."""
-    from emidm import run_sir
+    from emidm import run_sir_simulation
     from emidm.plotting import plot_sir
 
-    result = run_sir(N=100, I0=5, T=20, seed=0)
+    result = run_sir_simulation(N=100, I0=5, T=20, seed=0)
     fig, ax = plot_sir(result)
     assert fig is not None
     assert ax is not None
@@ -17,10 +17,10 @@ def test_plot_sir_with_dict():
 
 def test_plot_sir_with_dataframe():
     """Test plot_sir accepts DataFrame input."""
-    from emidm import run_sir, to_dataframe
+    from emidm import run_sir_simulation, to_dataframe
     from emidm.plotting import plot_sir
 
-    result = run_sir(N=100, I0=5, T=20, seed=0)
+    result = run_sir_simulation(N=100, I0=5, T=20, seed=0)
     df = to_dataframe(result)
     fig, ax = plot_sir(df)
     assert fig is not None
@@ -29,13 +29,13 @@ def test_plot_sir_with_dataframe():
 
 def test_plot_safir_with_dict():
     """Test plot_safir accepts dict input."""
-    from emidm import run_safir
+    from emidm import run_safir_simulation
     from emidm.plotting import plot_safir
 
     population = np.array([500, 500])
     contact_matrix = np.array([[3.0, 1.0], [1.0, 2.0]])
-    result = run_safir(population=population,
-                       contact_matrix=contact_matrix, T=20, seed=0)
+    result = run_safir_simulation(population=population,
+                                  contact_matrix=contact_matrix, T=20, seed=0)
     fig, ax = plot_safir(result)
     assert fig is not None
     assert ax is not None
@@ -43,10 +43,11 @@ def test_plot_safir_with_dict():
 
 def test_plot_replicates():
     """Test plot_replicates with replicate data."""
-    from emidm import run_model_with_replicates, run_sir
+    from emidm import run_sir_simulation, to_dataframe
     from emidm.plotting import plot_replicates
 
-    df = run_model_with_replicates(model=run_sir, reps=3, N=100, I0=5, T=20)
+    result = run_sir_simulation(reps=3, N=100, I0=5, T=20, seed=0)
+    df = to_dataframe(result)
     fig, ax = plot_replicates(df, compartment="I")
     assert fig is not None
     assert ax is not None
@@ -127,7 +128,7 @@ def test_to_dataframe_with_replicates():
 )
 def test_sir_facet_plot():
     """Test sir_facet_plot creates a plotnine plot."""
-    from emidm import run_model_with_replicates, run_sir
+    from emidm import run_sir_simulation, to_dataframe
     from emidm.plotting import sir_facet_plot
     from emidm.sampler import generate_lhs_samples
     import pandas as pd
@@ -135,11 +136,14 @@ def test_sir_facet_plot():
     # Generate small sample
     samples = generate_lhs_samples(
         {"beta": [0.1, 0.3], "gamma": [0.05, 0.15]}, n_samples=2, seed=0)
-    results = [
-        run_model_with_replicates(
-            model=run_sir, reps=2, N=100, T=10, **row.to_dict()).assign(**row.to_dict())
-        for _, row in samples.iterrows()
-    ]
+    results = []
+    for _, row in samples.iterrows():
+        result = run_sir_simulation(
+            reps=2, N=100, T=10, seed=0, **row.to_dict())
+        df = to_dataframe(result)
+        for col, val in row.items():
+            df[col] = val
+        results.append(df)
     df = pd.concat(results)
 
     plot = sir_facet_plot(df, facet_by=["beta"])

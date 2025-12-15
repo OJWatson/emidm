@@ -56,8 +56,8 @@ def test_get_model_info_returns_model_info():
     assert "S" in info.compartments
     assert "I" in info.compartments
     assert "R" in info.compartments
-    assert info.has_replicates is True
-    assert info.replicate_func is not None
+    # run_sir_simulation handles replicates via reps parameter directly
+    assert callable(info.func)
 
 
 def test_model_summary_returns_string():
