@@ -8,6 +8,7 @@
 
    .. autosummary::
    
+      make_diff_safir_model
       run_diff_safir
       run_diff_safir_replicates
       run_diff_sir

@@ -417,7 +417,6 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiffConfig</span><span class="p">,</span> <span class="n">run_diff_sir</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">emidm.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_params</span>
 
@@ -428,8 +427,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JAX backend: cpu
-JAX devices: [CpuDevice(id=0)]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JAX backend: gpu
+JAX devices: [cuda(id=0)]
 </pre></div>
 </div>
 </div>
@@ -449,20 +448,20 @@ JAX devices: [CpuDevice(id=0)]
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># True parameters</span>
 <span class="n">BETA_TRUE</span> <span class="o">=</span> <span class="mf">0.35</span>
 <span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.2</span>
-<span class="n">N_AGENTS</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2000</span>
 <span class="n">T</span> <span class="o">=</span> <span class="mi">80</span>
 <span class="n">I0</span> <span class="o">=</span> <span class="mi">5</span>
 
 <span class="c1"># Generate synthetic data</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">run_diff_sir</span><span class="p">(</span>
-    <span class="n">N_agents</span><span class="o">=</span><span class="n">N_AGENTS</span><span class="p">,</span>
+    <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
     <span class="n">I0</span><span class="o">=</span><span class="n">I0</span><span class="p">,</span>
     <span class="n">beta</span><span class="o">=</span><span class="n">BETA_TRUE</span><span class="p">,</span>
     <span class="n">gamma</span><span class="o">=</span><span class="n">GAMMA</span><span class="p">,</span>
     <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">DiffConfig</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">hard</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated epidemic with β = </span><span class="si">{</span><span class="n">BETA_TRUE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -471,6 +470,9 @@ JAX devices: [CpuDevice(id=0)]
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-12-15 06:39:05.875342: W external/xla/xla/service/gpu/nvptx_compiler.cc:765] The NVIDIA driver&#39;s CUDA version is 12.4 which is older than the ptxas CUDA version (12.9.86). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
+</pre></div>
+</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generated epidemic with β = 0.35
 Peak infections: 290 at day 35
 </pre></div>
@@ -508,22 +510,24 @@ Peak infections: 290 at day 35
 <span class="k">def</span><span class="w"> </span><span class="nf">loss_fn</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute MSE averaged over multiple replicates for robust optimization.&quot;&quot;&quot;</span>
     <span class="n">beta_seq</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span>
-    
+
     <span class="c1"># Run all replicates in parallel using vmap</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">run_one</span><span class="p">(</span><span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">totals</span> <span class="o">=</span> <span class="n">_run_diff_sir_core</span><span class="p">(</span>
             <span class="n">beta_seq</span><span class="p">,</span> <span class="n">state0</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">GAMMA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">TAU</span><span class="p">,</span> <span class="kc">False</span>  <span class="c1"># hard=False for gradients</span>
         <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">totals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Return I trajectory</span>
-    
     <span class="n">all_I</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">run_one</span><span class="p">)(</span><span class="n">states0</span><span class="p">,</span> <span class="n">run_keys</span><span class="p">)</span>
-    
+
     <span class="c1"># Average MSE across replicates</span>
     <span class="n">mse_per_rep</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">all_I</span> <span class="o">-</span> <span class="n">observed_I</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mse_per_rep</span><span class="p">)</span>
 
 <span class="c1"># Test and compile the loss function</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compiling loss function...&quot;</span><span class="p">)</span>
+
 <span class="n">test_beta</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.15</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss at β = 0.15: </span><span class="si">{</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss at β = 0.35 (true): </span><span class="si">{</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BETA_TRUE</span><span class="p">))</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -532,12 +536,8 @@ Peak infections: 290 at day 35
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Compiling loss function...
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss at β = 0.15: 19541.59
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss at β = 0.35 (true): 2451.22
+Loss at β = 0.15: 19541.65
+Loss at β = 0.35 (true): 2451.31
 </pre></div>
 </div>
 </div>
@@ -601,14 +601,13 @@ Peak infections: 290 at day 35
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Parameter Trajectory&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/498af9f943f5a0b9da0bec030c3dccb00cc246947c84cda443bc321f051578de.png" src="../_images/498af9f943f5a0b9da0bec030c3dccb00cc246947c84cda443bc321f051578de.png" />
+<img alt="../_images/5053faab4a6919e3eca8a61dd8e59b695e5f79ece77f31a74ce1ba597647cd01.png" src="../_images/5053faab4a6919e3eca8a61dd8e59b695e5f79ece77f31a74ce1ba597647cd01.png" />
 </div>
 </div>
 </section>
@@ -645,7 +644,6 @@ Peak infections: 290 at day 35
 
 <span class="c1"># Plot comparison</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-
 <span class="n">t</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Plot replicates with transparency</span>
@@ -661,21 +659,19 @@ Peak infections: 290 at day 35
 
 <span class="c1"># Plot observed data</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">observed_I</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observed (true)&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (days)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number infected&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Model Calibration: Fitted vs True Infection Curve&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
-
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/4eeb57ae776a5b8559712a3e10a8ecd54e61e3bb40242dc101745c981881924c.png" src="../_images/4eeb57ae776a5b8559712a3e10a8ecd54e61e3bb40242dc101745c981881924c.png" />
+<img alt="../_images/5f4f1a99ddfde00e5c5f4d120c40180f6fbb70ad6cb205ae43b22036831604b1.png" src="../_images/5f4f1a99ddfde00e5c5f4d120c40180f6fbb70ad6cb205ae43b22036831604b1.png" />
 </div>
 </div>
 </section>
