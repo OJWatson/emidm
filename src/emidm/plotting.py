@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from .utils import to_dataframe as _to_dataframe_util
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
@@ -35,16 +37,9 @@ def _to_dataframe(data, model_type: str = "sir") -> pd.DataFrame:
     if isinstance(data, pd.DataFrame):
         return data.copy()
 
-    # Convert dict (from JAX models) to DataFrame
+    # Use the centralized to_dataframe utility
     if isinstance(data, dict):
-        # Try to convert JAX arrays to numpy
-        result = {}
-        for k, v in data.items():
-            try:
-                result[k] = np.asarray(v)
-            except Exception:
-                result[k] = v
-        return pd.DataFrame(result)
+        return _to_dataframe_util(data, include_replicate=False)
 
     raise TypeError(f"Expected dict or DataFrame, got {type(data)}")
 

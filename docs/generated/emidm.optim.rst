@@ -8,6 +8,7 @@
 
    .. autosummary::
    
+      binomial_nll
       gaussian_nll
       make_sir_loss
       mse_loss

@@ -39,13 +39,9 @@ jobs:
         run: |
           mkdir -p docs/_build/html/slides
 
-          # Quarto (website project) writes outputs under _site/
-          cp -r _site/slides/emidm_intro1.html docs/_build/html/slides/
-          if [ -d _site/slides/emidm_intro1_files ]; then cp -r _site/slides/emidm_intro1_files docs/_build/html/slides/; fi
-
-          # Shared Quarto assets (JS/CSS) for slides
-          if [ -d _site/site_libs ]; then cp -r _site/site_libs docs/_build/html/; fi
-          if [ -f _site/styles.css ]; then cp -r _site/styles.css docs/_build/html/; fi
+          # Without _quarto.yml, Quarto outputs directly to slides/
+          cp -r slides/emidm_intro1.html docs/_build/html/slides/
+          if [ -d slides/emidm_intro1_files ]; then cp -r slides/emidm_intro1_files docs/_build/html/slides/; fi
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4

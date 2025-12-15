@@ -19,21 +19,23 @@ Quick Example
 
 .. code-block:: python
 
-   from emidm import simulate_sir
+   from emidm import run_sir_simulation, to_dataframe
    
    # Run a basic SIR simulation
-   results = simulate_sir(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
-   print(results[["t", "S", "I", "R"]].head())
+   results = run_sir_simulation(N=10000, I0=10, beta=0.3, gamma=0.1, T=100)
+   df = to_dataframe(results)
+   print(df[["t", "S", "I", "R"]].head())
 
 For differentiable models and gradient-based calibration:
 
 .. code-block:: python
 
    import jax
-   from emidm.diff import run_diff_sir, DiffConfig
+   from emidm import run_diff_sir_simulation, DiffConfig
    from emidm.optim import optimize_params
    
    # Fit parameters using gradients
+   key = jax.random.PRNGKey(0)
    beta_hat, history = optimize_params(
        loss_fn=my_loss_fn,
        init_params=jax.numpy.array(0.15),

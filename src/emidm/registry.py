@@ -250,8 +250,7 @@ def _register_builtin_models():
         category="stochastic",
         description="Stochastic SIR model",
         compartments=["S", "I", "R"],
-        replicate_func=sir.run_sir_replicates,
-    )(sir.run_sir)
+    )(sir.run_sir_simulation)
 
     # Stochastic SAFIR
     register_model(
@@ -259,8 +258,7 @@ def _register_builtin_models():
         category="stochastic",
         description="Age-structured SAFIR/SEIR model",
         compartments=["S", "E", "I", "R", "D"],
-        replicate_func=safir.run_safir_replicates,
-    )(safir.run_safir)
+    )(safir.run_safir_simulation)
 
     # Differentiable SIR
     register_model(
@@ -268,8 +266,7 @@ def _register_builtin_models():
         category="differentiable",
         description="Differentiable SIR model (JAX/Gumbel-Softmax)",
         compartments=["S", "I", "R"],
-        replicate_func=diff.run_diff_sir_replicates,
-    )(diff.run_diff_sir)
+    )(diff.run_diff_sir_simulation)
 
     # Differentiable SAFIR
     register_model(
@@ -277,8 +274,7 @@ def _register_builtin_models():
         category="differentiable",
         description="Differentiable age-structured SAFIR model (JAX)",
         compartments=["S", "E", "I", "R", "D"],
-        replicate_func=diff.run_diff_safir_replicates,
-    )(diff.run_diff_safir)
+    )(diff.run_diff_safir_simulation)
 
 
 # Register built-in models on import
