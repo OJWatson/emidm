@@ -1,0 +1,16 @@
+﻿emidm.optim
+===========
+
+.. automodule:: emidm.optim
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      gaussian_nll
+      make_sir_loss
+      mse_loss
+      optimize_params
+      poisson_nll
+   
