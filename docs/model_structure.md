@@ -8,8 +8,8 @@ Every differentiable model in `emidm` follows a two-layer pattern:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  User-Facing Function (run_diff_sir)                        │
-│  - Handles seed → key conversion                            │
+│  User-Facing Function (run_diff_sir_simulation)             │
+│  - Accepts JAX PRNGKey for vmap/jit compatibility           │
 │  - Sets up initial state                                    │
 │  - Calls JIT-compiled core                                  │
 │  - Returns user-friendly dict                               │
@@ -36,7 +36,7 @@ Every differentiable model in `emidm` follows a two-layer pattern:
 The user-facing function handles all the "messy" parts that don't need to be JIT-compiled:
 
 ```python
-def run_diff_sir(
+def run_diff_sir_simulation(
     *,
     N: int = 200,
     I0: int = 5,
@@ -44,17 +44,14 @@ def run_diff_sir(
     gamma: float = 0.1,
     T: int = 100,
     dt: float = 1.0,
-    seed: int = 0,
-    tau: float = 0.1,
-    hard: bool = True,
+    key,  # JAX PRNGKey - required for vmap/jit compatibility
+    config: DiffConfig = DiffConfig(),
 ) -> dict:
     """Run a differentiable SIR model simulation."""
     import jax
     import jax.numpy as jnp
     
-    # 1. Convert seed to JAX random key
-    key = jax.random.PRNGKey(seed)
-    
+    # 1. Key is passed directly (enables vmap/jit)
     # 2. Set up initial state
     S0 = jnp.zeros(N).at[0].set(N - I0)  # One-hot encoding
     I0_arr = jnp.zeros(N).at[I0].set(1.0)
@@ -74,7 +71,7 @@ def run_diff_sir(
 
 | Task | Why in Outer Function |
 |------|----------------------|
-| `seed → key` conversion | Keeps API simple (users pass int, not JAX key) |
+| Key validation | Ensures valid JAX PRNGKey is provided |
 | Initial state setup | May involve complex logic not needed in hot loop |
 | Return dict formatting | Converts JAX arrays to user-friendly format |
 | Default parameters | Provides sensible defaults without cluttering core |
@@ -351,8 +348,8 @@ def run_diff_sir(
 ## Design Patterns Summary
 
 | Pattern | Purpose | Example |
-|---------|---------|---------|
-| Two-layer architecture | Separate user API from JIT core | `run_diff_sir` → `_run_diff_sir_core` |
+|---------|---------|--------|
+| Two-layer architecture | Separate user API from JIT core | `run_diff_sir_simulation` → `_run_diff_sir_core` |
 | Static arguments | Enable JIT with dynamic shapes | `static_argnames=["N", "T"]` |
 | `jax.lax.scan` | Differentiable time stepping | `scan(step, init, times)` |
 | One-hot encoding | Enable Gumbel-Softmax sampling | `S = zeros(N).at[count].set(1.0)` |
